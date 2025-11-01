@@ -289,7 +289,7 @@ export default function RoutingPage() {
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="h-[640px] p-0">
               <RoutingMap allStores={allStores} routeStops={storesToVisit} />
             </CardContent>
           </Card>

@@ -37,10 +37,9 @@ interface RoutingMapProps {
 export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const layersRef = useRef<L.LayerGroup>(new L.LayerGroup());
+  const layersRef = useRef<L.LayerGroup | null>(null);
 
   useEffect(() => {
-    // Initialize map only once
     if (mapContainerRef.current && !mapRef.current) {
       // Fix for icon path issue with Next.js/Webpack
       delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -57,23 +56,20 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      layersRef.current.addTo(map);
+      layersRef.current = new L.LayerGroup().addTo(map);
     }
-  }, []); // Empty dependency array ensures this runs only once
+  }, []); 
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map) return;
+    const layers = layersRef.current;
+    if (!map || !layers) return;
 
-    // Invalidate map size to ensure it fits the container
     map.invalidateSize();
-
-    // Clear previous markers and route line
-    layersRef.current.clearLayers();
+    layers.clearLayers();
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
 
-    // Add markers for all stores
     allStores.forEach(store => {
       const isInRoute = routeStoreIds.has(store.id);
       const icon = isInRoute ? greenIcon : blueIcon;
@@ -86,27 +82,29 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
       L.marker([store.lat, store.lng], { icon })
         .bindPopup(popupText)
-        .addTo(layersRef.current);
+        .addTo(layers);
     });
 
-    // Draw route line if there are stops
     if (routeStops.length > 1) {
       const sortedStops = [...routeStops].sort((a,b) => a.visitOrder - b.visitOrder);
       const latLngs = sortedStops.map(stop => L.latLng(stop.lat, stop.lng));
-      L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
+      L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layers);
     }
 
-    // Fit map to show all stores
     if (routeStops.length > 0) {
       const bounds = L.latLngBounds(routeStops.map(stop => [stop.lat, stop.lng]));
-      map.fitBounds(bounds, { padding: [50, 50] });
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
     } else if (allStores.length > 0) {
       const bounds = L.latLngBounds(allStores.map(store => [store.lat, store.lng]));
-      map.fitBounds(bounds, { padding: [50, 50] });
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
     } else {
       map.setView([-22.8, -47.2], 9);
     }
-  }, [allStores, routeStops]); // Re-run this effect when data changes
+  }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', borderRadius: 'var(--radius)' }} />;
+  return <div ref={mapContainerRef} className="h-full w-full rounded-md" />;
 }
