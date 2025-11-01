@@ -122,5 +122,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     }
   }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
+  return <div ref={mapContainerRef} style={{ height: '640px', width: '100%' }} />;
 }
+
+    

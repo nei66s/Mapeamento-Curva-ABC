@@ -348,12 +348,12 @@ export default function RoutingPage() {
         </div>
 
         <div className="lg:col-span-2">
-           <Card className="min-h-[720px] flex flex-col">
+           <Card>
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 p-0">
+            <CardContent>
               <RoutingMap allStores={allStores} routeStops={fullRouteForMap} />
             </CardContent>
           </Card>
@@ -362,3 +362,5 @@ export default function RoutingPage() {
     </div>
   );
 }
+
+    
