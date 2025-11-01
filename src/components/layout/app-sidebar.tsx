@@ -1,11 +1,5 @@
 import Link from "next/link";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   BarChart3,
   LayoutDashboard,
   Grid3x3,
@@ -15,107 +9,52 @@ import {
   CalendarCheck,
   ClipboardCheck,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const navLinks = [
+    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
+    { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
+    { href: "/dashboard/incidents", icon: ShieldAlert, label: "Incidentes" },
+    { href: "/dashboard/preventive", icon: CalendarCheck, label: "Preventivas" },
+    { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Conformidade" },
+];
 
 export default function AppSidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-card sm:flex">
-      <TooltipProvider>
-        <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
-          <Link
-            href="/dashboard"
-            className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
-          >
-            <BarChart3 className="h-4 w-4 transition-all group-hover:scale-110" />
-            <span className="sr-only">Curva ABC Pro</span>
-          </Link>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/dashboard"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <LayoutDashboard className="h-5 w-5" />
-                <span className="sr-only">Dashboard</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Dashboard</TooltipContent>
-          </Tooltip>
-           <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/dashboard/categories"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <ListCollapse className="h-5 w-5" />
-                <span className="sr-only">Categorias</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Categorias</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/dashboard/matrix"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <Grid3x3 className="h-5 w-5" />
-                <span className="sr-only">Matriz de Itens</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Matriz de Itens</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/dashboard/incidents"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <ShieldAlert className="h-5 w-5" />
-                <span className="sr-only">Incidentes</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Incidentes</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/dashboard/preventive"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <CalendarCheck className="h-5 w-5" />
-                <span className="sr-only">Preventivas</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Preventivas</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/dashboard/compliance"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <ClipboardCheck className="h-5 w-5" />
-                <span className="sr-only">Conformidade</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Conformidade</TooltipContent>
-          </Tooltip>
-        </nav>
-        <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/dashboard/admin"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <Settings className="h-5 w-5" />
-                <span className="sr-only">Administração</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Administração</TooltipContent>
-          </Tooltip>
-        </nav>
-      </TooltipProvider>
+    <aside className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-card sm:flex">
+      <nav className="flex flex-col gap-4 px-4 sm:py-5">
+        <Link
+          href="/dashboard"
+          className="group flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-lg font-semibold text-primary md:text-base"
+        >
+          <BarChart3 className="h-5 w-5 text-primary transition-all group-hover:scale-110" />
+          <span className="font-bold text-xl text-primary">Curva ABC Pro</span>
+        </Link>
+        {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+              )}
+            >
+              <link.icon className="h-5 w-5" />
+              {link.label}
+            </Link>
+        ))}
+      </nav>
+      <nav className="mt-auto flex flex-col items-center gap-4 px-4 sm:py-5">
+         <Link
+            href="/dashboard/admin"
+            className={cn(
+                "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+            )}
+            >
+            <Settings className="h-5 w-5" />
+            Administração
+        </Link>
+      </nav>
     </aside>
   );
 }
