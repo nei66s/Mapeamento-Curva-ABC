@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Trash2, GripVertical, Sparkles, AlertCircle } from 'lucide-react';
+import { Trash2, GripVertical, Sparkles, AlertCircle } from 'lucide-react';
 import { allStores } from '@/lib/mock-data';
 import { mockTeams } from '@/lib/teams';
 import type { Store, Team, RouteStop } from '@/lib/types';
@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />,
+  loading: () => <Skeleton className="h-[600px] w-full" />,
 });
 
 
@@ -284,12 +284,12 @@ export default function RoutingPage() {
         </div>
 
         <div className="lg:col-span-2">
-           <Card className="h-full min-h-[600px]">
+           <Card className="h-full min-h-[720px]">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent className="h-[calc(100%-80px)]">
+            <CardContent>
               <RoutingMap allStores={allStores} routeStops={storesToVisit} />
             </CardContent>
           </Card>

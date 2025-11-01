@@ -6,11 +6,10 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Store, RouteStop } from '@/lib/types';
 
-// Import marker icons
+// Correctly import marker icons
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-
 
 const blueIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
@@ -35,21 +34,21 @@ interface RoutingMapProps {
   routeStops: RouteStop[];
 }
 
-
 export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layersRef = useRef<L.LayerGroup>(new L.LayerGroup());
 
   useEffect(() => {
+    // Initialize map only once
     if (mapContainerRef.current && !mapRef.current) {
-        // Fix for icon path issue with Next.js
-        delete (L.Icon.Default.prototype as any)._getIconUrl;
-        L.Icon.Default.mergeOptions({
-            iconRetinaUrl: iconRetinaUrl.src,
-            iconUrl: iconUrl.src,
-            shadowUrl: shadowUrl.src,
-        });
+      // Fix for icon path issue with Next.js/Webpack
+      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: iconRetinaUrl.src,
+        iconUrl: iconUrl.src,
+        shadowUrl: shadowUrl.src,
+      });
 
       const map = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
       mapRef.current = map;
@@ -60,11 +59,14 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
       layersRef.current.addTo(map);
     }
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+
+    // Invalidate map size to ensure it fits the container
+    map.invalidateSize();
 
     // Clear previous markers and route line
     layersRef.current.clearLayers();
@@ -86,7 +88,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         .bindPopup(popupText)
         .addTo(layersRef.current);
     });
-    
+
     // Draw route line if there are stops
     if (routeStops.length > 1) {
       const sortedStops = [...routeStops].sort((a,b) => a.visitOrder - b.visitOrder);
@@ -94,19 +96,19 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
     }
 
-    // Fit map to show all stores if there are stops
+    // Fit map to show all stores
     if (routeStops.length > 0) {
       const bounds = L.latLngBounds(routeStops.map(stop => [stop.lat, stop.lng]));
       map.fitBounds(bounds, { padding: [50, 50] });
     } else if (allStores.length > 0) {
-        const bounds = L.latLngBounds(allStores.map(store => [store.lat, store.lng]));
-        map.fitBounds(bounds, { padding: [50, 50] });
+      const bounds = L.latLngBounds(allStores.map(store => [store.lat, store.lng]));
+      map.fitBounds(bounds, { padding: [50, 50] });
     } else {
-        map.setView([-22.8, -47.2], 9);
+      map.setView([-22.8, -47.2], 9);
     }
-
-
-  }, [allStores, routeStops]);
+  }, [allStores, routeStops]); // Re-run this effect when data changes
 
   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', borderRadius: 'var(--radius)' }} />;
 }
+
+    
