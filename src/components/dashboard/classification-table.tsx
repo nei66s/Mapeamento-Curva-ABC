@@ -30,7 +30,7 @@ export function ClassificationTable() {
       <CardHeader>
         <CardTitle>Ranking de Categorias</CardTitle>
         <CardDescription>
-          Lista de todas as categorias e sua classificação de risco.
+          Lista de todas as categorias e sua classificação de criticidade.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -39,7 +39,7 @@ export function ClassificationTable() {
             <TableRow>
               <TableHead>Categoria</TableHead>
               <TableHead className="hidden sm:table-cell text-center">Qtd. Itens</TableHead>
-              <TableHead className="hidden md:table-cell">Índice de Risco</TableHead>
+              <TableHead className="hidden md:table-cell">Criticidade Média</TableHead>
               <TableHead className="text-right">Classificação</TableHead>
             </TableRow>
           </TableHeader>

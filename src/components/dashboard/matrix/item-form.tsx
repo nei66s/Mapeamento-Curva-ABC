@@ -21,7 +21,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import type { Item, Category } from '@/lib/types';
+import type { Item, Category, Classification } from '@/lib/types';
+import { impactFactors } from '@/lib/impact-factors';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useEffect } from 'react';
+import { Separator } from '@/components/ui/separator';
+import { ClassificationBadge } from '@/components/shared/risk-badge';
 
 interface ItemFormProps {
   item?: Item | null;
@@ -34,8 +39,9 @@ const formSchema = z.object({
   name: z.string().min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
   category: z.string().min(1, { message: 'Por favor, selecione uma categoria.' }),
   storeCount: z.coerce.number().int().min(0, { message: 'A quantidade de lojas deve ser um número positivo.' }),
-  generalIndex: z.coerce.number().int().min(1, 'O índice deve ser no mínimo 1.').max(10, 'O índice deve ser no máximo 10.'),
-  classification: z.enum(['A', 'B', 'C']),
+  impactFactors: z.array(z.string()).refine(value => value.some(item => item), {
+    message: "Você deve selecionar ao menos um fator de impacto.",
+  }),
   status: z.enum(['online', 'offline', 'maintenance']),
   leadTime: z.string().min(1, { message: 'O lead time é obrigatório.' }),
   contingencyPlan: z.string().min(10, { message: 'O plano de contingência deve ter pelo menos 10 caracteres.' }),
@@ -43,7 +49,18 @@ const formSchema = z.object({
   id: z.string().optional(),
 });
 
-type ItemFormData = z.infer<typeof formSchema>;
+type ItemFormData = Omit<z.infer<typeof formSchema>, 'classification'>;
+
+
+const calculateClassification = (impacts: string[]): Classification => {
+  if (impacts.includes('safety') || impacts.includes('sales')) {
+    return 'A';
+  }
+  if (impacts.includes('legal') || impacts.includes('brand')) {
+    return 'B';
+  }
+  return 'C';
+};
 
 export function ItemForm({ item, categories, onSubmit, onCancel }: ItemFormProps) {
   const form = useForm<ItemFormData>({
@@ -52,8 +69,7 @@ export function ItemForm({ item, categories, onSubmit, onCancel }: ItemFormProps
       name: item?.name || '',
       category: item?.category || '',
       storeCount: item?.storeCount || 0,
-      generalIndex: item?.generalIndex || 5,
-      classification: item?.classification || 'C',
+      impactFactors: item?.impactFactors || [],
       status: item?.status || 'online',
       leadTime: item?.leadTime || '',
       contingencyPlan: item?.contingencyPlan || '',
@@ -62,13 +78,34 @@ export function ItemForm({ item, categories, onSubmit, onCancel }: ItemFormProps
     },
   });
 
+  const watchedImpactFactors = form.watch('impactFactors', item?.impactFactors || []);
+  const calculatedClassification = calculateClassification(watchedImpactFactors);
+
   const handleSubmit = (data: ItemFormData) => {
-    onSubmit(data as Item);
+    const finalItem: Item = {
+      ...data,
+      classification: calculatedClassification,
+    };
+    onSubmit(finalItem);
   };
+  
+  useEffect(() => {
+    form.reset({
+      name: item?.name || '',
+      category: item?.category || '',
+      storeCount: item?.storeCount || 0,
+      impactFactors: item?.impactFactors || [],
+      status: item?.status || 'online',
+      leadTime: item?.leadTime || '',
+      contingencyPlan: item?.contingencyPlan || '',
+      imageUrl: item?.imageUrl || '',
+      id: item?.id || '',
+    });
+  }, [item, form]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-4 py-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -121,54 +158,16 @@ export function ItemForm({ item, categories, onSubmit, onCancel }: ItemFormProps
           )}
         />
         <div className="grid grid-cols-2 gap-4">
-            <FormField
+          <FormField
             control={form.control}
             name="storeCount"
             render={({ field }) => (
-                <FormItem>
-                <FormLabel>Qtd. Lojas</FormLabel>
-                <FormControl>
-                    <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-            <FormField
-            control={form.control}
-            name="generalIndex"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Índice Geral</FormLabel>
-                <FormControl>
-                    <Input type="number" min="1" max="10" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
-            />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="classification"
-            render={({ field }) => (
               <FormItem>
-                <FormLabel>Classificação</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a classificação" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="A">A - Mais Valiosos</SelectItem>
-                    <SelectItem value="B">B - Valor Intermediário</SelectItem>
-                    <SelectItem value="C">C - Menos Valiosos</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
+              <FormLabel>Qtd. Lojas</FormLabel>
+              <FormControl>
+                  <Input type="number" {...field} />
+              </FormControl>
+              <FormMessage />
               </FormItem>
             )}
           />
@@ -187,6 +186,64 @@ export function ItemForm({ item, categories, onSubmit, onCancel }: ItemFormProps
           />
         </div>
 
+        <Separator />
+        
+        <div>
+          <div className="mb-4">
+            <FormLabel>Fatores de Impacto Operacional</FormLabel>
+            <p className="text-sm text-muted-foreground">Selecione os impactos que a falha deste item pode causar.</p>
+          </div>
+          <FormField
+            control={form.control}
+            name="impactFactors"
+            render={() => (
+              <FormItem className="grid grid-cols-2 gap-4">
+                {impactFactors.map((factor) => (
+                  <FormField
+                    key={factor.id}
+                    control={form.control}
+                    name="impactFactors"
+                    render={({ field }) => {
+                      return (
+                        <FormItem
+                          key={factor.id}
+                          className="flex flex-row items-start space-x-3 space-y-0"
+                        >
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value?.includes(factor.id)}
+                              onCheckedChange={(checked) => {
+                                return checked
+                                  ? field.onChange([...field.value, factor.id])
+                                  : field.onChange(
+                                      field.value?.filter(
+                                        (value) => value !== factor.id
+                                      )
+                                    )
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="font-normal">
+                            {factor.label}
+                          </FormLabel>
+                        </FormItem>
+                      )
+                    }}
+                  />
+                ))}
+                 <FormMessage className="col-span-2" />
+              </FormItem>
+            )}
+          />
+        </div>
+        
+        <div className="flex items-center gap-4 rounded-md border bg-muted/50 p-3">
+          <h4 className="font-semibold text-sm">Classificação Automática:</h4>
+          <ClassificationBadge classification={calculatedClassification} />
+        </div>
+
+        <Separator />
+        
         <FormField
           control={form.control}
           name="contingencyPlan"

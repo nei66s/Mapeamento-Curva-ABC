@@ -1,12 +1,26 @@
 import type { Item, Incident, Category } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
+import { impactFactors, ImpactFactor } from './impact-factors';
 
-function getRandomClassification() {
+function getRandomClassification(): Classification {
   const rand = Math.random();
   if (rand < 0.2) return 'A';
   if (rand < 0.5) return 'B';
   return 'C';
 }
+
+function getRandomImpactFactors(): ImpactFactor['id'][] {
+    const factors: ImpactFactor['id'][] = [];
+    const factorCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 factors
+
+    const shuffled = [...impactFactors].sort(() => 0.5 - Math.random());
+    
+    for (let i = 0; i < factorCount; i++) {
+        factors.push(shuffled[i].id);
+    }
+    return factors;
+}
+
 
 const contingencyPlans = [
   "Acionar equipe de manutenção interna.", "Contratar serviço de locação de equipamento similar.", "Isolar a área e aguardar o técnico especialista.",
@@ -86,13 +100,22 @@ const itemCategoryMap: Record<string, string> = {
 export const mockItems: Item[] = itemNames.map((name, index) => {
   const imageId = `item-image-${(index % 5) + 1}`;
   const image = PlaceHolderImages.find(img => img.id === imageId);
+  const impactFactors = getRandomImpactFactors();
+  
+  let classification: Classification = 'C';
+  if (impactFactors.includes('safety') || impactFactors.includes('sales')) {
+    classification = 'A';
+  } else if (impactFactors.includes('legal') || impactFactors.includes('brand')) {
+    classification = 'B';
+  }
+
   return {
     id: `ITM-${String(index + 1).padStart(3, '0')}`,
     name: name,
     category: (itemCategoryMap as Record<string, string>)[name] || "Geral",
-    classification: getRandomClassification(),
+    classification,
     storeCount: Math.floor(Math.random() * 10) + 1,
-    generalIndex: Math.floor(Math.random() * 10) + 1,
+    impactFactors,
     status: Math.random() > 0.8 ? (Math.random() > 0.5 ? 'offline' : 'maintenance') : 'online',
     contingencyPlan: contingencyPlans[Math.floor(Math.random() * contingencyPlans.length)],
     leadTime: leadTimes[Math.floor(Math.random() * leadTimes.length)],
@@ -121,8 +144,15 @@ const rawCategories: Omit<Category, 'itemCount' | 'riskIndex'>[] = [
 export const mockCategories: Category[] = rawCategories.map(category => {
     const itemsInCategory = mockItems.filter(item => item.category === category.name);
     const itemCount = itemsInCategory.length;
-    const totalRisk = itemsInCategory.reduce((acc, item) => acc + item.generalIndex, 0);
-    const riskIndex = itemCount > 0 ? Math.round(totalRisk / itemCount) : 0;
+    
+    // Simplistic risk index based on item classifications within the category
+    const riskScore = itemsInCategory.reduce((acc, item) => {
+        if (item.classification === 'A') return acc + 3;
+        if (item.classification === 'B') return acc + 2;
+        return acc + 1;
+    }, 0);
+
+    const riskIndex = itemCount > 0 ? Math.round((riskScore / (itemCount * 3)) * 10) : 0;
     
     let imageUrl = '';
     switch(category.name) {

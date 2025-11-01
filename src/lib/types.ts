@@ -1,6 +1,7 @@
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
+import type { ImpactFactor } from './impact-factors';
 
 export type Category = {
   id: string;
@@ -18,7 +19,7 @@ export type Item = {
   category: string;
   classification: Classification;
   storeCount: number;
-  generalIndex: number;
+  impactFactors: ImpactFactor['id'][];
   status: 'online' | 'offline' | 'maintenance';
   contingencyPlan: string;
   leadTime: string;
