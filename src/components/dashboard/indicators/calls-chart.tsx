@@ -73,6 +73,7 @@ export function CallsChart({ data }: CallsChartProps) {
                                 const key = name as keyof typeof chartConfig;
                                 const config = chartConfig[key];
                                 if (!config) return null;
+                                
                                 const absValue = Math.abs(Number(value));
                                 return (
                                    <div className="flex items-center gap-2">
@@ -81,6 +82,7 @@ export function CallsChart({ data }: CallsChartProps) {
                                    </div>
                                 )
                             }}
+                            labelFormatter={(label) => new Date(label).toLocaleString('default', { month: 'short' })}
                         />
                     }
                 />
