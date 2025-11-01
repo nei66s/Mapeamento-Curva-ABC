@@ -5,21 +5,10 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import type { Incident } from '@/lib/types';
 
-// This is the correct way to fix the default icon issue with Webpack
+// Import marker icons directly from leaflet
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
-
-const DefaultIcon = L.icon({
-    iconRetinaUrl: iconRetinaUrl.src,
-    iconUrl: iconUrl.src,
-    shadowUrl: shadowUrl.src,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-});
-L.Marker.prototype.options.icon = DefaultIcon;
 
 interface IncidentMapProps {
   incidents: Incident[];
@@ -30,7 +19,17 @@ export default function IncidentMap({ incidents }: IncidentMapProps) {
   const mapRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
-    // Ensure this code only runs in the browser
+    // Set up the default icon paths
+    // This is a common fix for icon issues with webpack/Next.js
+    (L.Icon.Default.prototype as any)._getIconUrl = function() { return '' };
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: iconRetinaUrl.src,
+      iconUrl: iconUrl.src,
+      shadowUrl: shadowUrl.src,
+    });
+
+
+    // Ensure this code only runs in the browser and the map is not already initialized
     if (mapContainerRef.current && !mapRef.current) {
         
         const incidentsWithCoords = incidents.filter(
@@ -69,7 +68,7 @@ export default function IncidentMap({ incidents }: IncidentMapProps) {
         mapRef.current = null;
       }
     };
-  }, [incidents]); // Rerun effect if incidents change (though we might want a more sophisticated update logic later)
+  }, [incidents]);
 
   return (
     <div 
