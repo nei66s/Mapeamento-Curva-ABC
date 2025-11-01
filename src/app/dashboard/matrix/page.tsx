@@ -40,7 +40,7 @@ import { ClassificationBadge } from '@/components/shared/risk-badge';
 import { ItemForm } from '@/components/dashboard/matrix/item-form';
 import { mockItems, mockCategories } from '@/lib/mock-data';
 import type { Item } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Trademark, Wrench } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Landmark, Wrench } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,7 +61,7 @@ const factorIconMap: Record<ImpactFactor['id'], React.ElementType> = {
   safety: Shield,
   sales: ShoppingCart,
   legal: Scale,
-  brand: Trademark,
+  brand: Landmark,
   cost: Wrench,
 };
 
