@@ -44,6 +44,23 @@ interface RoutingMapProps {
   routeStops: RouteStop[];
 }
 
+const haversineDistance = (coords1: {lat: number, lng: number}, coords2: {lat: number, lng: number}): number => {
+    const toRad = (x: number) => (x * Math.PI) / 180;
+    const R = 6371; // Earth radius in km
+
+    const dLat = toRad(coords2.lat - coords1.lat);
+    const dLon = toRad(coords2.lng - coords1.lng);
+    const lat1 = toRad(coords1.lat);
+    const lat2 = toRad(coords2.lat);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+};
+
 export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -69,11 +86,6 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
       layersRef.current.addTo(mapRef.current);
     }
-    
-    // Invalidate size on every render to handle layout changes
-    if (mapRef.current) {
-      mapRef.current.invalidateSize();
-    }
   }, []);
 
   useEffect(() => {
@@ -85,7 +97,6 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
 
-    // Draw markers for stores not in the current route
     allStores.forEach(store => {
       if (!routeStoreIds.has(store.id)) {
         L.marker([store.lat, store.lng], { icon: blueIcon })
@@ -94,20 +105,15 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       }
     });
     
-    // The routeStops are now guaranteed to be sorted by the parent component
     routeStops.forEach((stop, index) => {
       let icon = greenIcon;
       let popupText = `<b>${stop.name}</b><br>${stop.city}`;
 
-      if (stop.visitOrder === -1) { // Start Point
+      if (stop.visitOrder === -1) { 
         icon = goldIcon;
         popupText += `<br><b>Ponto de Partida</b>`;
       } else {
         popupText += `<br><b>Visita #${stop.visitOrder + 1} na rota</b>`;
-      }
-      
-      if (stop.visitDate && stop.visitOrder !== -1) {
-          popupText += `<br>Data: ${format(new Date(stop.visitDate), 'dd/MM/yyyy')}`;
       }
 
       L.marker([stop.lat, stop.lng], { icon })
@@ -115,24 +121,57 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         .addTo(layersRef.current);
     });
 
-    // Draw polyline if there's a route
     if (routeStops.length > 1) {
       const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
+
+      for (let i = 0; i < routeStops.length - 1; i++) {
+        const start = routeStops[i];
+        const end = routeStops[i+1];
+        const distance = haversineDistance(start, end);
+        const midPoint = L.latLng((start.lat + end.lat) / 2, (start.lng + end.lng) / 2);
+        
+        const distanceMarker = L.divIcon({
+            className: 'distance-marker',
+            html: `<div>${distance.toFixed(1)} km</div>`
+        });
+        
+        L.marker(midPoint, { icon: distanceMarker }).addTo(layersRef.current);
+      }
     }
     
-    const locationsToBound = routeStops.length > 0 ? routeStops : allStores;
-    if (locationsToBound.length > 0) {
-      const bounds = L.latLngBounds(locationsToBound.map(loc => [loc.lat, loc.lng]));
+    if (routeStops.length > 0) {
+      const bounds = L.latLngBounds(routeStops.map(loc => [loc.lat, loc.lng]));
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50] });
       }
     } else {
       map.setView([-22.8, -47.2], 9);
     }
+
   }, [allStores, routeStops]);
+  
+  useEffect(() => {
+    // Inject custom CSS for distance markers
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .distance-marker {
+        background-color: rgba(255, 255, 255, 0.8);
+        border: 1px solid #777;
+        border-radius: 4px;
+        padding: 2px 5px;
+        font-size: 10px;
+        font-weight: bold;
+        text-align: center;
+        white-space: nowrap;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
 }
-
-    
