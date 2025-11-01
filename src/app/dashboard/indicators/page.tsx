@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -8,7 +7,7 @@ import type { MaintenanceIndicator } from '@/lib/types';
 import { KpiCard } from '@/components/dashboard/indicators/kpi-card';
 import { CallsChart } from '@/components/dashboard/indicators/calls-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUp, ArrowDown, TrendingUp, PlusCircle } from 'lucide-react';
+import { ArrowUp, ArrowDown, TrendingUp, PlusCircle, BrainCircuit } from 'lucide-react';
 import { EditableSlaTable } from '@/components/dashboard/indicators/editable-sla-table';
 import { EditableCallsTable } from '@/components/dashboard/indicators/editable-calls-table';
 import { SlaChart } from '@/components/dashboard/indicators/sla-chart';
@@ -20,9 +19,9 @@ import { EditableAgingTableByCriticism } from '@/components/dashboard/indicators
 import { AgingChart } from '@/components/dashboard/indicators/aging-chart';
 import { KpiAnalysis } from '@/components/dashboard/indicators/kpi-analysis';
 import { ParetoAnalysis } from '@/components/dashboard/indicators/pareto-analysis';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-
-export default function IndicatorsPage() {
+export default function DashboardPage() {
   const [indicators, setIndicators] = useState<MaintenanceIndicator[]>(mockMaintenanceIndicators);
   const [selectedMonth, setSelectedMonth] = useState<string>(mockMaintenanceIndicators[mockMaintenanceIndicators.length - 1].mes);
   const [annualSlaGoal, setAnnualSlaGoal] = useState<number>(80);
@@ -108,7 +107,7 @@ export default function IndicatorsPage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title="Indicadores de Manutenção"
+        title="Dashboard de Indicadores"
         description="Painel com os principais indicadores de desempenho operacional."
       >
         <div className="flex items-center gap-2">
@@ -169,16 +168,29 @@ export default function IndicatorsPage() {
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
                 />
             </div>
-
-            <KpiAnalysis indicator={selectedData} />
             
-            <CallsChart data={indicators} />
+            <Card className="border-primary border-2">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-primary">
+                        <BrainCircuit className="h-6 w-6" />
+                        Central de Análises com IA
+                    </CardTitle>
+                    <CardDescription>
+                        Utilize inteligência artificial para obter insights sobre seus dados de manutenção.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <KpiAnalysis indicator={selectedData} />
+                    <ParetoAnalysis incidents={incidentsForMonth} />
+                </CardContent>
+            </Card>
 
-            <SlaChart data={indicatorsWithGoal} />
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <CallsChart data={indicators} />
+              <SlaChart data={indicatorsWithGoal} />
+            </div>
 
             <AgingChart data={selectedData.aging} />
-
-            <ParetoAnalysis incidents={incidentsForMonth} />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <EditableSlaTable 

@@ -4,7 +4,7 @@ import { analyzeIncidentsForPareto } from '@/ai/flows/pareto-analysis-flow';
 import type { Incident } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BarChart, BrainCircuit, Sparkles } from 'lucide-react';
+import { BarChart, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ParetoChart } from './pareto-chart';
@@ -58,31 +58,32 @@ export function ParetoAnalysis({ incidents }: ParetoAnalysisProps) {
        }
       return <ParetoChart data={analysis} />;
     }
-    return null;
+    return (
+        <div className="text-sm text-muted-foreground text-center py-10">
+            Clique no botão para gerar uma análise de Pareto das causas raiz.
+        </div>
+    );
   };
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between">
+    <Card className="h-full">
+      <CardHeader className="flex-row items-start justify-between">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <BarChart className="h-6 w-6 text-primary" />
             Análise de Pareto (Causa Raiz)
           </CardTitle>
           <CardDescription>
-            Identifique as causas mais frequentes de incidentes no mês.
+            Identifique as causas mais frequentes.
           </CardDescription>
         </div>
         <Button onClick={fetchAnalysis} disabled={loading}>
           <Sparkles className="mr-2 h-4 w-4" />
-          {loading ? 'Analisando Causas...' : 'Gerar Gráfico de Pareto'}
+          {loading ? 'Analisando...' : 'Gerar Pareto'}
         </Button>
       </CardHeader>
-      {(loading || error || analysis) && (
         <CardContent>
             {renderContent()}
         </CardContent>
-      )}
     </Card>
   );
 }

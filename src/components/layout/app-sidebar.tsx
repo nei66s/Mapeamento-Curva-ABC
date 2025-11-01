@@ -7,7 +7,6 @@ import {
   Settings,
   ListCollapse,
   ClipboardCheck,
-  Gauge,
   Map,
   ClipboardList,
   Route,
@@ -37,15 +36,6 @@ export default function AppSidebar() {
           <BarChart3 className="h-5 w-5 text-primary transition-all group-hover:scale-110" />
           <span className="font-bold text-xl text-primary">Manutenção</span>
         </Link>
-        <nav className="flex flex-col gap-2">
-            <Link
-                href="/dashboard/indicators"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-            >
-                <Gauge className="h-5 w-5" />
-                Indicadores
-            </Link>
-        </nav>
       </div>
 
       <div className="flex-1 overflow-y-auto">

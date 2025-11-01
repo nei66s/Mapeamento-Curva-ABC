@@ -4,7 +4,7 @@ import { summarizeKpi } from '@/ai/flows/summarize-kpi-flow';
 import type { MaintenanceIndicator } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Sparkles, BrainCircuit } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -76,19 +76,22 @@ export function KpiAnalysis({ indicator }: KpiAnalysisProps) {
         </div>
       );
     }
-    return null;
+    return (
+        <div className="text-sm text-muted-foreground text-center py-10">
+            Clique no botão para gerar uma análise de desempenho com IA.
+        </div>
+    );
   };
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between">
+    <Card className="h-full">
+      <CardHeader className="flex-row items-start justify-between">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <BrainCircuit className="h-6 w-6 text-primary" />
-            Análise de Desempenho com IA
+            Análise de Desempenho
           </CardTitle>
           <CardDescription>
-            Receba um resumo executivo dos KPIs do mês selecionado.
+            Resumo executivo dos KPIs do mês.
           </CardDescription>
         </div>
         <Button onClick={fetchAnalysis} disabled={loading}>
@@ -96,11 +99,9 @@ export function KpiAnalysis({ indicator }: KpiAnalysisProps) {
           {loading ? 'Analisando...' : 'Analisar Mês'}
         </Button>
       </CardHeader>
-      {(loading || error || summary) && (
         <CardContent>
             {renderContent()}
         </CardContent>
-      )}
     </Card>
   );
 }

@@ -219,7 +219,7 @@ export const mockIncidents: Incident[] = [
   { id: 'INC-026', itemName: 'Torneiras / válvulas / sifões', location: 'Loja 08 - Paulinia', status: 'Fechado', openedAt: generateDateInMonth(2025, 4).toISOString(), description: "Vazamento contínuo na torneira do banheiro masculino.", lat: -22.7634, lng: -47.1545 },
   { id: 'INC-027', itemName: 'Elevador / monta-carga', location: 'Loja 09 - Limeira', status: 'Resolvido', openedAt: generateDateInMonth(2025, 4).toISOString(), description: "Problema Mecânico: o elevador está parando entre os andares.", lat: -22.5647, lng: -47.4069 },
   { id: 'INC-028', itemName: 'QGBT / Quadro geral', location: 'Loja 10 - Araras', status: 'Resolvido', openedAt: generateDateInMonth(2025, 4).toISOString(), description: "Falha Elétrica: IDR desarmando sem causa aparente.", lat: -22.3564, lng: -47.3828 },
-  { id: 'INC-029', itemName: 'Desgaste de Peça: correia do fatiador gasta.', location: 'Loja 11 - Indaiatuba', status: 'Resolvido', openedAt: generateDateInMonth(2025, 4).toISOString(), description: "Desgaste de Peça: correia do fatiador de frios gasta e patinando.", lat: -23.0867, lng: -47.2183 },
+  { id: 'INC-029', itemName: 'Moedor / picador / fatiador', location: 'Loja 11 - Indaiatuba', status: 'Resolvido', openedAt: generateDateInMonth(2025, 4).toISOString(), description: "Desgaste de Peça: correia do fatiador de frios gasta e patinando.", lat: -23.0867, lng: -47.2183 },
   { id: 'INC-030', itemName: 'Iluminação de área de vendas', location: 'Loja 12 - Tietê', status: 'Resolvido', openedAt: generateDateInMonth(2025, 4).toISOString(), description: "Falha Elétrica: reator de uma fileira de lâmpadas queimou.", lat: -23.1022, lng: -47.7153 },
 ];
 

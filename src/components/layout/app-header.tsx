@@ -9,7 +9,6 @@ import {
   BarChart3,
   ListCollapse,
   ClipboardCheck,
-  Gauge,
   Map,
   ClipboardList,
   Route,
@@ -44,14 +43,6 @@ export default function AppHeader() {
             >
               <BarChart3 className="h-5 w-5 transition-all group-hover:scale-110" />
               <span className="sr-only">Manutenção</span>
-            </Link>
-            
-            <Link
-              href="/dashboard/indicators"
-              className="flex items-center gap-4 px-2.5 text-foreground"
-            >
-              <Gauge className="h-5 w-5" />
-              Indicadores
             </Link>
             
             <Separator />
