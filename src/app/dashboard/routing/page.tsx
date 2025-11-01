@@ -260,7 +260,7 @@ export default function RoutingPage() {
                             <SelectValue placeholder="Selecione o ponto de partida..." />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={startPoint?.id || ''} disabled={!startPoint}>{startPoint?.name}</SelectItem>
+                            {startPoint && <SelectItem value={startPoint.id}>{startPoint.name}</SelectItem>}
                             {availableStores.map(store => (
                                 <SelectItem key={store.id} value={store.id}>{store.name}</SelectItem>
                             ))}
