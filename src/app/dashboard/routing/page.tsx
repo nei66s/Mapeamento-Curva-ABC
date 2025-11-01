@@ -31,7 +31,6 @@ const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-
   loading: () => <Skeleton className="h-full w-full" />,
 });
 
-
 function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolean }) {
   const {
     attributes,
@@ -53,9 +52,9 @@ function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolea
             <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab h-8 w-8">
                 <GripVertical className="h-5 w-5 text-muted-foreground" />
             </Button>
-        ) : <div className="w-8 h-8"/>}
+        ) : <div className="w-8 h-8 flex items-center justify-center"><Warehouse className="h-5 w-5 text-primary" /></div>}
         <div>
-            <p className={cn("font-semibold", isFirst ? "text-primary": "")}>{isFirst && <Warehouse className="inline-block h-4 w-4 mr-2" />} {stop.name}</p>
+            <p className={cn("font-semibold", isFirst ? "text-primary": "")}>{stop.name}</p>
             <p className="text-sm text-muted-foreground">{isFirst ? "Ponto de Partida" : stop.city}</p>
         </div>
       </div>
@@ -108,8 +107,6 @@ export default function RoutingPage() {
       setStoresToVisit((items) => {
         const oldIndex = items.findIndex(item => item.id === active.id);
         const newIndex = items.findIndex(item => item.id === over.id);
-        // Prevent the start point from being moved
-        if (oldIndex === 0 || newIndex === 0) return items;
         const newOrder = arrayMove(items, oldIndex, newIndex);
         return newOrder.map((item, index) => ({...item, visitOrder: index}));
       });
@@ -135,9 +132,8 @@ export default function RoutingPage() {
       });
       
       const storeVisitMap = new Map(storesToVisit.map(s => [s.id, s]));
-
       const validOptimizedRoute = response.optimizedRoute.filter(stop => storeVisitMap.has(stop.storeId));
-
+      
       const reorderedStops = validOptimizedRoute
         .map((stop, index) => {
             const storeDetails = storeVisitMap.get(stop.storeId)!;
@@ -221,7 +217,7 @@ export default function RoutingPage() {
             <Card>
                  <CardHeader>
                     <CardTitle>2. Monte a Rota</CardTitle>
-                    <CardDescription>Adicione as lojas que devem ser visitadas. A primeira loja da lista será o ponto de partida.</CardDescription>
+                    <CardDescription>Adicione as lojas que devem ser visitadas. A primeira loja será o ponto de partida.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2">
@@ -275,9 +271,9 @@ export default function RoutingPage() {
                                     {storesToVisit.map((stop, index) => (
                                       <div key={stop.id} className="flex items-center gap-2">
                                         <SortableStoreItem stop={stop} isFirst={index === 0} />
-                                        {index > 0 && <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeStoreFromRoute(stop.id)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeStoreFromRoute(stop.id)}>
                                           <Trash2 className="h-4 w-4" />
-                                        </Button>}
+                                        </Button>
                                       </div>
                                     ))}
                                 </div>
@@ -306,3 +302,5 @@ export default function RoutingPage() {
     </div>
   );
 }
+
+    

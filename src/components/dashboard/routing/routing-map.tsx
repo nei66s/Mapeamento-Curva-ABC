@@ -50,6 +50,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
+      // Fix for icon path issue with Next.js
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: iconRetinaUrl.src,
@@ -71,7 +72,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-
+    
     map.invalidateSize();
     layersRef.current.clearLayers();
 
@@ -89,7 +90,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     // Display route stops
     routeStops.forEach((stop, index) => {
       let icon = greenIcon;
-      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${stop.visitOrder + 1} na rota</b>`;
+      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index + 1} na rota</b>`;
 
       if (index === 0) {
         icon = goldIcon;
@@ -105,11 +106,13 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         .addTo(layersRef.current);
     });
 
+    // Draw polyline if there is a route
     if (routeStops.length > 1) {
       const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
     }
-
+    
+    // Fit map to bounds
     const locations = routeStops.length > 0 ? routeStops : allStores;
     if (locations.length > 0) {
       const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]));
@@ -123,3 +126,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;
 }
+
+    
