@@ -23,15 +23,19 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { IncidentForm } from '@/components/dashboard/incidents/incident-form';
 import { mockIncidents, mockItems } from '@/lib/mock-data';
 import type { Item, Incident, Classification, IncidentStatus } from '@/lib/types';
-import { PlusCircle, Clock, Sparkles, Search, ListFilter } from 'lucide-react';
+import { PlusCircle, Clock, Sparkles, Search, ListFilter, MoreVertical, Pencil, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -75,30 +79,59 @@ export default function IncidentsPage() {
       const classificationMatch = classificationFilters.size === 0 || (item && classificationFilters.has(item.classification));
 
       return searchMatch && statusMatch && classificationMatch;
-    });
+    }).sort((a, b) => new Date(b.openedAt).getTime() - new Date(a.openedAt).getTime());
   }, [incidents, searchTerm, statusFilters, classificationFilters, itemsMap]);
 
   const handleFormSubmit = (values: Omit<Incident, 'id' | 'openedAt' | 'status'|'lat'|'lng'>) => {
-    const newIncident: Incident = {
-      ...values,
-      id: `INC-${Date.now()}`,
-      openedAt: new Date().toISOString(),
-      status: 'Aberto',
-      lat: 0,
-      lng: 0,
-    };
-    setIncidents([newIncident, ...incidents]);
-    toast({
-      title: 'Incidente Registrado!',
-      description: `O incidente para o item "${values.itemName}" foi aberto.`,
-    });
+    if (selectedIncident) {
+      const updatedIncident = { ...selectedIncident, ...values };
+      setIncidents(incidents.map(inc => inc.id === selectedIncident.id ? updatedIncident : inc));
+      toast({
+        title: 'Incidente Atualizado!',
+        description: `O incidente para o item "${values.itemName}" foi atualizado.`,
+      });
+    } else {
+      const newIncident: Incident = {
+        ...values,
+        id: `INC-${Date.now()}`,
+        openedAt: new Date().toISOString(),
+        status: 'Aberto',
+        lat: 0,
+        lng: 0,
+      };
+      setIncidents([newIncident, ...incidents]);
+      toast({
+        title: 'Incidente Registrado!',
+        description: `O incidente para o item "${values.itemName}" foi aberto.`,
+      });
+    }
+    
     setIsFormOpen(false);
+    setSelectedIncident(null);
   };
+  
+  const openEditDialog = (incident: Incident) => {
+    setSelectedIncident(incident);
+    setIsFormOpen(true);
+  };
+
+  const openNewDialog = () => {
+    setSelectedIncident(null);
+    setIsFormOpen(true);
+  }
 
   const handleAnalysisClick = (incident: Incident) => {
     setSelectedIncident(incident);
     setIsAnalysisOpen(true);
   }
+  
+  const handleChangeStatus = (incidentId: string, newStatus: IncidentStatus) => {
+    setIncidents(incidents.map(inc => inc.id === incidentId ? { ...inc, status: newStatus } : inc));
+    toast({
+      title: 'Status Atualizado!',
+      description: `O status do incidente foi alterado para "${newStatus}".`,
+    });
+  };
 
   const toggleFilter = <T,>(set: Set<T>, value: T) => {
     const newSet = new Set(set);
@@ -118,17 +151,18 @@ export default function IncidentsPage() {
       >
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
           <DialogTrigger asChild>
-            <Button className="flex gap-2">
+            <Button onClick={openNewDialog} className="flex gap-2">
               <PlusCircle />
               Registrar Incidente
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Registrar Novo Incidente</DialogTitle>
+              <DialogTitle>{selectedIncident ? 'Editar Incidente' : 'Registrar Novo Incidente'}</DialogTitle>
             </DialogHeader>
             <IncidentForm
               items={mockItems}
+              incident={selectedIncident}
               onSubmit={handleFormSubmit}
               onCancel={() => setIsFormOpen(false)}
             />
@@ -138,9 +172,14 @@ export default function IncidentsPage() {
 
       <Card>
         <CardHeader className='flex-row items-center justify-between'>
-          <div>
-            <CardTitle>Lista de Incidentes</CardTitle>
-            <CardDescription>{filteredIncidents.length} incidentes encontrados.</CardDescription>
+          <div className='flex items-center gap-4'>
+            <div>
+                <CardTitle>Lista de Incidentes</CardTitle>
+                <CardDescription>{filteredIncidents.length} incidentes encontrados.</CardDescription>
+            </div>
+             <Badge variant="outline" className="flex items-center gap-1">
+                <Tag className="h-3 w-3" /> Mock Data
+            </Badge>
           </div>
           <div className="flex items-center gap-2">
             <div className="relative">
@@ -197,21 +236,51 @@ export default function IncidentsPage() {
               <Card key={incident.id} className="flex flex-col">
                 <CardHeader>
                   <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg">{incident.itemName}</CardTitle>
-                     <Badge variant={statusVariantMap[incident.status]}>
-                        {incident.status}
-                    </Badge>
+                    <div className="flex-1">
+                        <CardTitle className="text-lg">{incident.itemName}</CardTitle>
+                        <CardDescription>{incident.location}</CardDescription>
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2">
+                                <MoreVertical className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onSelect={() => openEditDialog(incident)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Editar Incidente
+                            </DropdownMenuItem>
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                     <Sparkles className="mr-2 h-4 w-4" />
+                                    Alterar Status
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                    {allStatuses.map(status => (
+                                        <DropdownMenuItem key={status} onSelect={() => handleChangeStatus(incident.id, status)} disabled={incident.status === status}>
+                                            {status}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <CardDescription>{incident.location}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-grow space-y-4">
                   <p className="text-sm text-muted-foreground line-clamp-3">
                     {incident.description}
                   </p>
+                  <div className='flex items-center justify-between'>
                     <Button variant="outline" size="sm" onClick={() => handleAnalysisClick(incident)}>
                         <Sparkles className="mr-2 h-4 w-4" />
                         Análise com IA
                     </Button>
+                     <Badge variant={statusVariantMap[incident.status]}>
+                        {incident.status}
+                    </Badge>
+                  </div>
                 </CardContent>
                 <CardFooter>
                   <div className="flex items-center text-xs text-muted-foreground">

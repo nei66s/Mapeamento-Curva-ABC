@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -25,6 +26,7 @@ import type { Item, Incident } from '@/lib/types';
 
 interface IncidentFormProps {
   items: Item[];
+  incident?: Incident | null;
   onSubmit: (data: Omit<Incident, 'id' | 'openedAt' | 'status' | 'lat' | 'lng'>) => void;
   onCancel: () => void;
 }
@@ -37,15 +39,31 @@ const formSchema = z.object({
 
 type IncidentFormData = z.infer<typeof formSchema>;
 
-export function IncidentForm({ items, onSubmit, onCancel }: IncidentFormProps) {
+export function IncidentForm({ items, incident, onSubmit, onCancel }: IncidentFormProps) {
   const form = useForm<IncidentFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      itemName: '',
-      location: '',
-      description: '',
+      itemName: incident?.itemName || '',
+      location: incident?.location || '',
+      description: incident?.description || '',
     },
   });
+  
+  useEffect(() => {
+    if (incident) {
+      form.reset({
+        itemName: incident.itemName,
+        location: incident.location,
+        description: incident.description,
+      });
+    } else {
+       form.reset({
+        itemName: '',
+        location: '',
+        description: '',
+      });
+    }
+  }, [incident, form]);
 
   const handleSubmit = (data: IncidentFormData) => {
     onSubmit(data);
@@ -117,7 +135,7 @@ export function IncidentForm({ items, onSubmit, onCancel }: IncidentFormProps) {
             <Button type="button" variant="outline" onClick={onCancel}>
                 Cancelar
             </Button>
-            <Button type="submit">Registrar</Button>
+            <Button type="submit">{incident ? 'Salvar Alterações' : 'Registrar'}</Button>
         </div>
       </form>
     </Form>
