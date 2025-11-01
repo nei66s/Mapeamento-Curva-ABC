@@ -10,6 +10,7 @@ import {
   Gauge,
   Map,
   ClipboardList,
+  Route,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ const mappingLinks = [
 
 const preventiveLinks = [
     { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Conformidade" },
+    { href: "/dashboard/routing", icon: Route, label: "Roteirização" },
 ];
 
 export default function AppSidebar() {

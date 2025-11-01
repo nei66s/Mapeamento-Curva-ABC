@@ -111,3 +111,14 @@ export type MaintenanceIndicator = {
     muito_alta: number;
   };
 };
+
+export type Team = {
+  id: string;
+  name: string;
+  technicians: string[];
+  region: string;
+};
+
+export type RouteStop = Store & {
+  visitOrder: number;
+};
