@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Store, RouteStop } from '@/lib/types';
+import { distributionCenter } from '@/lib/mock-data';
 
 // Correctly import marker icons
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
@@ -27,6 +28,15 @@ const greenIcon = new L.Icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
+});
+
+const goldIcon = new L.Icon({
+	iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+	iconSize: [25, 41],
+	iconAnchor: [12, 41],
+	popupAnchor: [1, -34],
+	shadowSize: [41, 41]
 });
 
 interface RoutingMapProps {
@@ -70,24 +80,32 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
 
+    // Display all non-route stores
     allStores.forEach(store => {
-      const isInRoute = routeStoreIds.has(store.id);
-      const icon = isInRoute ? greenIcon : blueIcon;
-      const stopInfo = routeStops.find(s => s.id === store.id);
-
-      let popupText = `<b>${store.name}</b><br>${store.city}`;
-      if (stopInfo) {
-        popupText += `<br><b>Visita #${stopInfo.visitOrder} na rota</b>`;
+      if (!routeStoreIds.has(store.id)) {
+        L.marker([store.lat, store.lng], { icon: blueIcon })
+          .bindPopup(`<b>${store.name}</b><br>${store.city}`)
+          .addTo(layers);
       }
+    });
+    
+    // Display route stops
+    routeStops.forEach(stop => {
+        let icon = greenIcon;
+        let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${stop.visitOrder} na rota</b>`;
 
-      L.marker([store.lat, store.lng], { icon })
-        .bindPopup(popupText)
-        .addTo(layers);
+        if (stop.id === distributionCenter.id) {
+            icon = goldIcon; // Special icon for the CD
+            popupText = `<b>${stop.name}</b><br>Ponto de Partida`;
+        }
+
+        L.marker([stop.lat, stop.lng], { icon })
+            .bindPopup(popupText)
+            .addTo(layers);
     });
 
     if (routeStops.length > 1) {
-      const sortedStops = [...routeStops].sort((a,b) => a.visitOrder - b.visitOrder);
-      const latLngs = sortedStops.map(stop => L.latLng(stop.lat, stop.lng));
+      const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layers);
     }
 
@@ -97,7 +115,8 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         map.fitBounds(bounds, { padding: [50, 50] });
       }
     } else if (allStores.length > 0) {
-      const bounds = L.latLngBounds(allStores.map(store => [store.lat, store.lng]));
+       const allLocations = [...allStores, distributionCenter];
+      const bounds = L.latLngBounds(allLocations.map(store => [store.lat, store.lng]));
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50] });
       }
@@ -106,5 +125,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     }
   }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} className="h-full w-full rounded-md" />;
+  return <div ref={mapContainerRef} className="h-full w-full" />;
 }

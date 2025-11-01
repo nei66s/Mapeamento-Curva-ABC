@@ -7,8 +7,8 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, GripVertical, Sparkles, AlertCircle } from 'lucide-react';
-import { allStores } from '@/lib/mock-data';
+import { Trash2, GripVertical, Sparkles, AlertCircle, Warehouse } from 'lucide-react';
+import { allStores, distributionCenter } from '@/lib/mock-data';
 import { mockTeams } from '@/lib/teams';
 import type { Store, Team, RouteStop } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -114,26 +114,32 @@ export default function RoutingPage() {
   }, []);
 
   const handleOptimizeRoute = async () => {
-    if (storesToVisit.length < 2) {
+    if (storesToVisit.length < 1) {
       toast({
         variant: 'destructive',
         title: 'Não é possível otimizar',
-        description: 'Adicione pelo menos duas lojas à rota para otimização.',
+        description: 'Adicione pelo menos uma loja à rota para otimização.',
       });
       return;
     }
     setIsOptimizing(true);
     setOptimizationResult(null);
     try {
+      const storesForApi = [distributionCenter, ...storesToVisit];
+
       const response = await optimizeRoute({ 
-          stores: storesToVisit,
+          stores: storesForApi,
           startDate: startDate?.toISOString() ?? new Date().toISOString(),
       });
       
-      const reorderedStops = response.optimizedRoute.map((stop, index) => {
-          const storeDetails = storesToVisit.find(s => s.id === stop.storeId)!;
-          return { ...storeDetails, visitOrder: index + 1, visitDate: stop.visitDate };
-      });
+      const reorderedStops = response.optimizedRoute
+        .map((stop, index) => {
+            const storeDetails = storesToVisit.find(s => s.id === stop.storeId)!;
+            // The API returns the CD as the first stop, so we filter it out from the display list
+            if (!storeDetails) return null;
+            return { ...storeDetails, visitOrder: index + 1, visitDate: stop.visitDate };
+        })
+        .filter((s): s is RouteStop => s !== null);
       
       setStoresToVisit(reorderedStops);
       setOptimizationResult(response);
@@ -155,6 +161,11 @@ export default function RoutingPage() {
   };
   
   const selectedTeam = useMemo(() => mockTeams.find(t => t.id === selectedTeamId), [selectedTeamId]);
+  
+  const routeWithCD = useMemo(() => {
+    const sortedStops = [...storesToVisit].sort((a,b) => a.visitOrder - b.visitOrder);
+    return [{ ...distributionCenter, visitOrder: 0 }, ...sortedStops];
+  }, [storesToVisit]);
 
 
   return (
@@ -213,7 +224,7 @@ export default function RoutingPage() {
             <Card>
                  <CardHeader>
                     <CardTitle>2. Monte a Rota</CardTitle>
-                    <CardDescription>Adicione as lojas que devem ser visitadas.</CardDescription>
+                    <CardDescription>Adicione as lojas que devem ser visitadas a partir do Centro de Distribuição.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2">
@@ -237,11 +248,19 @@ export default function RoutingPage() {
                     <CardDescription>Ordene as visitas ou use a IA para otimizar a rota e as datas.</CardDescription>
                 </CardHeader>
                 <CardContent>
+                     <div className="flex items-center gap-2 border bg-muted/50 p-3 rounded-md mb-4">
+                        <Warehouse className="h-6 w-6 text-primary" />
+                        <div>
+                            <p className="font-semibold text-sm">Ponto de Partida</p>
+                            <p className="text-sm text-muted-foreground">{distributionCenter.name}</p>
+                        </div>
+                    </div>
+
                     {storesToVisit.length > 0 && (
                       <div className="flex items-center justify-between mb-4">
                         <Button 
                             onClick={handleOptimizeRoute} 
-                            disabled={isOptimizing || storesToVisit.length < 2 || !startDate}
+                            disabled={isOptimizing || storesToVisit.length < 1 || !startDate}
                             className='flex gap-2'
                         >
                             <Sparkles />
@@ -287,10 +306,10 @@ export default function RoutingPage() {
            <Card className="h-full min-h-[720px]">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
-              <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
+              <CardDescription>Visualize a rota planejada no mapa a partir do CD.</CardDescription>
             </CardHeader>
-            <CardContent className="h-[640px] p-0">
-              <RoutingMap allStores={allStores} routeStops={storesToVisit} />
+            <CardContent className="h-full p-0">
+              <RoutingMap allStores={allStores} routeStops={routeWithCD} />
             </CardContent>
           </Card>
         </div>
