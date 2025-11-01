@@ -179,14 +179,6 @@ export const allStores: Store[] = [
     { id: "LOJA-18", name: "Loja 18 - Mogi Mirim", city: "Mogi Mirim", lat: -22.4319, lng: -46.9564 },
 ];
 
-export const distributionCenter: Store = {
-  id: "CD-01",
-  name: "Centro de Distribuição - Sumaré",
-  city: "Sumaré",
-  lat: -22.8219,
-  lng: -47.2669,
-};
-
 export const mockIncidents: Incident[] = [
   { id: 'INC-001', itemName: 'Rack de compressores / unidade condensadora', location: 'Loja 01 - Americana', status: 'Aberto', openedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: "Parada total do equipamento de refrigeração central, afetando a climatização de toda a área de vendas. A temperatura interna subiu 5°C em 1 hora.", lat: -22.7532, lng: -47.3292 },
   { id: 'INC-002', itemName: 'Balcões refrigerados', location: 'Loja 02 - Santa Bárbara', status: 'Em Andamento', openedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: "Não está atingindo a temperatura ideal, risco de perda de produtos perecíveis. A temperatura está oscilando entre 8°C e 12°C.", lat: -22.7391, lng: -47.4005 },

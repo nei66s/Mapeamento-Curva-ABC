@@ -29,7 +29,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
-  loading: () => <Skeleton className="h-[640px] w-full" />,
+  loading: () => <Skeleton className="h-full w-full" />,
 });
 
 
@@ -289,12 +289,12 @@ export default function RoutingPage() {
         </div>
 
         <div className="lg:col-span-2">
-           <Card className="min-h-[720px]">
+           <Card className="flex flex-col min-h-[720px]">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent className="h-[640px] p-0">
+            <CardContent className="flex-1">
               <RoutingMap allStores={allStores} routeStops={routeWithCD} />
             </CardContent>
           </Card>
