@@ -70,7 +70,7 @@ const kpiSummaryFlow = ai.defineFlow(
     outputSchema: KpiSummaryOutputSchema,
   },
   async input => {
-    const {output} = await kpiSummaryFlow(input);
+    const {output} = await kpiSummaryPrompt(input);
     return output!;
   }
 );
