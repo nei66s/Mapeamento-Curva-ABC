@@ -58,7 +58,10 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         shadowUrl: shadowUrl.src,
       });
 
-      mapRef.current = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
+      mapRef.current = L.map(mapContainerRef.current, {
+        center: [-22.8, -47.2],
+        zoom: 9
+      });
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -87,7 +90,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
     routeStops.forEach((stop, index) => {
       let icon = greenIcon;
-      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index + 1} na rota</b>`;
+      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index} na rota</b>`;
 
       if (index === 0) {
         icon = goldIcon;
@@ -119,7 +122,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     }
   }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} className="h-[640px] w-full" />;
+  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
 }
-
-    

@@ -31,14 +31,14 @@ const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-
   loading: () => <Skeleton className="h-[640px] w-full" />,
 });
 
-function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolean }) {
+function SortableStoreItem({ stop }: { stop: RouteStop }) {
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
     transition,
-  } = useSortable({id: stop.id, disabled: isFirst});
+  } = useSortable({id: stop.id});
   
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -46,19 +46,17 @@ function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolea
   };
   
   return (
-    <div ref={setNodeRef} style={style} className={cn("flex items-center justify-between p-2 rounded-md border", isFirst ? "bg-primary/10 border-primary" : "bg-background")}>
+    <div ref={setNodeRef} style={style} className="flex items-center justify-between p-2 rounded-md border bg-background">
       <div className="flex items-center gap-3">
-        {!isFirst ? (
-            <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab h-8 w-8">
-                <GripVertical className="h-5 w-5 text-muted-foreground" />
-            </Button>
-        ) : <div className="w-8 h-8 flex items-center justify-center"><Warehouse className="h-5 w-5 text-primary" /></div>}
+        <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab h-8 w-8">
+            <GripVertical className="h-5 w-5 text-muted-foreground" />
+        </Button>
         <div>
-            <p className={cn("font-semibold", isFirst ? "text-primary": "")}>{stop.name}</p>
-            <p className="text-sm text-muted-foreground">{isFirst ? "Ponto de Partida" : stop.city}</p>
+            <p className="font-semibold">{stop.name}</p>
+            <p className="text-sm text-muted-foreground">{stop.city}</p>
         </div>
       </div>
-       {stop.visitDate && !isFirst && (
+       {stop.visitDate && (
         <div className="text-sm font-medium text-muted-foreground pr-2">
           {format(new Date(stop.visitDate), 'dd/MM')}
         </div>
@@ -67,11 +65,23 @@ function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolea
   );
 }
 
+const StartPointItem = ({ stop }: { stop: RouteStop }) => (
+    <div className="flex items-center justify-between p-2 rounded-md border bg-primary/10 border-primary">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 flex items-center justify-center"><Warehouse className="h-5 w-5 text-primary" /></div>
+        <div>
+            <p className="font-semibold text-primary">{stop.name}</p>
+            <p className="text-sm text-muted-foreground">Ponto de Partida</p>
+        </div>
+      </div>
+    </div>
+);
+
 
 export default function RoutingPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const [startPoint, setStartPoint] = useState<Store | null>(null);
   const [storesToVisit, setStoresToVisit] = useState<RouteStop[]>([]);
-  const [availableStores, setAvailableStores] = useState<Store[]>(allStores.sort((a,b) => a.name.localeCompare(b.name)));
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizationResult, setOptimizationResult] = useState<RouteOptimizerOutput | null>(null);
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
@@ -82,22 +92,31 @@ export default function RoutingPage() {
     useSensor(PointerSensor)
   );
 
+  const availableStores = useMemo(() => {
+    const storesInRouteIds = new Set([...storesToVisit.map(s => s.id), startPoint?.id]);
+    return allStores.filter(s => !storesInRouteIds.has(s.id)).sort((a,b) => a.name.localeCompare(b.name));
+  }, [storesToVisit, startPoint]);
+
+
+  const handleSetStartPoint = (storeId: string) => {
+    const store = allStores.find(s => s.id === storeId);
+    if(store) {
+        setStartPoint(store);
+        setOptimizationResult(null);
+    }
+  }
+
   const addStoreToRoute = (storeId: string) => {
     const store = availableStores.find(s => s.id === storeId);
     if (store) {
       setStoresToVisit(prev => [...prev, { ...store, visitOrder: prev.length }]);
-      setAvailableStores(prev => prev.filter(s => s.id !== storeId));
       setOptimizationResult(null);
     }
   };
   
   const removeStoreFromRoute = (storeId: string) => {
-    const store = storesToVisit.find(s => s.id === storeId);
-    if(store) {
-        setStoresToVisit(prev => prev.filter(s => s.id !== storeId).map((s, i) => ({ ...s, visitOrder: i })));
-        setAvailableStores(prev => [...prev, allStores.find(s => s.id === storeId)!].sort((a,b) => a.name.localeCompare(b.name)));
-        setOptimizationResult(null);
-    }
+    setStoresToVisit(prev => prev.filter(s => s.id !== storeId).map((s, i) => ({ ...s, visitOrder: i })));
+    setOptimizationResult(null);
   };
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -115,38 +134,49 @@ export default function RoutingPage() {
   }, []);
 
   const handleOptimizeRoute = async () => {
-    if (storesToVisit.length < 2) {
-      toast({
-        variant: 'destructive',
-        title: 'Não é possível otimizar',
-        description: 'Adicione pelo menos duas lojas à rota para otimização.',
-      });
+    if (!startPoint) {
+      toast({ variant: 'destructive', title: 'Ponto de Partida necessário', description: 'Selecione um ponto de partida antes de otimizar.' });
       return;
     }
+    if (storesToVisit.length === 0) {
+        toast({ variant: 'destructive', title: 'Nenhuma loja para visitar', description: 'Adicione pelo menos uma loja para otimizar a rota.' });
+        return;
+    }
+    
     setIsOptimizing(true);
     setOptimizationResult(null);
+
+    const storesForApi = [startPoint, ...storesToVisit];
+
     try {
       const response = await optimizeRoute({ 
-          stores: storesToVisit,
+          stores: storesForApi,
           startDate: startDate?.toISOString() ?? new Date().toISOString(),
       });
       
-      const storeVisitMap = new Map(storesToVisit.map(s => [s.id, s]));
+      const storeVisitMap = new Map(storesForApi.map(s => [s.id, s]));
       const validOptimizedRoute = response.optimizedRoute.filter(stop => storeVisitMap.has(stop.storeId));
       
+      // First item is start point, should not have a visit date
+      const startPointId = validOptimizedRoute[0]?.storeId;
+
       const reorderedStops = validOptimizedRoute
+        .slice(1) // Remove start point from optimized list
         .map((stop, index) => {
             const storeDetails = storeVisitMap.get(stop.storeId)!;
             return { ...storeDetails, visitOrder: index, visitDate: stop.visitDate };
         });
       
-      setStoresToVisit(reorderedStops);
-      setOptimizationResult(response);
-
-      toast({
-        title: 'Rota Otimizada!',
-        description: `A rota foi otimizada com sucesso pela IA.`,
-      });
+      if(startPointId !== startPoint.id){
+         toast({ variant: 'destructive', title: 'Erro de Otimização', description: 'A IA não retornou o ponto de partida correto. Tente novamente.' });
+      } else {
+        setStoresToVisit(reorderedStops);
+        setOptimizationResult(response);
+        toast({
+          title: 'Rota Otimizada!',
+          description: `A rota foi otimizada com sucesso pela IA.`,
+        });
+      }
     } catch (error) {
       console.error("Error optimizing route:", error);
       toast({
@@ -161,6 +191,11 @@ export default function RoutingPage() {
   
   const selectedTeam = useMemo(() => mockTeams.find(t => t.id === selectedTeamId), [selectedTeamId]);
   
+  const fullRouteForMap = useMemo(() => {
+    if (!startPoint) return [];
+    return [{...startPoint, visitOrder: -1}, ...storesToVisit]
+  }, [startPoint, storesToVisit]);
+
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
@@ -216,12 +251,32 @@ export default function RoutingPage() {
 
             <Card>
                  <CardHeader>
-                    <CardTitle>2. Monte a Rota</CardTitle>
-                    <CardDescription>Adicione as lojas que devem ser visitadas. A primeira loja será o ponto de partida.</CardDescription>
+                    <CardTitle>2. Selecione o Ponto de Partida</CardTitle>
+                    <CardDescription>Escolha a loja que servirá como ponto de início da rota.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || ''}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecione o ponto de partida..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={startPoint?.id || ''} disabled={!startPoint}>{startPoint?.name}</SelectItem>
+                            {availableStores.map(store => (
+                                <SelectItem key={store.id} value={store.id}>{store.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </CardContent>
+            </Card>
+
+            <Card>
+                 <CardHeader>
+                    <CardTitle>3. Adicionar Lojas para Visitar</CardTitle>
+                    <CardDescription>Adicione os destinos que devem ser visitados a partir do ponto de partida.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2">
-                        <Select onValueChange={addStoreToRoute} value="">
+                        <Select onValueChange={addStoreToRoute} value="" disabled={!startPoint}>
                              <SelectTrigger>
                                 <SelectValue placeholder="Adicionar uma loja à rota..." />
                             </SelectTrigger>
@@ -237,15 +292,15 @@ export default function RoutingPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>3. Sequência de Visitas</CardTitle>
-                    <CardDescription>Ordene as visitas ou use a IA para otimizar a rota e as datas.</CardDescription>
+                    <CardTitle>4. Sequência de Visitas</CardTitle>
+                    <CardDescription>Ordene os destinos ou use a IA para otimizar a rota e as datas.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {storesToVisit.length > 0 && (
+                    {startPoint && (
                       <div className="flex items-center justify-between mb-4">
                         <Button 
                             onClick={handleOptimizeRoute} 
-                            disabled={isOptimizing || storesToVisit.length < 2 || !startDate}
+                            disabled={isOptimizing || storesToVisit.length === 0 || !startDate}
                             className='flex gap-2'
                         >
                             <Sparkles />
@@ -265,36 +320,43 @@ export default function RoutingPage() {
                     )}
                     
                     <ScrollArea className="h-64 pr-4">
+                       <div className="space-y-3">
+                        {startPoint && <StartPointItem stop={startPoint} />}
+                        
                         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                             <SortableContext items={storesToVisit.map(s => s.id)} strategy={verticalListSortingStrategy}>
-                                <div className="space-y-3">
-                                    {storesToVisit.map((stop, index) => (
+                                
+                                    {storesToVisit.map((stop) => (
                                       <div key={stop.id} className="flex items-center gap-2">
-                                        <SortableStoreItem stop={stop} isFirst={index === 0} />
+                                        <SortableStoreItem stop={stop} />
                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeStoreFromRoute(stop.id)}>
                                           <Trash2 className="h-4 w-4" />
                                         </Button>
                                       </div>
                                     ))}
-                                </div>
+                                
                             </SortableContext>
                         </DndContext>
+                       </div>
                     </ScrollArea>
-                    {storesToVisit.length === 0 && (
-                        <p className="text-sm text-muted-foreground text-center py-8">Nenhuma loja na rota. Adicione lojas para começar.</p>
+                    {!startPoint && (
+                        <p className="text-sm text-muted-foreground text-center py-8">Selecione um ponto de partida para começar.</p>
+                    )}
+                    {startPoint && storesToVisit.length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center py-8">Nenhuma loja de destino. Adicione lojas para continuar.</p>
                     )}
                 </CardContent>
             </Card>
         </div>
 
         <div className="lg:col-span-2">
-           <Card>
+           <Card className="min-h-[720px] flex flex-col">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <RoutingMap allStores={allStores} routeStops={storesToVisit} />
+            <CardContent className="flex-1 p-0">
+              <RoutingMap allStores={allStores} routeStops={fullRouteForMap} />
             </CardContent>
           </Card>
         </div>
@@ -302,5 +364,3 @@ export default function RoutingPage() {
     </div>
   );
 }
-
-    
