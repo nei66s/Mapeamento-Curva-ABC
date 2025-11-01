@@ -29,7 +29,7 @@ interface IncidentMapProps {
   incidents: Incident[];
 }
 
-export const IncidentMap = ({ incidents }: IncidentMapProps) => {
+export function IncidentMap({ incidents }: IncidentMapProps) {
   const incidentsWithCoords = incidents.filter(
     incident => incident.lat != null && incident.lng != null && (incident.status === 'Aberto' || incident.status === 'Em Andamento')
   );
