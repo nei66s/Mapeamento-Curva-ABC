@@ -36,7 +36,6 @@ export function CallsChart({ data }: CallsChartProps) {
   const chartData = data.map(item => ({
       name: new Date(`${item.mes}-02`).toLocaleString('default', { month: 'short' }),
       abertos: item.chamados_abertos,
-      // Make 'solucionados' negative for downward bars
       solucionados: -item.chamados_solucionados,
       backlog: item.backlog,
   }));
@@ -52,6 +51,7 @@ export function CallsChart({ data }: CallsChartProps) {
             <ComposedChart 
                 data={chartData} 
                 margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
+                stackOffset="sign"
             >
                 <CartesianGrid vertical={false} />
                 <XAxis 
@@ -63,7 +63,6 @@ export function CallsChart({ data }: CallsChartProps) {
                 <YAxis 
                     tickLine={false}
                     axisLine={false}
-                    // Format ticks to show absolute values
                     tickFormatter={(value) => Math.abs(value).toString()}
                 />
                 <Tooltip 
