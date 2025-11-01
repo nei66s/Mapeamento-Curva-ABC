@@ -55,7 +55,7 @@ export function CallsChart({ data }: CallsChartProps) {
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
             <ComposedChart 
                 data={chartData} 
-                margin={{ top: 20, right: 20, left: -20, bottom: 5 }}
+                margin={{ top: 20, right: 20, left: -20, bottom: 20 }}
                 stackOffset="sign"
             >
                 <CartesianGrid vertical={false} />
@@ -74,9 +74,9 @@ export function CallsChart({ data }: CallsChartProps) {
                     cursor={{ fill: 'hsl(var(--muted))' }}
                     content={
                         <ChartTooltipContent 
-                             formatter={(value, name, item) => {
-                                const key = item.dataKey as keyof typeof chartConfig;
-                                const config = chartConfig[key]
+                             formatter={(value, name) => {
+                                const key = name as keyof typeof chartConfig;
+                                const config = chartConfig[key];
                                 if (!config) return null;
                                 
                                 const absValue = Math.abs(Number(value));
@@ -95,7 +95,7 @@ export function CallsChart({ data }: CallsChartProps) {
                     <LabelList 
                         dataKey="abertos" 
                         position="top"
-                        offset={4}
+                        offset={8}
                         formatter={(value: number) => value === maxAbertos ? value.toLocaleString() : ''}
                         className="fill-foreground font-medium text-xs"
                     />
@@ -103,8 +103,8 @@ export function CallsChart({ data }: CallsChartProps) {
                 <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[0, 0, 4, 4]} name="Solucionados" stackId="a">
                      <LabelList 
                         dataKey="solucionados" 
-                        position="bottom" 
-                        offset={4}
+                        position="insideBottom"
+                        offset={-8}
                         formatter={(value: number) => value === minSolucionados ? Math.abs(value).toLocaleString() : ''}
                         className="fill-foreground font-medium text-xs"
                     />
@@ -120,7 +120,7 @@ export function CallsChart({ data }: CallsChartProps) {
                     <LabelList 
                         dataKey="backlog" 
                         position="top"
-                        offset={4}
+                        offset={8}
                         formatter={(value: number) => (value === maxBacklog || value === minBacklog) ? value.toLocaleString() : ''}
                         className="fill-destructive font-medium text-xs"
                     />
