@@ -97,6 +97,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
 
+    // Draw markers for stores not in the route
     allStores.forEach(store => {
       if (!routeStoreIds.has(store.id)) {
         L.marker([store.lat, store.lng], { icon: blueIcon })
@@ -105,6 +106,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       }
     });
     
+    // Draw markers for stores in the route
     routeStops.forEach((stop, index) => {
       let icon = greenIcon;
       let popupText = `<b>${stop.name}</b><br>${stop.city}`;
@@ -121,6 +123,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         .addTo(layersRef.current);
     });
 
+    // Draw the polyline and distance markers
     if (routeStops.length > 1) {
       const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
@@ -140,6 +143,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       }
     }
     
+    // Adjust map bounds
     if (routeStops.length > 0) {
       const bounds = L.latLngBounds(routeStops.map(loc => [loc.lat, loc.lng]));
       if (bounds.isValid()) {
@@ -153,24 +157,25 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
   
   useEffect(() => {
     // Inject custom CSS for distance markers
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .distance-marker {
-        background-color: rgba(255, 255, 255, 0.8);
-        border: 1px solid #777;
-        border-radius: 4px;
-        padding: 2px 5px;
-        font-size: 10px;
-        font-weight: bold;
-        text-align: center;
-        white-space: nowrap;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
+    const styleId = 'distance-marker-style';
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.innerHTML = `
+        .distance-marker {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #777;
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        `;
+        document.head.appendChild(style);
+    }
   }, []);
 
   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
