@@ -1,4 +1,4 @@
-import type { Item, Incident } from '@/lib/types';
+import type { Item, Incident, Category } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 
 function getRandomClassification() {
@@ -8,12 +8,22 @@ function getRandomClassification() {
   return 'C';
 }
 
-const categories = [
-    "Segurança / CFTV / Alarme", "Elétrica / Iluminação", "Refrigeração / Climatização Central",
-    "Energização / Geradores / Nobreaks", "Hidráulica / Utilidades", "Infraestrutura Predial",
-    "Açougue / Frios", "Rotisserie / Cozinha", "Padaria / Confeitaria", "Hortifrúti / Floricultura",
-    "Depósito / Doca", "Limpeza e Apoio", "Estacionamento / Acessos / Cancelas",
-    "Refeitório / Vestiários / Áreas de Apoio ao Colaborador", "Logo/ Painéis / Iluminação decorativa"
+export const mockCategories: Category[] = [
+    { id: "CAT-001", name: "Segurança / CFTV / Alarme", description: "Sistemas de vigilância, controle de acesso e alarmes." },
+    { id: "CAT-002", name: "Elétrica / Iluminação", description: "Infraestrutura elétrica, quadros de energia e sistemas de iluminação." },
+    { id: "CAT-003", name: "Refrigeração / Climatização Central", description: "Equipamentos de refrigeração industrial e ar condicionado central." },
+    { id: "CAT-004", name: "Energização / Geradores / Nobreaks", description: "Fontes de energia de emergência e estabilizadores." },
+    { id: "CAT-005", name: "Hidráulica / Utilidades", description: "Sistemas de abastecimento de água e saneamento." },
+    { id: "CAT-006", name: "Infraestrutura Predial", description: "Elevadores, estruturas e sistemas de segurança predial." },
+    { id: "CAT-007", name: "Açougue / Frios", description: "Equipamentos específicos para o setor de carnes e frios." },
+    { id: "CAT-008", name: "Rotisserie / Cozinha", description: "Equipamentos para preparo de alimentos em cozinhas industriais." },
+    { id: "CAT-009", name: "Padaria / Confeitaria", description: "Maquinário para produção de pães e confeitaria." },
+    { id: "CAT-010", name: "Hortifrúti / Floricultura", description: "Sistemas de refrigeração e exposição para produtos frescos." },
+    { id: "CAT-011", name: "Depósito / Doca", description: "Equipamentos para logística e armazenamento." },
+    { id: "CAT-012", name: "Limpeza e Apoio", description: "Maquinário para limpeza de grandes áreas." },
+    { id: "CAT-013", name: "Estacionamento / Acessos / Cancelas", description: "Controle de acesso de veículos e segurança perimetral." },
+    { id: "CAT-014", name: "Refeitório / Vestiários / Áreas de Apoio ao Colaborador", description: "Infraestrutura para áreas de funcionários." },
+    { id: "CAT-015", name: "Logo/ Painéis / Iluminação decorativa", description: "Sistemas de comunicação visual e iluminação de fachada." }
 ];
 
 const itemNames = [
@@ -35,7 +45,7 @@ const itemNames = [
     "Iluminação decorativa / fachadas"
 ];
 
-const itemCategoryMap = {
+const itemCategoryMap: Record<string, string> = {
     "DVR / NVR Central": "Segurança / CFTV / Alarme",
     "Câmeras de frente de loja / cofres": "Segurança / CFTV / Alarme",
     "Sensores de presença / alarme": "Segurança / CFTV / Alarme",
@@ -82,14 +92,6 @@ const itemCategoryMap = {
     "Equipamentos de cozinha / micro-ondas": "Refeitório / Vestiários / Áreas de Apoio ao Colaborador",
     "Painéis LED / letreiros": "Logo/ Painéis / Iluminação decorativa",
     "Iluminação decorativa / fachadas": "Logo/ Painéis / Iluminação decorativa",
-    "Ar Condicionado Central": "Refrigeração / Climatização Central",
-    "Câmera de Segurança 2": "Segurança / CFTV / Alarme",
-    "Painel Elétrico Principal": "Elétrica / Iluminação",
-    "Freezer Horizontal": "Refrigeração / Climatização Central",
-    "Sistema de Alarme": "Segurança / CFTV / Alarme",
-    "Gerador de Energia": "Energização / Geradores / Nobreaks",
-    "Câmera de Segurança 5": "Segurança / CFTV / Alarme",
-    "Balcão Refrigerado": "Açougue / Frios"
 };
 
 
@@ -119,7 +121,7 @@ export const mockItems: Item[] = itemNames.map((name, index) => {
 
 
 export const mockIncidents: Incident[] = [
-  { id: 'INC-001', itemName: 'Ar Condicionado Central', location: 'Loja A (SP)', status: 'Aberto', openedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: "Parada total do equipamento de refrigeração central, afetando a climatização de toda a área de vendas. A temperatura interna subiu 5°C em 1 hora.", lat: -23.5505, lng: -46.6333 },
+  { id: 'INC-001', itemName: 'Rack de compressores / unidade condensadora', location: 'Loja A (SP)', status: 'Aberto', openedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: "Parada total do equipamento de refrigeração central, afetando a climatização de toda a área de vendas. A temperatura interna subiu 5°C em 1 hora.", lat: -23.5505, lng: -46.6333 },
   { id: 'INC-002', itemName: 'Balcões refrigerados', location: 'Loja B (RJ)', status: 'Em Andamento', openedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: "Não está atingindo a temperatura ideal, risco de perda de produtos perecíveis. A temperatura está oscilando entre 8°C e 12°C.", lat: -22.9068, lng: -43.1729 },
   { id: 'INC-003', itemName: 'QGBT / Quadro geral', location: 'Loja C (MG)', status: 'Resolvido', openedAt: new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString(), description: "Desarme do disjuntor principal causou interrupção total de energia na loja por 45 minutos. Todas as operações foram paralisadas.", lat: -19.9167, lng: -43.9345 },
   { id: 'INC-004', itemName: 'Nobreak central / retificador', location: 'Depósito Central (BA)', status: 'Fechado', openedAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(), description: "Falha na bateria do nobreak durante uma queda de energia, resultando na perda de dados não salvos nos servidores administrativos.", lat: -12.9777, lng: -38.5016 },

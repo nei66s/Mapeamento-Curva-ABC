@@ -11,6 +11,7 @@ import {
   Grid3x3,
   ShieldAlert,
   Settings,
+  ListCollapse,
 } from "lucide-react";
 
 export default function AppSidebar() {
@@ -37,6 +38,18 @@ export default function AppSidebar() {
             </TooltipTrigger>
             <TooltipContent side="right">Dashboard</TooltipContent>
           </Tooltip>
+           <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="/dashboard/categories"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              >
+                <ListCollapse className="h-5 w-5" />
+                <span className="sr-only">Categorias</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Categorias</TooltipContent>
+          </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
@@ -44,7 +57,7 @@ export default function AppSidebar() {
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               >
                 <Grid3x3 className="h-5 w-5" />
-                <span className="sr-only">Matriz</span>
+                <span className="sr-only">Matriz de Itens</span>
               </Link>
             </TooltipTrigger>
             <TooltipContent side="right">Matriz de Itens</TooltipContent>

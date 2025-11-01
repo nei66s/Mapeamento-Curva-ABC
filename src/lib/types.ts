@@ -2,6 +2,12 @@ export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
 
+export type Category = {
+  id: string;
+  name: string;
+  description: string;
+};
+
 export type Item = {
   id: string;
   name: string;

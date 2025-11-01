@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -38,14 +38,17 @@ import {
 import { PageHeader } from '@/components/shared/page-header';
 import { ClassificationBadge } from '@/components/shared/risk-badge';
 import { ItemForm } from '@/components/dashboard/matrix/item-form';
-import { mockItems } from '@/lib/mock-data';
+import { mockItems, mockCategories } from '@/lib/mock-data';
 import type { Item } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -56,6 +59,14 @@ export default function MatrixPage() {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+
+  const filteredItems = useMemo(() => {
+    if (!categoryFilter) {
+      return items;
+    }
+    return items.filter(item => item.category === categoryFilter);
+  }, [items, categoryFilter]);
 
   const handleFormSubmit = (values: Item) => {
     if (selectedItem) {
@@ -102,6 +113,12 @@ export default function MatrixPage() {
     setIsFormOpen(true);
   }
 
+  const handleCategoryFilterChange = (category: string) => {
+    setCategoryFilter(prev => (prev === category ? null : category));
+  };
+  
+  const clearFilter = () => setCategoryFilter(null);
+
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
@@ -123,6 +140,7 @@ export default function MatrixPage() {
             </DialogHeader>
             <ItemForm
               item={selectedItem}
+              categories={mockCategories}
               onSubmit={handleFormSubmit}
               onCancel={() => setIsFormOpen(false)}
             />
@@ -131,10 +149,43 @@ export default function MatrixPage() {
       </PageHeader>
       <Card>
         <CardHeader>
-          <CardTitle>Todos os Itens</CardTitle>
-          <CardDescription>
-            Lista completa de itens cadastrados no sistema.
-          </CardDescription>
+           <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Todos os Itens</CardTitle>
+              <CardDescription>
+                {filteredItems.length} de {items.length} itens exibidos.
+              </CardDescription>
+            </div>
+             <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex gap-2">
+                      <ListFilter className="h-4 w-4" />
+                      Filtrar por Categoria
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Selecione uma categoria</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {mockCategories.map(cat => (
+                       <DropdownMenuCheckboxItem
+                        key={cat.id}
+                        checked={categoryFilter === cat.name}
+                        onSelect={e => e.preventDefault()}
+                        onCheckedChange={() => handleCategoryFilterChange(cat.name)}
+                      >
+                        {cat.name}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {categoryFilter && (
+                   <Button variant="ghost" size="icon" onClick={clearFilter} className="text-muted-foreground">
+                      <X className="h-4 w-4" />
+                   </Button>
+                )}
+             </div>
+           </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -148,7 +199,7 @@ export default function MatrixPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map(item => (
+              {filteredItems.map(item => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">

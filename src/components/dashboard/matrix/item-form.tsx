@@ -21,17 +21,18 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import type { Item, Classification } from '@/lib/types';
+import type { Item, Category } from '@/lib/types';
 
 interface ItemFormProps {
   item?: Item | null;
+  categories: Category[];
   onSubmit: (data: Item) => void;
   onCancel: () => void;
 }
 
 const formSchema = z.object({
   name: z.string().min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
-  category: z.string().min(3, { message: 'A categoria deve ter pelo menos 3 caracteres.' }),
+  category: z.string().min(1, { message: 'Por favor, selecione uma categoria.' }),
   storeCount: z.coerce.number().int().min(0, { message: 'A quantidade de lojas deve ser um número positivo.' }),
   generalIndex: z.coerce.number().int().min(1, 'O índice deve ser no mínimo 1.').max(10, 'O índice deve ser no máximo 10.'),
   classification: z.enum(['A', 'B', 'C']),
@@ -44,7 +45,7 @@ const formSchema = z.object({
 
 type ItemFormData = z.infer<typeof formSchema>;
 
-export function ItemForm({ item, onSubmit, onCancel }: ItemFormProps) {
+export function ItemForm({ item, categories, onSubmit, onCancel }: ItemFormProps) {
   const form = useForm<ItemFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,32 +69,44 @@ export function ItemForm({ item, onSubmit, onCancel }: ItemFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-4 py-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome do Item</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Ar Condicionado Central" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Categoria</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Refrigeração" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome do Item</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Ar Condicionado Central" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoria</FormLabel>
+                 <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione uma categoria" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+       
          <FormField
           control={form.control}
           name="imageUrl"
