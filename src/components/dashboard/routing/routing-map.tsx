@@ -29,7 +29,7 @@ const greenIcon = new L.Icon({
 
 interface RoutingMapProps {
   allStores: Store[];
-  routeStops: Pick<Store, 'id' | 'name' | 'lat' | 'lng' | 'city'>[];
+  routeStops: RouteStop[];
 }
 
 
@@ -76,17 +76,23 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
       let popupText = `<b>${store.name}</b><br>${store.city}`;
       if (stopInfo) {
-        popupText += `<br><b>Visita alocada neste mês</b>`;
+        popupText += `<br><b>Visita #${stopInfo.visitOrder} na rota</b>`;
       }
 
       L.marker([store.lat, store.lng], { icon })
         .bindPopup(popupText)
         .addTo(markersLayerRef.current);
     });
+    
+    // Draw route line if there are stops
+    if (routeStops.length > 1) {
+      const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
+      routeLineRef.current = L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(map);
+    }
 
     // Fit map to show all stores if there are stops
     if (routeStops.length > 0) {
-      const bounds = L.latLngBounds(allStores.map(stop => [stop.lat, stop.lng]));
+      const bounds = L.latLngBounds(routeStops.map(stop => [stop.lat, stop.lng]));
       map.fitBounds(bounds, { padding: [50, 50] });
     } else {
         map.setView([-22.8, -47.2], 9);

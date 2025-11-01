@@ -3,8 +3,6 @@
  * @fileOverview Provides a flow to optimize a route of stores based on their coordinates.
  *
  * - optimizeRoute - A function that takes a list of stores and returns an optimized route.
- * - RouteOptimizerInput - The input type for the optimizeRoute function.
- * - RouteOptimizerOutput - The return type for the optimizeRoute function.
  */
 
 import {ai} from '@/ai/genkit';
