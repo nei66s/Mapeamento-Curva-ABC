@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, GripVertical, Sparkles, AlertCircle, Warehouse } from 'lucide-react';
+import { Trash2, GripVertical, Sparkles, Warehouse } from 'lucide-react';
 import { allStores } from '@/lib/mock-data';
 import { mockTeams } from '@/lib/teams';
 import type { Store, Team, RouteStop } from '@/lib/types';
@@ -20,12 +20,11 @@ import { optimizeRoute, type RouteOptimizerOutput } from '@/ai/flows/route-optim
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, AlertCircle } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
@@ -54,7 +53,7 @@ function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolea
             <GripVertical className="h-5 w-5 text-muted-foreground" />
         </Button>
         <div>
-            <p className={cn("font-semibold", isFirst ? "text-primary": "")}>{stop.name}</p>
+            <p className={cn("font-semibold", isFirst ? "text-primary": "")}>{isFirst && <Warehouse className="inline-block h-4 w-4 mr-2" />} {stop.name}</p>
             <p className="text-sm text-muted-foreground">{isFirst ? "Ponto de Partida" : stop.city}</p>
         </div>
       </div>
@@ -71,7 +70,7 @@ function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolea
 export default function RoutingPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [storesToVisit, setStoresToVisit] = useState<RouteStop[]>([]);
-  const [availableStores, setAvailableStores] = useState<Store[]>(allStores);
+  const [availableStores, setAvailableStores] = useState<Store[]>(allStores.sort((a,b) => a.name.localeCompare(b.name)));
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizationResult, setOptimizationResult] = useState<RouteOptimizerOutput | null>(null);
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
@@ -289,12 +288,12 @@ export default function RoutingPage() {
         </div>
 
         <div className="lg:col-span-2">
-           <Card className="flex flex-col min-h-[720px]">
+           <Card className="min-h-[720px]">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1">
+            <CardContent className="h-[640px] p-0">
               <RoutingMap allStores={allStores} routeStops={routeWithCD} />
             </CardContent>
           </Card>
@@ -303,5 +302,3 @@ export default function RoutingPage() {
     </div>
   );
 }
-
-    
