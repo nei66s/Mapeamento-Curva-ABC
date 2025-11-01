@@ -44,7 +44,7 @@ import { IncidentAnalysis } from '@/components/dashboard/incidents/incident-anal
 import { Skeleton } from '@/components/ui/skeleton';
 
 const IncidentMap = dynamic(() =>
-  import('@/components/dashboard/incidents/incident-map').then((mod) => mod.IncidentMap),
+  import('@/components/dashboard/incidents/incident-map'),
   { 
     ssr: false,
     loading: () => <Skeleton className="h-[400px] w-full" /> 
