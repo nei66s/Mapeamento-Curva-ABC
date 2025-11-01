@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,6 +41,16 @@ import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { IncidentAnalysis } from '@/components/dashboard/incidents/incident-analysis';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const IncidentMap = dynamic(() =>
+  import('@/components/dashboard/incidents/incident-map').then((mod) => mod.IncidentMap),
+  { 
+    ssr: false,
+    loading: () => <Skeleton className="h-[400px] w-full" /> 
+  }
+);
+
 
 const statusVariantMap: Record<Incident['status'], 'destructive' | 'accent' | 'success' | 'default'> = {
   Aberto: 'destructive',
@@ -169,6 +180,17 @@ export default function IncidentsPage() {
           </DialogContent>
         </Dialog>
       </PageHeader>
+      
+      <Card>
+        <CardHeader>
+            <CardTitle>Mapa de Incidentes</CardTitle>
+            <CardDescription>Visualização geográfica dos incidentes abertos ou em andamento.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <IncidentMap incidents={filteredIncidents} />
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardHeader className='flex-row items-center justify-between'>
