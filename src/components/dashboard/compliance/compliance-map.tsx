@@ -16,10 +16,9 @@ interface ComplianceMapProps {
   scheduledVisits: StoreComplianceData[];
 }
 
-// Define custom icons
 const blueIcon = new L.Icon({
 	iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-	shadowUrl: shadowUrl.src,
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 	iconSize: [25, 41],
 	iconAnchor: [12, 41],
 	popupAnchor: [1, -34],
@@ -28,7 +27,7 @@ const blueIcon = new L.Icon({
 
 const greenIcon = new L.Icon({
 	iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-	shadowUrl: shadowUrl.src,
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 	iconSize: [25, 41],
 	iconAnchor: [12, 41],
 	popupAnchor: [1, -34],
@@ -37,7 +36,7 @@ const greenIcon = new L.Icon({
 
 const orangeIcon = new L.Icon({
 	iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-	shadowUrl: shadowUrl.src,
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
 	iconSize: [25, 41],
 	iconAnchor: [12, 41],
 	popupAnchor: [1, -34],
@@ -48,33 +47,36 @@ const orangeIcon = new L.Icon({
 export default function ComplianceMap({ allStores, scheduledVisits }: ComplianceMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.Marker[]>([]);
-
-  useEffect(() => {
-    // Correctly configure the default icon path for Leaflet
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: iconRetinaUrl.src,
-      iconUrl: iconUrl.src,
-      shadowUrl: shadowUrl.src,
-    });
-  }, []);
+  const markersRef = useRef<L.LayerGroup>(new L.LayerGroup());
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
+        // Fix for icon path issue with Next.js
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        L.Icon.Default.mergeOptions({
+            iconRetinaUrl: iconRetinaUrl.src,
+            iconUrl: iconUrl.src,
+            shadowUrl: shadowUrl.src,
+        });
+        
         const map = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
         mapRef.current = map;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
-    }
 
-    // Clear previous markers
-    if (mapRef.current) {
-      markersRef.current.forEach(marker => mapRef.current!.removeLayer(marker));
-      markersRef.current = [];
+        markersRef.current.addTo(map);
     }
+  }, []);
+
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    
+    // Clear previous markers
+    markersRef.current.clearLayers();
     
     // Determine the status of each store
     const storeStatusMap = new Map<string, 'completed' | 'pending'>();
@@ -83,37 +85,24 @@ export default function ComplianceMap({ allStores, scheduledVisits }: Compliance
         storeStatusMap.set(visit.storeId, hasPending ? 'pending' : 'completed');
     });
 
-    if (mapRef.current) {
-        allStores.forEach(store => {
-            let icon = blueIcon;
-            let popupText = `<b>${store.name}</b><br>${store.city}<br>Sem visita no período.`;
-            const status = storeStatusMap.get(store.id);
+    allStores.forEach(store => {
+        let icon = blueIcon;
+        let popupText = `<b>${store.name}</b><br>${store.city}<br>Sem visita no período.`;
+        const status = storeStatusMap.get(store.id);
 
-            if (status === 'completed') {
-                icon = greenIcon;
-                popupText = `<b>${store.name}</b><br>${store.city}<br>Status: Concluído`;
-            } else if (status === 'pending') {
-                icon = orangeIcon;
-                popupText = `<b>${store.name}</b><br>${store.city}<br>Status: Pendente`;
-            }
-            
-            const marker = L.marker([store.lat, store.lng], { icon })
-                .addTo(mapRef.current!)
-                .bindPopup(popupText);
-            
-            markersRef.current.push(marker);
-        });
-    }
+        if (status === 'completed') {
+            icon = greenIcon;
+            popupText = `<b>${store.name}</b><br>${store.city}<br>Status: Concluído`;
+        } else if (status === 'pending') {
+            icon = orangeIcon;
+            popupText = `<b>${store.name}</b><br>${store.city}<br>Status: Pendente`;
+        }
+        
+        L.marker([store.lat, store.lng], { icon })
+            .bindPopup(popupText)
+            .addTo(markersRef.current);
+    });
 
-    return () => {
-       if (mapRef.current) {
-            markersRef.current.forEach(marker => {
-                if (mapRef.current!.hasLayer(marker)) {
-                    mapRef.current!.removeLayer(marker);
-                }
-            });
-       }
-    };
   }, [allStores, scheduledVisits]);
 
   return (
