@@ -43,10 +43,6 @@ export default function IndicatorsPage() {
     })).reverse();
   }, []);
   
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
   const agingData = selectedData ? [
     { range: 'Até 30 dias', value: selectedData.aging.inferior_30 },
     { range: '30-60 dias', value: selectedData.aging.entre_30_60 },
@@ -87,21 +83,22 @@ export default function IndicatorsPage() {
                 />
                  <KpiCard
                     title="Backlog"
-                    value={selectedData.backlog.toLocaleString()}
+                    value={selectedData.backlog}
                     description="Chamados pendentes"
                     icon={TrendingUp}
                 />
                 <KpiCard
                     title="Valor Mensal"
-                    value={formatCurrency(selectedData.valor_mensal)}
+                    value={selectedData.valor_mensal}
                     change={selectedData.variacao_percentual_valor}
                     changeType={selectedData.variacao_percentual_valor >= 0 ? 'increase' : 'decrease'}
                     description="Custo total em manutenção"
                     icon={HandCoins}
+                    formatAsCurrency={true}
                 />
                  <KpiCard
                     title="Chamados Solucionados"
-                    value={selectedData.chamados_solucionados.toLocaleString()}
+                    value={selectedData.chamados_solucionados}
                     description={`${selectedData.chamados_abertos} abertos no mês`}
                     icon={selectedData.chamados_solucionados > selectedData.chamados_abertos ? ArrowUp : ArrowDown}
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
