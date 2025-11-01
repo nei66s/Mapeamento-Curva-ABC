@@ -1,4 +1,5 @@
 
+
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
@@ -81,7 +82,7 @@ export type AgingCriticidade = {
 };
 
 export type MaintenanceIndicator = {
-  id: string;
+  id:string;
   mes: string;
   sla_mensal: number;
   meta_sla: number;
@@ -121,4 +122,7 @@ export type Team = {
 
 export type RouteStop = Store & {
   visitOrder: number;
+  visitDate?: string;
 };
+
+    

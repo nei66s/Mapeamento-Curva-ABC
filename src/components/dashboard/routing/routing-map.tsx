@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -103,6 +104,9 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     if (routeStops.length > 0) {
       const bounds = L.latLngBounds(routeStops.map(stop => [stop.lat, stop.lng]));
       map.fitBounds(bounds, { padding: [50, 50] });
+    } else if (allStores.length > 0) {
+        const bounds = L.latLngBounds(allStores.map(store => [store.lat, store.lng]));
+        map.fitBounds(bounds, { padding: [50, 50] });
     } else {
         map.setView([-22.8, -47.2], 9);
     }
@@ -112,3 +116,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', borderRadius: 'var(--radius)' }} />;
 }
+
+    

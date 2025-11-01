@@ -7,7 +7,6 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
 import { PlusCircle, Trash2, GripVertical, Sparkles, AlertCircle } from 'lucide-react';
 import { allStores } from '@/lib/mock-data';
 import { mockTeams } from '@/lib/teams';
@@ -17,9 +16,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { optimizeRoute } from '@/ai/flows/route-optimizer-flow';
+import { optimizeRoute, type RouteOptimizerOutput } from '@/ai/flows/route-optimizer-flow';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
@@ -52,6 +57,11 @@ function SortableStoreItem({ stop }: { stop: RouteStop }) {
             <p className="text-sm text-muted-foreground">{stop.city}</p>
         </div>
       </div>
+       {stop.visitDate && (
+        <div className="text-sm font-medium text-muted-foreground pr-2">
+          {format(new Date(stop.visitDate), 'dd/MM')}
+        </div>
+      )}
     </div>
   );
 }
@@ -62,7 +72,8 @@ export default function RoutingPage() {
   const [storesToVisit, setStoresToVisit] = useState<RouteStop[]>([]);
   const [availableStores, setAvailableStores] = useState<Store[]>(allStores);
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [optimizedDistance, setOptimizedDistance] = useState<number | null>(null);
+  const [optimizationResult, setOptimizationResult] = useState<RouteOptimizerOutput | null>(null);
+  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
 
   const { toast } = useToast();
 
@@ -75,15 +86,16 @@ export default function RoutingPage() {
     if (store) {
       setStoresToVisit(prev => [...prev, { ...store, visitOrder: prev.length + 1 }]);
       setAvailableStores(prev => prev.filter(s => s.id !== storeId));
+      setOptimizationResult(null);
     }
   };
   
   const removeStoreFromRoute = (storeId: string) => {
     const store = storesToVisit.find(s => s.id === storeId);
     if(store) {
-        setStoresToVisit(prev => prev.filter(s => s.id !== storeId));
-        // Add back to available stores, keeping original sorting
+        setStoresToVisit(prev => prev.filter(s => s.id !== storeId).map((s, i) => ({ ...s, visitOrder: i + 1 })));
         setAvailableStores(prev => [...prev, allStores.find(s => s.id === storeId)!].sort((a,b) => a.name.localeCompare(b.name)));
+        setOptimizationResult(null);
     }
   };
 
@@ -97,6 +109,7 @@ export default function RoutingPage() {
         const newOrder = arrayMove(items, oldIndex, newIndex);
         return newOrder.map((item, index) => ({...item, visitOrder: index + 1}));
       });
+      setOptimizationResult(null);
     }
   }, []);
 
@@ -110,21 +123,24 @@ export default function RoutingPage() {
       return;
     }
     setIsOptimizing(true);
-    setOptimizedDistance(null);
+    setOptimizationResult(null);
     try {
-      const response = await optimizeRoute({ stores: storesToVisit });
+      const response = await optimizeRoute({ 
+          stores: storesToVisit,
+          startDate: startDate?.toISOString() ?? new Date().toISOString(),
+      });
       
-      const reorderedStops = response.optimizedRoute.map((storeId, index) => {
-          const store = storesToVisit.find(s => s.id === storeId)!;
-          return { ...store, visitOrder: index + 1 };
+      const reorderedStops = response.optimizedRoute.map((stop, index) => {
+          const storeDetails = storesToVisit.find(s => s.id === stop.storeId)!;
+          return { ...storeDetails, visitOrder: index + 1, visitDate: stop.visitDate };
       });
       
       setStoresToVisit(reorderedStops);
-      setOptimizedDistance(response.totalDistance);
+      setOptimizationResult(response);
 
       toast({
         title: 'Rota Otimizada!',
-        description: `A rota foi otimizada com sucesso pela IA. Distância total: ${response.totalDistance.toFixed(2)} km.`,
+        description: `A rota mensal foi otimizada com sucesso pela IA.`,
       });
     } catch (error) {
       console.error("Error optimizing route:", error);
@@ -152,10 +168,10 @@ export default function RoutingPage() {
         <div className="lg:col-span-1 flex flex-col gap-8">
             <Card>
                  <CardHeader>
-                    <CardTitle>1. Selecione a Equipe</CardTitle>
-                    <CardDescription>Escolha a equipe que fará a rota de visitas.</CardDescription>
+                    <CardTitle>1. Selecione a Equipe e Data</CardTitle>
+                    <CardDescription>Escolha a equipe e a data de início da rota.</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="grid grid-cols-2 gap-4">
                     <Select onValueChange={setSelectedTeamId} value={selectedTeamId || ''}>
                         <SelectTrigger>
                             <SelectValue placeholder="Selecione uma equipe" />
@@ -168,6 +184,29 @@ export default function RoutingPage() {
                             ))}
                         </SelectContent>
                     </Select>
+                     <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant={'outline'}
+                            className={cn(
+                                'justify-start text-left font-normal',
+                                !startDate && 'text-muted-foreground'
+                            )}
+                            >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {startDate ? format(startDate, 'PPP', { locale: ptBR }) : <span>Data de início</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar
+                            mode="single"
+                            selected={startDate}
+                            onSelect={setStartDate}
+                            initialFocus
+                            locale={ptBR}
+                            />
+                        </PopoverContent>
+                    </Popover>
                 </CardContent>
             </Card>
 
@@ -194,15 +233,15 @@ export default function RoutingPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>3. Rota do Mês</CardTitle>
-                    <CardDescription>Ordene as visitas. A primeira da lista é a primeira a ser visitada.</CardDescription>
+                    <CardTitle>3. Rota Mensal</CardTitle>
+                    <CardDescription>Ordene as visitas ou use a IA para otimizar a rota e as datas.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {storesToVisit.length > 0 && (
                       <div className="flex items-center justify-between mb-4">
                         <Button 
                             onClick={handleOptimizeRoute} 
-                            disabled={isOptimizing || storesToVisit.length < 2}
+                            disabled={isOptimizing || storesToVisit.length < 2 || !startDate}
                             className='flex gap-2'
                         >
                             <Sparkles />
@@ -211,12 +250,12 @@ export default function RoutingPage() {
                       </div>
                     )}
                     
-                    {optimizedDistance !== null && (
+                    {optimizationResult && (
                       <Alert className="mb-4">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Rota Otimizada</AlertTitle>
                         <AlertDescription>
-                           Distância total estimada: <b>{optimizedDistance.toFixed(2)} km</b>.
+                           Distância total estimada: <b>{optimizationResult.totalDistance.toFixed(2)} km</b>. As datas foram sugeridas.
                         </AlertDescription>
                       </Alert>
                     )}
@@ -259,3 +298,5 @@ export default function RoutingPage() {
     </div>
   );
 }
+
+    
