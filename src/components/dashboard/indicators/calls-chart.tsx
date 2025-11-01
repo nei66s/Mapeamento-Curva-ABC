@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, Line } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, Line, LabelList } from "recharts";
 import {
   Card,
   CardContent,
@@ -40,6 +40,11 @@ export function CallsChart({ data }: CallsChartProps) {
       backlog: item.backlog,
   }));
 
+  const maxAbertos = Math.max(...chartData.map(d => d.abertos));
+  const minSolucionados = Math.min(...chartData.map(d => d.solucionados));
+  const maxBacklog = Math.max(...chartData.map(d => d.backlog));
+  const minBacklog = Math.min(...chartData.map(d => d.backlog));
+
   return (
     <Card>
       <CardHeader>
@@ -50,7 +55,7 @@ export function CallsChart({ data }: CallsChartProps) {
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
             <ComposedChart 
                 data={chartData} 
-                margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
                 stackOffset="sign"
             >
                 <CartesianGrid vertical={false} />
@@ -86,8 +91,22 @@ export function CallsChart({ data }: CallsChartProps) {
                     }
                 />
                 <Legend />
-                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name="Abertos" stackId="a" />
-                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[0, 0, 4, 4]} name="Solucionados" stackId="a" />
+                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name="Abertos" stackId="a">
+                    <LabelList 
+                        dataKey="abertos" 
+                        position="top" 
+                        formatter={(value: number) => value === maxAbertos ? value.toLocaleString() : ''}
+                        className="fill-foreground font-medium text-xs"
+                    />
+                </Bar>
+                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[0, 0, 4, 4]} name="Solucionados" stackId="a">
+                     <LabelList 
+                        dataKey="solucionados" 
+                        position="bottom" 
+                        formatter={(value: number) => value === minSolucionados ? Math.abs(value).toLocaleString() : ''}
+                        className="fill-foreground font-medium text-xs"
+                    />
+                </Bar>
                 <Line 
                     type="monotone"
                     dataKey="backlog"
@@ -95,7 +114,14 @@ export function CallsChart({ data }: CallsChartProps) {
                     strokeWidth={2}
                     dot={false}
                     name="Backlog"
-                />
+                >
+                    <LabelList 
+                        dataKey="backlog" 
+                        position="top"
+                        formatter={(value: number) => (value === maxBacklog || value === minBacklog) ? value.toLocaleString() : ''}
+                        className="fill-destructive font-medium text-xs"
+                    />
+                </Line>
             </ComposedChart>
         </ChartContainer>
       </CardContent>

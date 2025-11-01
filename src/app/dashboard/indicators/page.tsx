@@ -6,7 +6,6 @@ import { PageHeader } from '@/components/shared/page-header';
 import { mockMaintenanceIndicators } from '@/lib/mock-data';
 import type { MaintenanceIndicator } from '@/lib/types';
 import { KpiCard } from '@/components/dashboard/indicators/kpi-card';
-import { SlaTrendChart } from '@/components/dashboard/indicators/sla-trend-chart';
 import { CallsChart } from '@/components/dashboard/indicators/calls-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
@@ -16,39 +15,26 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { ArrowUp, ArrowDown, TrendingUp, HandCoins } from 'lucide-react';
-import { CriticalityChart } from '@/components/dashboard/indicators/criticality-chart';
+import { ArrowUp, ArrowDown, TrendingUp } from 'lucide-react';
+import { EditableSlaTable } from '@/components/dashboard/indicators/editable-sla-table';
+import { EditableCallsTable } from '@/components/dashboard/indicators/editable-calls-table';
+import { EditableAgingTable } from '@/components/dashboard/indicators/editable-aging-table';
 
 
 export default function IndicatorsPage() {
+  const [indicators, setIndicators] = useState<MaintenanceIndicator[]>(mockMaintenanceIndicators);
   const [selectedMonth, setSelectedMonth] = useState<string>(mockMaintenanceIndicators[mockMaintenanceIndicators.length - 1].mes);
 
   const selectedData = useMemo(() => {
-    return mockMaintenanceIndicators.find(d => d.mes === selectedMonth) || mockMaintenanceIndicators[0];
-  }, [selectedMonth]);
+    return indicators.find(d => d.mes === selectedMonth) || indicators[0];
+  }, [selectedMonth, indicators]);
 
   const allMonths = useMemo(() => {
-    return mockMaintenanceIndicators.map(d => ({
+    return indicators.map(d => ({
       value: d.mes,
       label: new Date(`${d.mes}-02`).toLocaleString('default', { month: 'long', year: 'numeric' })
     })).reverse();
-  }, []);
-  
-  const agingData = selectedData ? [
-    { range: 'Até 30 dias', value: selectedData.aging.inferior_30 },
-    { range: '30-60 dias', value: selectedData.aging.entre_30_60 },
-    { range: '60-90 dias', value: selectedData.aging.entre_60_90 },
-    { range: 'Acima de 90 dias', value: selectedData.aging.superior_90 },
-  ] : [];
+  }, [indicators]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -72,7 +58,7 @@ export default function IndicatorsPage() {
       
       {selectedData && (
         <>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <KpiCard
                     title="SLA Mensal"
                     value={`${selectedData.sla_mensal}%`}
@@ -88,15 +74,6 @@ export default function IndicatorsPage() {
                     icon={TrendingUp}
                 />
                 <KpiCard
-                    title="Valor Mensal"
-                    value={selectedData.valor_mensal}
-                    change={selectedData.variacao_percentual_valor}
-                    changeType={selectedData.variacao_percentual_valor >= 0 ? 'increase' : 'decrease'}
-                    description="Custo total em manutenção"
-                    icon={HandCoins}
-                    formatAsCurrency={true}
-                />
-                 <KpiCard
                     title="Chamados Solucionados"
                     value={selectedData.chamados_solucionados}
                     description={`${selectedData.chamados_abertos} abertos no mês`}
@@ -104,49 +81,15 @@ export default function IndicatorsPage() {
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
                 />
             </div>
-            <div className="grid gap-8 lg:grid-cols-5">
-                <div className="lg:col-span-3">
-                    <SlaTrendChart data={mockMaintenanceIndicators} />
-                </div>
-                 <div className="lg:col-span-2">
-                    <CallsChart data={mockMaintenanceIndicators} />
-                </div>
+            
+            <CallsChart data={indicators} />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <EditableSlaTable data={indicators} setData={setIndicators} />
+                <EditableCallsTable data={indicators} setData={setIndicators} />
             </div>
-            <div className="grid gap-8 lg:grid-cols-5">
-                 <div className="lg:col-span-2">
-                    <CriticalityChart data={selectedData.criticidade} />
-                 </div>
-                 <div className="lg:col-span-3">
-                     <Card>
-                        <CardHeader>
-                            <CardTitle>Aging do Backlog</CardTitle>
-                            <CardDescription>Distribuição dos chamados pendentes por tempo de abertura.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Faixa de Tempo</TableHead>
-                                        <TableHead className="text-right">Qtd. Chamados</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {agingData.map(item => (
-                                        <TableRow key={item.range}>
-                                            <TableCell className="font-medium">{item.range}</TableCell>
-                                            <TableCell className="text-right">
-                                                <Badge variant="secondary" className="text-base">
-                                                    {item.value.toLocaleString()}
-                                                </Badge>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                     </Card>
-                 </div>
-            </div>
+
+            <EditableAgingTable indicator={selectedData} />
         </>
       )}
 

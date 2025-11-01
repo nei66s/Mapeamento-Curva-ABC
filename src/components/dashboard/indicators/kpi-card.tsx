@@ -26,15 +26,17 @@ export function KpiCard({ title, value, change, changeType, description, icon: I
   const [displayValue, setDisplayValue] = useState(String(value));
 
   useEffect(() => {
+    let formattedValue: string;
     if (typeof value === 'number') {
       if (formatAsCurrency) {
-        setDisplayValue(value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }));
+        formattedValue = value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       } else {
-        setDisplayValue(value.toLocaleString('pt-BR'));
+        formattedValue = value.toLocaleString('pt-BR');
       }
     } else {
-        setDisplayValue(value);
+        formattedValue = value;
     }
+    setDisplayValue(formattedValue);
   }, [value, formatAsCurrency]);
 
   return (
