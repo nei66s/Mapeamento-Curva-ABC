@@ -103,8 +103,8 @@ export function CallsChart({ data }: CallsChartProps) {
                 <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[0, 0, 4, 4]} name="Solucionados" stackId="a">
                      <LabelList 
                         dataKey="solucionados" 
-                        position="insideBottom"
-                        offset={-8}
+                        position="bottom"
+                        offset={8}
                         formatter={(value: number) => value === minSolucionados ? Math.abs(value).toLocaleString() : ''}
                         className="fill-foreground font-medium text-xs"
                     />
