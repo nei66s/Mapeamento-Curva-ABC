@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, PlusCircle, Trash2 } from 'lucide-react';
+import { CalendarIcon, PlusCircle, Trash2, Sparkles, Loader2, Route as RouteIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { allStores } from '@/lib/mock-data';
@@ -21,6 +21,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { optimizeRoute } from '@/ai/flows/route-optimizer-flow';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
@@ -53,6 +55,8 @@ export default function RoutingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(mockTeams[0]?.id || null);
   const [routeStops, setRouteStops] = useState<RouteStop[]>([]);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [optimizationResult, setOptimizationResult] = useState<{distance: number} | null>(null);
   const { toast } = useToast();
 
   const sensors = useSensors(useSensor(PointerSensor));
@@ -61,6 +65,42 @@ export default function RoutingPage() {
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
     return allStores.filter(store => !routeStoreIds.has(store.id));
   }, [routeStops]);
+  
+  const handleOptimizeRoute = async () => {
+    if (routeStops.length < 2) {
+      toast({
+        variant: 'destructive',
+        title: 'Rota muito curta',
+        description: 'Adicione pelo menos duas lojas à rota para otimizá-la.',
+      });
+      return;
+    }
+    setIsOptimizing(true);
+    setOptimizationResult(null);
+    try {
+      const result = await optimizeRoute({ stores: routeStops });
+      const reorderedStops = result.optimizedRoute.map((storeId, index) => {
+        const originalStop = routeStops.find(s => s.id === storeId)!;
+        return { ...originalStop, visitOrder: index + 1 };
+      });
+      setRouteStops(reorderedStops);
+      setOptimizationResult({ distance: result.totalDistance });
+      toast({
+        title: 'Rota Otimizada!',
+        description: 'A ordem das visitas foi ajustada para máxima eficiência.',
+      });
+    } catch (error) {
+      console.error('Failed to optimize route:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Erro na Otimização',
+        description: 'Não foi possível otimizar a rota. Tente novamente.',
+      });
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
+
 
   const handleAddStoreToRoute = (storeId: string) => {
     const storeToAdd = allStores.find(s => s.id === storeId);
@@ -70,6 +110,7 @@ export default function RoutingPage() {
         visitOrder: routeStops.length + 1,
       };
       setRouteStops(prev => [...prev, newStop]);
+      setOptimizationResult(null); // Clear old result
       toast({
         title: 'Loja Adicionada à Rota',
         description: `${storeToAdd.name} foi adicionada ao roteiro.`,
@@ -84,6 +125,7 @@ export default function RoutingPage() {
         prev.filter(s => s.id !== storeId)
             .map((stop, index) => ({ ...stop, visitOrder: index + 1 }))
       );
+      setOptimizationResult(null); // Clear old result
       toast({
         variant: 'destructive',
         title: 'Loja Removida da Rota',
@@ -100,6 +142,7 @@ export default function RoutingPage() {
         const oldIndex = items.findIndex(item => item.id === active.id);
         const newIndex = items.findIndex(item => item.id === over.id);
         const newArray = arrayMove(items, oldIndex, newIndex);
+        setOptimizationResult(null); // Clear old result
         return newArray.map((item, index) => ({...item, visitOrder: index + 1}));
       });
     }
@@ -132,7 +175,7 @@ export default function RoutingPage() {
                   {selectedDate ? format(selectedDate, 'PPP', { locale: ptBR }) : <span>Escolha uma data</span>}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0" align="start">
                 <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus locale={ptBR} />
               </PopoverContent>
             </Popover>
@@ -168,7 +211,7 @@ export default function RoutingPage() {
           </Card>
         </div>
 
-        <div className="grid grid-rows-2 gap-8">
+        <div className="grid grid-rows-1 gap-8">
           <Card>
             <CardHeader>
               <CardTitle>Lojas Disponíveis</CardTitle>
@@ -193,10 +236,27 @@ export default function RoutingPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Rota do Dia</CardTitle>
-               {selectedTeam && <CardDescription>Para a equipe <span className='font-semibold text-primary'>{selectedTeam.name}</span></CardDescription>}
+              <div className="flex justify-between items-center">
+                <div>
+                    <CardTitle>Rota do Dia</CardTitle>
+                    {selectedTeam && <CardDescription>Para a equipe <span className='font-semibold text-primary'>{selectedTeam.name}</span></CardDescription>}
+                </div>
+                 <Button onClick={handleOptimizeRoute} disabled={isOptimizing || routeStops.length < 2}>
+                  {isOptimizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                  Otimizar Rota
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
+                {optimizationResult && (
+                    <Alert className="mb-4">
+                        <RouteIcon className="h-4 w-4" />
+                        <AlertTitle>Rota Otimizada!</AlertTitle>
+                        <AlertDescription>
+                            Distância total estimada do percurso: <span className="font-bold">{optimizationResult.distance.toFixed(2)} km</span>.
+                        </AlertDescription>
+                    </Alert>
+                )}
               <ScrollArea className="h-48">
                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                   <SortableContext items={routeStops} strategy={verticalListSortingStrategy}>
