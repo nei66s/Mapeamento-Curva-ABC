@@ -82,7 +82,6 @@ export function CallsChart({ data }: CallsChartProps) {
                                    </div>
                                 )
                             }}
-                            labelFormatter={(label) => new Date(label).toLocaleString('default', { month: 'short' })}
                         />
                     }
                 />
