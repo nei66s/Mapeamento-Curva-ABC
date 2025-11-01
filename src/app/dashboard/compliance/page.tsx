@@ -17,7 +17,9 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, getMonth, getYear, setMonth, setYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PlusCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ScheduleVisitForm } from '@/components/dashboard/compliance/schedule-visit-form';
 
 export default function CompliancePage() {
   const [checklistItems, setChecklistItems] = useState<ComplianceChecklistItem[]>(
@@ -29,6 +31,7 @@ export default function CompliancePage() {
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [displayDate, setDisplayDate] = useState(new Date());
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -71,6 +74,7 @@ export default function CompliancePage() {
     const newItem: ComplianceChecklistItem = {
       id: `CHK-${Date.now()}`,
       name: itemName,
+      classification: 'C' // Default to C
     };
     setChecklistItems(prev => [...prev, newItem]);
     setStoreData(prevData =>
@@ -101,6 +105,23 @@ export default function CompliancePage() {
       description: `"${itemToRemove.name}" foi removido do checklist.`,
     });
   };
+
+  const handleScheduleVisit = (storeName: string, visitDate: Date) => {
+    const newVisit: StoreComplianceData = {
+        storeId: `LOJA-${Date.now()}`,
+        storeName: storeName,
+        visitDate: visitDate.toISOString(),
+        items: checklistItems.map(item => ({ itemId: item.id, status: 'pending' })),
+    };
+
+    setStoreData(prev => [...prev, newVisit]);
+    toast({
+        title: "Visita agendada!",
+        description: `Visita para a ${storeName} agendada em ${format(visitDate, 'dd/MM/yyyy')}.`,
+    });
+    setIsFormOpen(false);
+  };
+
 
   const handleMonthChange = (month: number) => {
     setDisplayDate(prev => setMonth(prev, month));
@@ -135,7 +156,26 @@ export default function CompliancePage() {
       <PageHeader
         title="Conformidade Preventiva"
         description="Acompanhe a conclusão dos itens de manutenção essenciais em todas as lojas."
-      />
+      >
+        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex gap-2">
+              <PlusCircle />
+              Agendar Visita
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Agendar Nova Visita</DialogTitle>
+            </DialogHeader>
+            <ScheduleVisitForm 
+                onSubmit={handleScheduleVisit}
+                onCancel={() => setIsFormOpen(false)}
+                defaultDate={selectedDate || new Date()}
+            />
+          </DialogContent>
+        </Dialog>
+      </PageHeader>
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
             <ComplianceSummary storeData={filteredStoreData} checklistItems={checklistItems} />

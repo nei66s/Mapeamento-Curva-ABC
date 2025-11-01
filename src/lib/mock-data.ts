@@ -165,14 +165,33 @@ export const mockIncidents: Incident[] = [
   { id: 'INC-005', itemName: 'Câmeras externas / perímetro', location: 'Loja D (RS)', status: 'Aberto', openedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: "Uma das câmeras do perímetro parou de gravar. A imagem está congelada.", lat: -30.0346, lng: -51.2177 },
 ];
 
+const checklistItemCategoryMapping: Record<string, string[]> = {
+  'Geradores': ['Energização / Geradores / Nobreaks'],
+  'Elevadores e Esteiras': ['Infraestrutura Predial'],
+  'Rampas Hidráulicas': ['Depósito / Doca'],
+  'AVCB': ['Infraestrutura Predial'],
+  'Equipamentos de Produção': ['Açougue / Frios', 'Rotisserie / Cozinha', 'Padaria / Confeitaria'],
+  'Ar Cond. Central': ['Refrigeração / Climatização Central'],
+  'Ar Cond. Split': ['Refrigeração / Climatização Central'],
+};
+
+const getChecklistItemClassification = (itemName: string): Classification => {
+  const categories = checklistItemCategoryMapping[itemName] || [];
+  const itemsInCategories = mockItems.filter(item => categories.includes(item.category));
+  if (itemsInCategories.some(item => item.classification === 'A')) return 'A';
+  if (itemsInCategories.some(item => item.classification === 'B')) return 'B';
+  return 'C';
+}
+
+
 export const mockComplianceChecklistItems: ComplianceChecklistItem[] = [
-  { id: 'CHK-01', name: 'Geradores' },
-  { id: 'CHK-02', name: 'Elevadores e Esteiras' },
-  { id: 'CHK-03', name: 'Rampas Hidráulicas' },
-  { id: 'CHK-04', name: 'AVCB' },
-  { id: 'CHK-05', name: 'Equipamentos de Produção' },
-  { id: 'CHK-06', name: 'Ar Cond. Central' },
-  { id: 'CHK-07', name: 'Ar Cond. Split' },
+  { id: 'CHK-01', name: 'Geradores', classification: getChecklistItemClassification('Geradores') },
+  { id: 'CHK-02', name: 'Elevadores e Esteiras', classification: getChecklistItemClassification('Elevadores e Esteiras') },
+  { id: 'CHK-03', name: 'Rampas Hidráulicas', classification: getChecklistItemClassification('Rampas Hidráulicas') },
+  { id: 'CHK-04', name: 'AVCB', classification: getChecklistItemClassification('AVCB') },
+  { id: 'CHK-05', name: 'Equipamentos de Produção', classification: getChecklistItemClassification('Equipamentos de Produção') },
+  { id: 'CHK-06', name: 'Ar Cond. Central', classification: getChecklistItemClassification('Ar Cond. Central') },
+  { id: 'CHK-07', name: 'Ar Cond. Split', classification: getChecklistItemClassification('Ar Cond. Split') },
 ];
 
 const generateStoreData = (): StoreComplianceData[] => {

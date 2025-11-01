@@ -40,6 +40,7 @@ export type Incident = {
 export type ComplianceChecklistItem = {
     id: string;
     name: string;
+    classification: Classification;
 };
 
 export type ComplianceStatus = 'completed' | 'pending' | 'not-applicable';
@@ -52,4 +53,12 @@ export type StoreComplianceData = {
         itemId: string;
         status: ComplianceStatus;
     }[];
+};
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatarUrl?: string;
 };

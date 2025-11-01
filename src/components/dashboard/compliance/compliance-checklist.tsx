@@ -23,9 +23,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
-import { CheckCircle2, XCircle, CircleSlash, MoreVertical } from 'lucide-react';
+import { CheckCircle2, XCircle, CircleSlash } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ClassificationBadge } from '@/components/shared/risk-badge';
 
 interface ComplianceChecklistProps {
   checklistItems: ComplianceChecklistItem[];
@@ -77,7 +78,10 @@ export function ComplianceChecklist({
                         <TableHead key={item.id} className="text-center min-w-[150px]">
                              <Tooltip>
                                 <TooltipTrigger className="cursor-help">
-                                    <span className="border-b border-dashed border-muted-foreground">{item.name}</span>
+                                     <div className='flex items-center justify-center gap-2'>
+                                        <span className="border-b border-dashed border-muted-foreground">{item.name}</span>
+                                        <ClassificationBadge classification={item.classification} />
+                                     </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>{item.name}</p>
