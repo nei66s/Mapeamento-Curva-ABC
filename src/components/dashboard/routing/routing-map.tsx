@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Store, RouteStop } from '@/lib/types';
+import { format } from 'date-fns';
 
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
@@ -122,5 +123,3 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;
 }
-
-    
