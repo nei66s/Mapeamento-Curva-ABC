@@ -72,6 +72,7 @@ export type User = {
   email: string;
   role: UserRole;
   avatarUrl?: string;
+  password?: string;
 };
 
 export type AgingCriticidade = {
@@ -124,5 +125,3 @@ export type RouteStop = Store & {
   visitOrder: number;
   visitDate?: string;
 };
-
-    

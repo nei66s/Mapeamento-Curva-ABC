@@ -1,6 +1,14 @@
+
 import { User, UserRole } from './types';
 
 export const mockUsers: User[] = [
+  {
+    id: 'user-00',
+    name: 'Admin',
+    email: 'admin@example.com',
+    role: 'admin',
+    password: 'admin'
+  },
   {
     id: 'user-01',
     name: 'Líder Regional 01',
