@@ -18,6 +18,7 @@ import { AddMonthForm } from '@/components/dashboard/indicators/add-month-form';
 import { useToast } from '@/hooks/use-toast';
 import { EditableAgingTableByCriticism } from '@/components/dashboard/indicators/editable-aging-table-by-criticism';
 import { AgingChart } from '@/components/dashboard/indicators/aging-chart';
+import { KpiAnalysis } from '@/components/dashboard/indicators/kpi-analysis';
 
 
 export default function IndicatorsPage() {
@@ -158,6 +159,8 @@ export default function IndicatorsPage() {
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
                 />
             </div>
+
+            <KpiAnalysis indicator={selectedData} />
             
             <CallsChart data={indicators} />
 
