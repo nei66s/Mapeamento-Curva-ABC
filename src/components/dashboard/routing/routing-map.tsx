@@ -69,16 +69,23 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
       layersRef.current.addTo(mapRef.current);
     }
+    
+    // Invalidate size on every render to handle layout changes
+    if (mapRef.current) {
+      mapRef.current.invalidateSize();
+    }
   }, []);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-
+    
+    map.invalidateSize();
     layersRef.current.clearLayers();
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
 
+    // Draw markers for stores not in the current route
     allStores.forEach(store => {
       if (!routeStoreIds.has(store.id)) {
         L.marker([store.lat, store.lng], { icon: blueIcon })
@@ -87,15 +94,19 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       }
     });
 
+    // Sort stops by visitOrder: -1 (start) first, then ascending order
     const sortedRouteStops = [...routeStops].sort((a, b) => a.visitOrder - b.visitOrder);
 
+    // Draw markers and popups for stops in the route
     sortedRouteStops.forEach((stop, index) => {
       let icon = greenIcon;
-      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index + 1} na rota</b>`;
+      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index} na rota</b>`;
 
-      if (stop.visitOrder === -1) {
+      if (stop.visitOrder === -1) { // Start Point
         icon = goldIcon;
         popupText = `<b>${stop.name}</b><br>Ponto de Partida`;
+      } else {
+        popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${stop.visitOrder + 1} na rota</b>`;
       }
       
       if (stop.visitDate && stop.visitOrder !== -1) {
@@ -107,14 +118,15 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         .addTo(layersRef.current);
     });
 
+    // Draw polyline if there's a route
     if (sortedRouteStops.length > 1) {
       const latLngs = sortedRouteStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
     }
     
-    const locations = sortedRouteStops.length > 0 ? sortedRouteStops : allStores;
-    if (locations.length > 0) {
-      const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]));
+    const locationsToBound = sortedRouteStops.length > 0 ? sortedRouteStops : allStores;
+    if (locationsToBound.length > 0) {
+      const bounds = L.latLngBounds(locationsToBound.map(loc => [loc.lat, loc.lng]));
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50] });
       }
@@ -123,5 +135,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     }
   }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} className="h-[640px] w-full" />;
+  return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
 }

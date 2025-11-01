@@ -192,6 +192,7 @@ export default function RoutingPage() {
   
   const fullRouteForMap = useMemo(() => {
     if (!startPoint) return [];
+    // Give startPoint a visitOrder of -1 to ensure it's always first
     return [{...startPoint, visitOrder: -1}, ...storesToVisit]
   }, [startPoint, storesToVisit]);
 
@@ -319,7 +320,7 @@ export default function RoutingPage() {
                     
                     <ScrollArea className="h-64 pr-4">
                        <div className="space-y-3">
-                        {startPoint && <StartPointItem stop={startPoint} />}
+                        {startPoint && <StartPointItem stop={{...startPoint, visitOrder: -1}} />}
                         
                         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                             <SortableContext items={storesToVisit.map(s => s.id)} strategy={verticalListSortingStrategy}>
@@ -348,12 +349,12 @@ export default function RoutingPage() {
         </div>
 
         <div className="lg:col-span-2">
-           <Card>
+           <Card className="min-h-[720px] flex flex-col">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 p-0">
               <RoutingMap allStores={allStores} routeStops={fullRouteForMap} />
             </CardContent>
           </Card>
@@ -362,5 +363,3 @@ export default function RoutingPage() {
     </div>
   );
 }
-
-    
