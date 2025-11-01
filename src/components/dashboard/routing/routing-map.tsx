@@ -5,7 +5,6 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Store, RouteStop } from '@/lib/types';
-import { distributionCenter } from '@/lib/mock-data';
 
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
@@ -87,13 +86,17 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     });
 
     // Display route stops
-    routeStops.forEach(stop => {
+    routeStops.forEach((stop, index) => {
       let icon = greenIcon;
-      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${stop.visitOrder} na rota</b>`;
+      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${stop.visitOrder + 1} na rota</b>`;
 
-      if (stop.id === distributionCenter.id) {
+      if (index === 0) {
         icon = goldIcon;
         popupText = `<b>${stop.name}</b><br>Ponto de Partida`;
+      }
+      
+      if (stop.visitDate && index > 0) {
+          popupText += `<br>Data: ${format(new Date(stop.visitDate), 'dd/MM/yyyy')}`;
       }
 
       L.marker([stop.lat, stop.lng], { icon })
@@ -117,5 +120,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     }
   }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} className="w-full h-full" />;
+  return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;
 }
+
+    

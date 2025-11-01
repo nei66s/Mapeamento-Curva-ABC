@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2, GripVertical, Sparkles, AlertCircle, Warehouse } from 'lucide-react';
-import { allStores, distributionCenter } from '@/lib/mock-data';
+import { allStores } from '@/lib/mock-data';
 import { mockTeams } from '@/lib/teams';
 import type { Store, Team, RouteStop } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
@@ -29,11 +29,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
-  loading: () => <Skeleton className="h-[720px] w-full" />,
+  loading: () => <Skeleton className="h-[640px] w-full" />,
 });
 
 
-function SortableStoreItem({ stop }: { stop: RouteStop }) {
+function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolean }) {
   const {
     attributes,
     listeners,
@@ -48,17 +48,17 @@ function SortableStoreItem({ stop }: { stop: RouteStop }) {
   };
   
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center justify-between p-2 rounded-md border bg-background">
+    <div ref={setNodeRef} style={style} className={cn("flex items-center justify-between p-2 rounded-md border", isFirst ? "bg-primary/10 border-primary" : "bg-background")}>
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab h-8 w-8">
             <GripVertical className="h-5 w-5 text-muted-foreground" />
         </Button>
         <div>
-            <p className="font-semibold text-primary">{stop.name}</p>
-            <p className="text-sm text-muted-foreground">{stop.city}</p>
+            <p className={cn("font-semibold", isFirst ? "text-primary": "")}>{stop.name}</p>
+            <p className="text-sm text-muted-foreground">{isFirst ? "Ponto de Partida" : stop.city}</p>
         </div>
       </div>
-       {stop.visitDate && (
+       {stop.visitDate && !isFirst && (
         <div className="text-sm font-medium text-muted-foreground pr-2">
           {format(new Date(stop.visitDate), 'dd/MM')}
         </div>
@@ -85,7 +85,7 @@ export default function RoutingPage() {
   const addStoreToRoute = (storeId: string) => {
     const store = availableStores.find(s => s.id === storeId);
     if (store) {
-      setStoresToVisit(prev => [...prev, { ...store, visitOrder: prev.length + 1 }]);
+      setStoresToVisit(prev => [...prev, { ...store, visitOrder: prev.length }]);
       setAvailableStores(prev => prev.filter(s => s.id !== storeId));
       setOptimizationResult(null);
     }
@@ -94,7 +94,7 @@ export default function RoutingPage() {
   const removeStoreFromRoute = (storeId: string) => {
     const store = storesToVisit.find(s => s.id === storeId);
     if(store) {
-        setStoresToVisit(prev => prev.filter(s => s.id !== storeId).map((s, i) => ({ ...s, visitOrder: i + 1 })));
+        setStoresToVisit(prev => prev.filter(s => s.id !== storeId).map((s, i) => ({ ...s, visitOrder: i })));
         setAvailableStores(prev => [...prev, allStores.find(s => s.id === storeId)!].sort((a,b) => a.name.localeCompare(b.name)));
         setOptimizationResult(null);
     }
@@ -108,46 +108,41 @@ export default function RoutingPage() {
         const oldIndex = items.findIndex(item => item.id === active.id);
         const newIndex = items.findIndex(item => item.id === over.id);
         const newOrder = arrayMove(items, oldIndex, newIndex);
-        return newOrder.map((item, index) => ({...item, visitOrder: index + 1}));
+        return newOrder.map((item, index) => ({...item, visitOrder: index}));
       });
       setOptimizationResult(null);
     }
   }, []);
 
   const handleOptimizeRoute = async () => {
-    if (storesToVisit.length < 1) {
+    if (storesToVisit.length < 2) {
       toast({
         variant: 'destructive',
         title: 'Não é possível otimizar',
-        description: 'Adicione pelo menos uma loja à rota para otimização.',
+        description: 'Adicione pelo menos duas lojas à rota para otimização.',
       });
       return;
     }
     setIsOptimizing(true);
     setOptimizationResult(null);
     try {
-      const storesForApi = [distributionCenter, ...storesToVisit];
-
       const response = await optimizeRoute({ 
-          stores: storesForApi,
+          stores: storesToVisit,
           startDate: startDate?.toISOString() ?? new Date().toISOString(),
       });
       
       const reorderedStops = response.optimizedRoute
         .map((stop, index) => {
             const storeDetails = storesToVisit.find(s => s.id === stop.storeId)!;
-            // The API returns the CD as the first stop, so we filter it out from the display list
-            if (!storeDetails) return null;
-            return { ...storeDetails, visitOrder: index + 1, visitDate: stop.visitDate };
-        })
-        .filter((s): s is RouteStop => s !== null);
+            return { ...storeDetails, visitOrder: index, visitDate: stop.visitDate };
+        });
       
       setStoresToVisit(reorderedStops);
       setOptimizationResult(response);
 
       toast({
         title: 'Rota Otimizada!',
-        description: `A rota mensal foi otimizada com sucesso pela IA.`,
+        description: `A rota foi otimizada com sucesso pela IA.`,
       });
     } catch (error) {
       console.error("Error optimizing route:", error);
@@ -164,11 +159,8 @@ export default function RoutingPage() {
   const selectedTeam = useMemo(() => mockTeams.find(t => t.id === selectedTeamId), [selectedTeamId]);
   
   const routeWithCD = useMemo(() => {
-    const sortedStops = [...storesToVisit].sort((a,b) => a.visitOrder - b.visitOrder);
-    return [{ ...distributionCenter, visitOrder: 0 }, ...sortedStops];
+    return [...storesToVisit].sort((a,b) => a.visitOrder - b.visitOrder);
   }, [storesToVisit]);
-
-  const allLocations = useMemo(() => [...allStores, distributionCenter], []);
 
   return (
     <div className="flex flex-col gap-8">
@@ -226,7 +218,7 @@ export default function RoutingPage() {
             <Card>
                  <CardHeader>
                     <CardTitle>2. Monte a Rota</CardTitle>
-                    <CardDescription>Adicione as lojas que devem ser visitadas a partir do Centro de Distribuição.</CardDescription>
+                    <CardDescription>Adicione as lojas que devem ser visitadas. A primeira loja da lista será o ponto de partida.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2">
@@ -246,23 +238,15 @@ export default function RoutingPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>3. Rota Mensal</CardTitle>
+                    <CardTitle>3. Sequência de Visitas</CardTitle>
                     <CardDescription>Ordene as visitas ou use a IA para otimizar a rota e as datas.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                     <div className="flex items-center gap-2 border bg-muted/50 p-3 rounded-md mb-4">
-                        <Warehouse className="h-6 w-6 text-primary" />
-                        <div>
-                            <p className="font-semibold text-sm">Ponto de Partida</p>
-                            <p className="text-sm text-muted-foreground">{distributionCenter.name}</p>
-                        </div>
-                    </div>
-
                     {storesToVisit.length > 0 && (
                       <div className="flex items-center justify-between mb-4">
                         <Button 
                             onClick={handleOptimizeRoute} 
-                            disabled={isOptimizing || storesToVisit.length < 1 || !startDate}
+                            disabled={isOptimizing || storesToVisit.length < 2 || !startDate}
                             className='flex gap-2'
                         >
                             <Sparkles />
@@ -285,9 +269,9 @@ export default function RoutingPage() {
                         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                             <SortableContext items={storesToVisit.map(s => s.id)} strategy={verticalListSortingStrategy}>
                                 <div className="space-y-3">
-                                    {storesToVisit.map(stop => (
+                                    {storesToVisit.map((stop, index) => (
                                       <div key={stop.id} className="flex items-center gap-2">
-                                        <SortableStoreItem stop={stop} />
+                                        <SortableStoreItem stop={stop} isFirst={index === 0} />
                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeStoreFromRoute(stop.id)}>
                                           <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -305,13 +289,13 @@ export default function RoutingPage() {
         </div>
 
         <div className="lg:col-span-2">
-           <Card className="flex flex-col min-h-[720px]">
+           <Card className="min-h-[720px]">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
-              <CardDescription>Visualize a rota planejada no mapa a partir do CD.</CardDescription>
+              <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 p-0">
-              <RoutingMap allStores={allLocations} routeStops={routeWithCD} />
+            <CardContent className="h-[640px] p-0">
+              <RoutingMap allStores={allStores} routeStops={routeWithCD} />
             </CardContent>
           </Card>
         </div>
@@ -319,3 +303,5 @@ export default function RoutingPage() {
     </div>
   );
 }
+
+    
