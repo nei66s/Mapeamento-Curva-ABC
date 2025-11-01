@@ -2,20 +2,27 @@
 
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import type { Incident } from '@/lib/types';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-// Fix for default icon not showing up
+// Importa as imagens dos ícones para que o Webpack as processe corretamente.
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
+// Solução definitiva: Cria uma instância de ícone e a define como o padrão do Leaflet.
+// Isso evita a necessidade de manipular o protótipo do L.Icon.Default e resolve os
+// conflitos com o StrictMode do React e o hot-reloading do Next.js.
+const DefaultIcon = L.icon({
   iconRetinaUrl: iconRetinaUrl.src,
   iconUrl: iconUrl.src,
   shadowUrl: shadowUrl.src,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
+L.Marker.prototype.options.icon = DefaultIcon;
 
 
 interface IncidentMapProps {
@@ -27,11 +34,11 @@ export const IncidentMap = ({ incidents }: IncidentMapProps) => {
     incident => incident.lat != null && incident.lng != null && (incident.status === 'Aberto' || incident.status === 'Em Andamento')
   );
 
-  // Calculate center of map
+  // Calcula o centro do mapa
   const center: [number, number] =
     incidentsWithCoords.length > 0
       ? [incidentsWithCoords[0].lat!, incidentsWithCoords[0].lng!]
-      : [-14.235, -51.9253]; // Brazil center
+      : [-14.235, -51.9253]; // Centro do Brasil
 
   return (
     <MapContainer
