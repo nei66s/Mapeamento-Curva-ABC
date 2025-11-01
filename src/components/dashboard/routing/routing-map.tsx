@@ -75,7 +75,6 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     const map = mapRef.current;
     if (!map) return;
 
-    map.invalidateSize();
     layersRef.current.clearLayers();
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
@@ -88,16 +87,18 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       }
     });
 
-    routeStops.forEach((stop, index) => {
-      let icon = greenIcon;
-      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index} na rota</b>`;
+    const sortedRouteStops = [...routeStops].sort((a, b) => a.visitOrder - b.visitOrder);
 
-      if (index === 0) {
+    sortedRouteStops.forEach((stop, index) => {
+      let icon = greenIcon;
+      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index + 1} na rota</b>`;
+
+      if (stop.visitOrder === -1) {
         icon = goldIcon;
         popupText = `<b>${stop.name}</b><br>Ponto de Partida`;
       }
       
-      if (stop.visitDate && index > 0) {
+      if (stop.visitDate && stop.visitOrder !== -1) {
           popupText += `<br>Data: ${format(new Date(stop.visitDate), 'dd/MM/yyyy')}`;
       }
 
@@ -106,12 +107,12 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         .addTo(layersRef.current);
     });
 
-    if (routeStops.length > 1) {
-      const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
+    if (sortedRouteStops.length > 1) {
+      const latLngs = sortedRouteStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
     }
     
-    const locations = routeStops.length > 0 ? routeStops : allStores;
+    const locations = sortedRouteStops.length > 0 ? sortedRouteStops : allStores;
     if (locations.length > 0) {
       const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]));
       if (bounds.isValid()) {
@@ -122,7 +123,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     }
   }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} style={{ height: '640px', width: '100%' }} />;
+  return <div ref={mapContainerRef} className="h-[640px] w-full" />;
 }
-
-    
