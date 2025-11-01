@@ -229,56 +229,65 @@ const generateStoreData = (): StoreComplianceData[] => {
 
 export const mockStoreComplianceData: StoreComplianceData[] = generateStoreData();
 
-
-export const mockMaintenanceIndicators: MaintenanceIndicator[] = [
-  {
-    "id": "1",
-    "mes": "2025-01",
-    "sla_mensal": 75.8, "meta_sla": 80.0, "crescimento_mensal_sla": -2.5, "r2_tendencia": 88.1,
-    "chamados_abertos": 1650, "chamados_solucionados": 1580, "backlog": 1050,
-    "valor_mensal": 1205678.90, "variacao_percentual_valor": 15.2,
-    "aging": { "inferior_30": 420, "entre_30_60": 180, "entre_60_90": 100, "superior_90": 350 },
-    "criticidade": { "baixa": 12, "media": 70, "alta": 170, "muito_alta": 80 },
-    "prioridade": { "baixa": 15.5, "media": 25.8, "alta": 40.2, "muito_alta": 18.5 }
-  },
-  {
-    "id": "2",
-    "mes": "2025-02",
-    "sla_mensal": 78.2, "meta_sla": 80.0, "crescimento_mensal_sla": 2.4, "r2_tendencia": 89.5,
-    "chamados_abertos": 1700, "chamados_solucionados": 1720, "backlog": 1030,
-    "valor_mensal": 1310987.50, "variacao_percentual_valor": 8.7,
-    "aging": { "inferior_30": 450, "entre_30_60": 170, "entre_60_90": 95, "superior_90": 315 },
-    "criticidade": { "baixa": 15, "media": 75, "alta": 180, "muito_alta": 85 },
-    "prioridade": { "baixa": 14.8, "media": 27.5, "alta": 38.9, "muito_alta": 18.8 }
-  },
-  {
-    "id": "3",
-    "mes": "2025-03",
-    "sla_mensal": 80.99, "meta_sla": 80.0, "crescimento_mensal_sla": 2.79, "r2_tendencia": 90.67,
-    "chamados_abertos": 1760, "chamados_solucionados": 1846, "backlog": 1145,
-    "valor_mensal": 1413859.36, "variacao_percentual_valor": 7.8,
-    "aging": { "inferior_30": 480, "entre_30_60": 189, "entre_60_90": 91, "superior_90": 385 },
-    "criticidade": { "baixa": 14, "media": 77, "alta": 185, "muito_alta": 91 },
-    "prioridade": { "baixa": 16.16, "media": 28.91, "alta": 37.82, "muito_alta": 17.12 }
-  },
-  {
-    "id": "4",
-    "mes": "2025-04",
-    "sla_mensal": 82.5, "meta_sla": 80.0, "crescimento_mensal_sla": 1.51, "r2_tendencia": 91.2,
-    "chamados_abertos": 1800, "chamados_solucionados": 1780, "backlog": 1165,
-    "valor_mensal": 1450000.00, "variacao_percentual_valor": 2.5,
-    "aging": { "inferior_30": 500, "entre_30_60": 200, "entre_60_90": 100, "superior_90": 365 },
-    "criticidade": { "baixa": 18, "media": 80, "alta": 190, "muito_alta": 95 },
-    "prioridade": { "baixa": 17.0, "media": 30.0, "alta": 36.0, "muito_alta": 17.0 }
-  },
-  {
-    "id": "5",
-    "mes": "2025-05",
-    "sla_mensal": 81.7, "meta_sla": 80.0, "crescimento_mensal_sla": -0.8, "r2_tendencia": 90.8,
-    "chamados_abertos": 1720, "chamados_solucionados": 1882, "backlog": 1003,
-    "valor_mensal": 1395432.10, "variacao_percentual_valor": -3.76,
-    "aging": { "inferior_30": 400, "entre_30_60": 160, "entre_60_90": 80, "superior_90": 363 },
-    "criticidade": { "baixa": 16, "media": 72, "alta": 175, "muito_alta": 89 },
-    "prioridade": { "baixa": 16.5, "media": 29.5, "alta": 37.0, "muito_alta": 17.0 }
-  }
+const fullIndicatorData = [
+    { mes: "2024-01", chamados_abertos: 1337, chamados_solucionados: 1408, backlog: 1638 },
+    { mes: "2024-02", chamados_abertos: 1386, chamados_solucionados: 802, backlog: 1567 },
+    { mes: "2024-03", chamados_abertos: 1379, chamados_solucionados: 779, backlog: 2151 },
+    { mes: "2024-04", chamados_abertos: 1334, chamados_solucionados: 918, backlog: 2751 },
+    { mes: "2024-05", chamados_abertos: 1323, chamados_solucionados: 1477, backlog: 3167 },
+    { mes: "2024-06", chamados_abertos: 1200, chamados_solucionados: 1303, backlog: 3013 },
+    { mes: "2024-07", chamados_abertos: 1566, chamados_solucionados: 1285, backlog: 2910 },
+    { mes: "2024-08", chamados_abertos: 1439, chamados_solucionados: 1254, backlog: 2629 },
+    { mes: "2024-09", chamados_abertos: 1568, chamados_solucionados: 1366, backlog: 2444 },
+    { mes: "2024-10", chamados_abertos: 1258, chamados_solucionados: 1272, backlog: 2242 },
+    { mes: "2024-11", chamados_abertos: 1637, chamados_solucionados: 1199, backlog: 2256 },
+    { mes: "2024-12", chamados_abertos: 1442, chamados_solucionados: 1246, backlog: 1818 },
+    { mes: "2025-01", chamados_abertos: 1790, chamados_solucionados: 1737, backlog: 1818 },
+    { mes: "2025-02", chamados_abertos: 1725, chamados_solucionados: 1789, backlog: 1871 },
+    { mes: "2025-03", chamados_abertos: 1760, chamados_solucionados: 1846, backlog: 1807 },
+    { mes: "2025-04", chamados_abertos: 1475, chamados_solucionados: 1598, backlog: 1721 },
+    { mes: "2025-05", chamados_abertos: 1454, chamados_solucionados: 1616, backlog: 1598 },
+    { mes: "2025-06", chamados_abertos: 1362, chamados_solucionados: 1380, backlog: 1436 },
+    { mes: "2025-07", chamados_abertos: 1367, chamados_solucionados: 1489, backlog: 1314 },
+    { mes: "2025-08", chamados_abertos: 1355, chamados_solucionados: 1369, backlog: 1145 }
 ];
+
+export const mockMaintenanceIndicators: MaintenanceIndicator[] = fullIndicatorData.map((item, index) => {
+    const prevItem = fullIndicatorData[index - 1] || item;
+    const sla_mensal = 78 + Math.sin(index) * 5; // Placeholder SLA
+    const crescimento_mensal_sla = sla_mensal - (78 + Math.sin(index - 1) * 5);
+    const valor_mensal = (item.chamados_abertos * 700) + Math.random() * 100000;
+    const prev_valor_mensal = (prevItem.chamados_abertos * 700) + Math.random() * 100000;
+
+    return {
+        id: String(index + 1),
+        mes: item.mes,
+        sla_mensal: parseFloat(sla_mensal.toFixed(2)),
+        meta_sla: 80.0,
+        crescimento_mensal_sla: parseFloat(crescimento_mensal_sla.toFixed(2)),
+        r2_tendencia: 90.0 + Math.random() * 2, // Placeholder
+        chamados_abertos: item.chamados_abertos,
+        chamados_solucionados: item.chamados_solucionados,
+        backlog: item.backlog,
+        valor_mensal: parseFloat(valor_mensal.toFixed(2)),
+        variacao_percentual_valor: parseFloat((((valor_mensal - prev_valor_mensal) / prev_valor_mensal) * 100).toFixed(2)),
+        aging: {
+            inferior_30: Math.floor(item.backlog * 0.4),
+            entre_30_60: Math.floor(item.backlog * 0.3),
+            entre_60_90: Math.floor(item.backlog * 0.2),
+            superior_90: Math.floor(item.backlog * 0.1)
+        },
+        criticidade: {
+            baixa: Math.floor(item.chamados_abertos * 0.1),
+            media: Math.floor(item.chamados_abertos * 0.5),
+            alta: Math.floor(item.chamados_abertos * 0.3),
+            muito_alta: Math.floor(item.chamados_abertos * 0.1)
+        },
+        prioridade: {
+            baixa: Math.random() * 20,
+            media: Math.random() * 30,
+            alta: Math.random() * 40,
+            muito_alta: Math.random() * 10
+        }
+    };
+});
