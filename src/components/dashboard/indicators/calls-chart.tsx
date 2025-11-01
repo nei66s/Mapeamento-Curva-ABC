@@ -55,7 +55,7 @@ export function CallsChart({ data }: CallsChartProps) {
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
             <ComposedChart 
                 data={chartData} 
-                margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 20, right: 20, left: -20, bottom: 0 }}
                 stackOffset="sign"
             >
                 <CartesianGrid vertical={false} />
@@ -77,7 +77,7 @@ export function CallsChart({ data }: CallsChartProps) {
                              formatter={(value, name) => {
                                 const key = name as keyof typeof chartConfig;
                                 const config = chartConfig[key];
-                                if (!config) return null;
+                                if (!config) return [value, name];
                                 
                                 const absValue = Math.abs(Number(value));
                                 return (
@@ -87,6 +87,7 @@ export function CallsChart({ data }: CallsChartProps) {
                                    </div>
                                 )
                             }}
+                             labelFormatter={(label) => new Date(label + ' 1, 2000').toLocaleString('default', { month: 'short' })}
                         />
                     }
                 />
