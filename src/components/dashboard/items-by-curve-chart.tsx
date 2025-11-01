@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Pie, PieChart, ResponsiveContainer, Cell, Tooltip } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import {
   Card,
   CardContent,
@@ -12,37 +12,30 @@ import {
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { mockItems } from "@/lib/mock-data";
 
-const COLORS = {
-    A: "hsl(var(--destructive))",
-    B: "hsl(var(--accent))",
-    C: "hsl(var(--chart-2))",
+const chartConfig = {
+  items: {
+    label: "Itens",
+  },
+  A: {
+    label: "Curva A",
+    color: "hsl(var(--destructive))",
+  },
+  B: {
+    label: "Curva B",
+    color: "hsl(var(--accent))",
+  },
+  C: {
+    label: "Curva C",
+    color: "hsl(var(--chart-2))",
+  },
 };
 
 export function ItemsByCurveChart() {
   const data = [
-    { name: "Curva A", value: mockItems.filter(e => e.classification === 'A').length, fill: COLORS.A },
-    { name: "Curva B", value: mockItems.filter(e => e.classification === 'B').length, fill: COLORS.B },
-    { name: "Curva C", value: mockItems.filter(e => e.classification === 'C').length, fill: COLORS.C },
+    { curve: "A", items: mockItems.filter(e => e.classification === 'A').length, fill: chartConfig.A.color },
+    { curve: "B", items: mockItems.filter(e => e.classification === 'B').length, fill: chartConfig.B.color },
+    { curve: "C", items: mockItems.filter(e => e.classification === 'C').length, fill: chartConfig.C.color },
   ];
-
-  const chartConfig = {
-    value: {
-      label: "Itens",
-    },
-    A: {
-      label: "Curva A",
-      color: "hsl(var(--destructive))",
-    },
-    B: {
-      label: "Curva B",
-      color: "hsl(var(--accent))",
-    },
-    C: {
-      label: "Curva C",
-      color: "hsl(var(--chart-2))",
-    },
-  };
-
 
   return (
     <Card className="shadow-md">
@@ -53,51 +46,34 @@ export function ItemsByCurveChart() {
       <CardContent>
         <div className="h-[250px] w-full">
           <ChartContainer config={chartConfig}>
-            <PieChart>
-                <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltipContent hideLabel />} />
-                <Pie
-                  data={data}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={2}
-                  labelLine={false}
-                  label={({
-                    cx,
-                    cy,
-                    midAngle,
-                    innerRadius,
-                    outerRadius,
-                    value,
-                    index,
-                  }) => {
-                    const RADIAN = Math.PI / 180;
-                    const radius = 25 + innerRadius + (outerRadius - innerRadius);
-                    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-                    return (
-                      <text
-                        x={x}
-                        y={y}
-                        fill="hsl(var(--foreground))"
-                        textAnchor={x > cx ? "start" : "end"}
-                        dominantBaseline="central"
-                        className="text-sm font-medium"
-                      >
-                        {data[index].name} ({value})
-                      </text>
-                    );
-                  }}
-                >
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-              </PieChart>
+            <BarChart 
+                data={data}
+                margin={{ top: 20, right: 20, left: 0, bottom: 0 }}
+            >
+              <XAxis
+                dataKey="curve"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => `Curva ${value}`}
+                className="text-xs"
+              />
+              <YAxis 
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <Tooltip
+                cursor={{ fill: "hsl(var(--muted))" }}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Bar 
+                dataKey="items" 
+                radius={[4, 4, 0, 0]}
+                label={{ position: "top", offset: 4, className: "fill-foreground font-medium text-sm" }}
+              />
+            </BarChart>
           </ChartContainer>
         </div>
       </CardContent>
