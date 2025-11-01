@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Pie, PieChart, ResponsiveContainer, Cell, Tooltip } from "recharts";
@@ -61,7 +62,7 @@ export function ItemsByCurveChart() {
                   cx="50%"
                   cy="50%"
                   innerRadius={50}
-                  outerRadius={100}
+                  outerRadius={80}
                   paddingAngle={2}
                   labelLine={false}
                   label={({
