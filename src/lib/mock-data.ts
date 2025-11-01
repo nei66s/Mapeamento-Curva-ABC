@@ -8,23 +8,12 @@ function getRandomClassification() {
   return 'C';
 }
 
-export const mockCategories: Category[] = [
-    { id: "CAT-001", name: "Segurança / CFTV / Alarme", description: "Sistemas de vigilância, controle de acesso e alarmes." },
-    { id: "CAT-002", name: "Elétrica / Iluminação", description: "Infraestrutura elétrica, quadros de energia e sistemas de iluminação." },
-    { id: "CAT-003", name: "Refrigeração / Climatização Central", description: "Equipamentos de refrigeração industrial e ar condicionado central." },
-    { id: "CAT-004", name: "Energização / Geradores / Nobreaks", description: "Fontes de energia de emergência e estabilizadores." },
-    { id: "CAT-005", name: "Hidráulica / Utilidades", description: "Sistemas de abastecimento de água e saneamento." },
-    { id: "CAT-006", name: "Infraestrutura Predial", description: "Elevadores, estruturas e sistemas de segurança predial." },
-    { id: "CAT-007", name: "Açougue / Frios", description: "Equipamentos específicos para o setor de carnes e frios." },
-    { id: "CAT-008", name: "Rotisserie / Cozinha", description: "Equipamentos para preparo de alimentos em cozinhas industriais." },
-    { id: "CAT-009", name: "Padaria / Confeitaria", description: "Maquinário para produção de pães e confeitaria." },
-    { id: "CAT-010", name: "Hortifrúti / Floricultura", description: "Sistemas de refrigeração e exposição para produtos frescos." },
-    { id: "CAT-011", name: "Depósito / Doca", description: "Equipamentos para logística e armazenamento." },
-    { id: "CAT-012", name: "Limpeza e Apoio", description: "Maquinário para limpeza de grandes áreas." },
-    { id: "CAT-013", name: "Estacionamento / Acessos / Cancelas", description: "Controle de acesso de veículos e segurança perimetral." },
-    { id: "CAT-014", name: "Refeitório / Vestiários / Áreas de Apoio ao Colaborador", description: "Infraestrutura para áreas de funcionários." },
-    { id: "CAT-015", name: "Logo/ Painéis / Iluminação decorativa", description: "Sistemas de comunicação visual e iluminação de fachada." }
+const contingencyPlans = [
+  "Acionar equipe de manutenção interna.", "Contratar serviço de locação de equipamento similar.", "Isolar a área e aguardar o técnico especialista.",
+  "Utilizar equipamento reserva.", "Redirecionar fluxo de clientes.", "Iniciar operação em modo de contingência manual."
 ];
+
+const leadTimes = ["Imediato", "2 horas", "4 horas", "8 horas", "24 horas", "48 horas"];
 
 const itemNames = [
     "DVR / NVR Central", "Câmeras de frente de loja / cofres", "Sensores de presença / alarme",
@@ -94,14 +83,6 @@ const itemCategoryMap: Record<string, string> = {
     "Iluminação decorativa / fachadas": "Logo/ Painéis / Iluminação decorativa",
 };
 
-
-const contingencyPlans = [
-  "Acionar equipe de manutenção interna.", "Contratar serviço de locação de equipamento similar.", "Isolar a área e aguardar o técnico especialista.",
-  "Utilizar equipamento reserva.", "Redirecionar fluxo de clientes.", "Iniciar operação em modo de contingência manual."
-];
-
-const leadTimes = ["Imediato", "2 horas", "4 horas", "8 horas", "24 horas", "48 horas"];
-
 export const mockItems: Item[] = itemNames.map((name, index) => {
   const imageId = `item-image-${(index % 5) + 1}`;
   const image = PlaceHolderImages.find(img => img.id === imageId);
@@ -117,6 +98,57 @@ export const mockItems: Item[] = itemNames.map((name, index) => {
     leadTime: leadTimes[Math.floor(Math.random() * leadTimes.length)],
     imageUrl: image?.imageUrl,
   }
+});
+
+const rawCategories: Omit<Category, 'itemCount' | 'riskIndex'>[] = [
+    { id: "CAT-001", name: "Segurança / CFTV / Alarme", description: "Sistemas de vigilância, controle de acesso e alarmes.", classification: 'A' },
+    { id: "CAT-002", name: "Elétrica / Iluminação", description: "Infraestrutura elétrica, quadros de energia e sistemas de iluminação.", classification: 'A' },
+    { id: "CAT-003", name: "Refrigeração / Climatização Central", description: "Equipamentos de refrigeração industrial e ar condicionado central.", classification: 'A' },
+    { id: "CAT-004", name: "Energização / Geradores / Nobreaks", description: "Fontes de energia de emergência e estabilizadores.", classification: 'A' },
+    { id: "CAT-005", name: "Hidráulica / Utilidades", description: "Sistemas de abastecimento de água e saneamento.", classification: 'B' },
+    { id: "CAT-006", name: "Infraestrutura Predial", description: "Elevadores, estruturas e sistemas de segurança predial.", classification: 'B' },
+    { id: "CAT-007", name: "Açougue / Frios", description: "Equipamentos específicos para o setor de carnes e frios.", classification: 'B' },
+    { id: "CAT-008", name: "Rotisserie / Cozinha", description: "Equipamentos para preparo de alimentos em cozinhas industriais.", classification: 'C' },
+    { id: "CAT-009", name: "Padaria / Confeitaria", description: "Maquinário para produção de pães e confeitaria.", classification: 'B' },
+    { id: "CAT-010", name: "Hortifrúti / Floricultura", description: "Sistemas de refrigeração e exposição para produtos frescos.", classification: 'C' },
+    { id: "CAT-011", name: "Depósito / Doca", description: "Equipamentos para logística e armazenamento.", classification: 'B' },
+    { id: "CAT-012", name: "Limpeza e Apoio", description: "Maquinário para limpeza de grandes áreas.", classification: 'C' },
+    { id: "CAT-013", name: "Estacionamento / Acessos / Cancelas", description: "Controle de acesso de veículos e segurança perimetral.", classification: 'C' },
+    { id: "CAT-014", name: "Refeitório / Vestiários / Áreas de Apoio ao Colaborador", description: "Infraestrutura para áreas de funcionários.", classification: 'C' },
+    { id: "CAT-015", name: "Logo/ Painéis / Iluminação decorativa", description: "Sistemas de comunicação visual e iluminação de fachada.", classification: 'C' }
+];
+
+export const mockCategories: Category[] = rawCategories.map(category => {
+    const itemsInCategory = mockItems.filter(item => item.category === category.name);
+    const itemCount = itemsInCategory.length;
+    const totalRisk = itemsInCategory.reduce((acc, item) => acc + item.generalIndex, 0);
+    const riskIndex = itemCount > 0 ? Math.round(totalRisk / itemCount) : 0;
+    
+    let imageUrl = '';
+    switch(category.name) {
+        case 'Segurança / CFTV / Alarme':
+            imageUrl = PlaceHolderImages.find(i => i.id === 'item-image-2')?.imageUrl || '';
+            break;
+        case 'Elétrica / Iluminação':
+            imageUrl = PlaceHolderImages.find(i => i.id === 'item-image-3')?.imageUrl || '';
+            break;
+        case 'Refrigeração / Climatização Central':
+             imageUrl = PlaceHolderImages.find(i => i.id === 'item-image-1')?.imageUrl || '';
+             break;
+        case 'Açougue / Frios':
+            imageUrl = PlaceHolderImages.find(i => i.id === 'item-image-4')?.imageUrl || '';
+            break;
+        case 'Padaria / Confeitaria':
+            imageUrl = PlaceHolderImages.find(i => i.id === 'item-image-5')?.imageUrl || '';
+            break;
+    }
+
+    return {
+        ...category,
+        itemCount,
+        riskIndex,
+        imageUrl,
+    };
 });
 
 

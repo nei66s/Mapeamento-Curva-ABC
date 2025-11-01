@@ -40,7 +40,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { CategoryForm } from '@/components/dashboard/categories/category-form';
 import { mockCategories } from '@/lib/mock-data';
 import type { Category } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +48,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import { ClassificationBadge } from '@/components/shared/risk-badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>(mockCategories);
@@ -55,7 +58,7 @@ export default function CategoriesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
 
-  const handleFormSubmit = (values: Omit<Category, 'id'>) => {
+  const handleFormSubmit = (values: Omit<Category, 'id' | 'itemCount' | 'riskIndex'>) => {
     if (selectedCategory) {
       const updatedCategory = { ...selectedCategory, ...values };
       setCategories(
@@ -66,7 +69,12 @@ export default function CategoriesPage() {
         description: `A categoria "${values.name}" foi atualizada.`,
       });
     } else {
-      const newCategory: Category = { ...values, id: `CAT-${Date.now()}` };
+      const newCategory: Category = { 
+        ...values, 
+        id: `CAT-${Date.now()}`,
+        itemCount: 0,
+        riskIndex: 0,
+      };
       setCategories([newCategory, ...categories]);
       toast({
         title: 'Categoria Adicionada!',
@@ -137,7 +145,8 @@ export default function CategoriesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-1/3">Nome da Categoria</TableHead>
+                <TableHead>Categoria</TableHead>
+                <TableHead>Classificação</TableHead>
                 <TableHead>Descrição</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -145,7 +154,23 @@ export default function CategoriesPage() {
             <TableBody>
               {categories.map(category => (
                 <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell>
+                     <div className="flex items-center gap-3">
+                      <Avatar>
+                        {category.imageUrl ? (
+                          <AvatarImage src={category.imageUrl} alt={category.name} data-ai-hint="category image"/>
+                        ) : (
+                          <AvatarFallback>
+                            <ImageIcon className="text-muted-foreground" />
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <span className="font-medium">{category.name}</span>
+                     </div>
+                  </TableCell>
+                   <TableCell>
+                    <ClassificationBadge classification={category.classification} />
+                  </TableCell>
                   <TableCell className="text-muted-foreground">{category.description}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

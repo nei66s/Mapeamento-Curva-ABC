@@ -6,6 +6,10 @@ export type Category = {
   id: string;
   name: string;
   description: string;
+  classification: Classification;
+  imageUrl?: string;
+  itemCount: number;
+  riskIndex: number;
 };
 
 export type Item = {

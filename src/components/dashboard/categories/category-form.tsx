@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -16,16 +15,19 @@ import {
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import type { Category } from '@/lib/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CategoryFormProps {
   category?: Category | null;
-  onSubmit: (data: Omit<Category, 'id'>) => void;
+  onSubmit: (data: Omit<Category, 'id' | 'itemCount' | 'riskIndex'>) => void;
   onCancel: () => void;
 }
 
 const formSchema = z.object({
   name: z.string().min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
   description: z.string().min(10, { message: 'A descrição deve ter pelo menos 10 caracteres.' }),
+  classification: z.enum(['A', 'B', 'C']),
+  imageUrl: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).optional().or(z.literal('')),
 });
 
 type CategoryFormData = z.infer<typeof formSchema>;
@@ -36,6 +38,8 @@ export function CategoryForm({ category, onSubmit, onCancel }: CategoryFormProps
     defaultValues: {
       name: category?.name || '',
       description: category?.description || '',
+      classification: category?.classification || 'C',
+      imageUrl: category?.imageUrl || '',
     },
   });
 
@@ -77,6 +81,41 @@ export function CategoryForm({ category, onSubmit, onCancel }: CategoryFormProps
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL da Imagem</FormLabel>
+              <FormControl>
+                <Input placeholder="https://exemplo.com/imagem.png" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+            control={form.control}
+            name="classification"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Classificação</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a classificação" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="A">A - Mais Valiosos</SelectItem>
+                    <SelectItem value="B">B - Valor Intermediário</SelectItem>
+                    <SelectItem value="C">C - Menos Valiosos</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar

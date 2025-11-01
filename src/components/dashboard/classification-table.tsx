@@ -13,47 +13,52 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { mockItems } from "@/lib/mock-data";
+import { mockCategories } from "@/lib/mock-data";
 import { ClassificationBadge } from "@/components/shared/risk-badge";
 import { Progress } from "@/components/ui/progress";
 
 export function ClassificationTable() {
-    const sortedItems = [...mockItems].sort((a, b) => a.name.localeCompare(b.name));
+    const sortedCategories = [...mockCategories].sort((a, b) => {
+        if (a.classification !== b.classification) {
+            return a.classification.localeCompare(b.classification);
+        }
+        return b.riskIndex - a.riskIndex;
+    });
 
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>Ranking de Itens</CardTitle>
+        <CardTitle>Ranking de Categorias</CardTitle>
         <CardDescription>
-          Lista de todos os itens cadastrados e sua classificação.
+          Lista de todas as categorias e sua classificação de risco.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Item</TableHead>
-              <TableHead className="hidden sm:table-cell text-center">Qtd. Lojas</TableHead>
-              <TableHead className="hidden md:table-cell">Índice Geral</TableHead>
+              <TableHead>Categoria</TableHead>
+              <TableHead className="hidden sm:table-cell text-center">Qtd. Itens</TableHead>
+              <TableHead className="hidden md:table-cell">Índice de Risco</TableHead>
               <TableHead className="text-right">Classificação</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedItems.slice(0, 7).map((item) => (
-              <TableRow key={item.id}>
+            {sortedCategories.slice(0, 7).map((category) => (
+              <TableRow key={category.id}>
                 <TableCell>
-                  <div className="font-medium">{item.name}</div>
-                  <div className="text-sm text-muted-foreground">{item.category}</div>
+                  <div className="font-medium">{category.name}</div>
+                  <div className="text-sm text-muted-foreground truncate max-w-xs">{category.description}</div>
                 </TableCell>
-                <TableCell className="hidden sm:table-cell text-center">{item.storeCount}</TableCell>
+                <TableCell className="hidden sm:table-cell text-center">{category.itemCount}</TableCell>
                 <TableCell className="hidden md:table-cell">
                     <div className="flex items-center gap-2">
-                        <Progress value={item.generalIndex * 10} className="h-2" />
-                        <span className="font-medium">{item.generalIndex}/10</span>
+                        <Progress value={category.riskIndex * 10} className="h-2" />
+                        <span className="font-medium">{category.riskIndex}/10</span>
                     </div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <ClassificationBadge classification={item.classification} />
+                  <ClassificationBadge classification={category.classification} />
                 </TableCell>
               </TableRow>
             ))}
