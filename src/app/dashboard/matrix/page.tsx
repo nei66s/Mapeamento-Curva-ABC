@@ -207,6 +207,7 @@ export default function MatrixPage() {
                     <TableHead>Item</TableHead>
                     <TableHead>Classificação</TableHead>
                     <TableHead>Fatores de Impacto</TableHead>
+                    <TableHead className="hidden md:table-cell">Lead Time</TableHead>
                     <TableHead className="hidden md:table-cell">Plano de Contingência</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -257,6 +258,7 @@ export default function MatrixPage() {
                           })}
                         </div>
                       </TableCell>
+                      <TableCell className="hidden md:table-cell">{item.leadTime}</TableCell>
                       <TableCell className="hidden md:table-cell">{item.contingencyPlan}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -305,5 +307,3 @@ export default function MatrixPage() {
     </div>
   );
 }
-
-    
