@@ -217,7 +217,7 @@ export default function RoutingPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2">
-                        <Select onValueChange={addStoreToRoute} value="" disabled={!selectedTeamId}>
+                        <Select onValueChange={addStoreToRoute} value="">
                              <SelectTrigger>
                                 <SelectValue placeholder="Adicionar uma loja à rota..." />
                             </SelectTrigger>
