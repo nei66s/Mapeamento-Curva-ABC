@@ -18,24 +18,30 @@ import {
 import { Input } from '@/components/ui/input';
 import type { MaintenanceIndicator } from '@/lib/types';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Label } from '@/components/ui/label';
 
 interface EditableSlaTableProps {
   data: MaintenanceIndicator[];
   setData: React.Dispatch<React.SetStateAction<MaintenanceIndicator[]>>;
+  annualSlaGoal: number;
+  setAnnualSlaGoal: (value: number) => void;
 }
 
-export function EditableSlaTable({ data, setData }: EditableSlaTableProps) {
-  const handleChange = (
+export function EditableSlaTable({ data, setData, annualSlaGoal, setAnnualSlaGoal }: EditableSlaTableProps) {
+  const handleSlaChange = (
     id: string,
-    field: keyof Pick<MaintenanceIndicator, 'sla_mensal' | 'meta_sla'>,
     value: string
   ) => {
     const newValue = parseFloat(value) || 0;
     setData(prevData =>
       prevData.map(item =>
-        item.id === id ? { ...item, [field]: newValue } : item
+        item.id === id ? { ...item, sla_mensal: newValue } : item
       )
     );
+  };
+  
+  const handleGoalChange = (value: string) => {
+    setAnnualSlaGoal(parseInt(value, 10) || 0);
   };
 
   return (
@@ -43,17 +49,26 @@ export function EditableSlaTable({ data, setData }: EditableSlaTableProps) {
       <CardHeader>
         <CardTitle>Evolução SLA vs. Meta</CardTitle>
         <CardDescription>
-          Preencha os valores de SLA alcançado e a meta para cada mês.
+          Preencha os valores de SLA alcançado para cada mês.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-72">
+        <div className="mb-4 space-y-2">
+            <Label htmlFor="annual-goal">Meta Anual de SLA (%)</Label>
+            <Input
+                id="annual-goal"
+                type="number"
+                value={annualSlaGoal}
+                onChange={e => handleGoalChange(e.target.value)}
+                className="h-8 w-32"
+            />
+        </div>
+        <ScrollArea className="h-60">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Mês</TableHead>
-                <TableHead>SLA (%)</TableHead>
-                <TableHead>Meta (%)</TableHead>
+                <TableHead className="text-right">SLA Alcançado (%)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -65,20 +80,12 @@ export function EditableSlaTable({ data, setData }: EditableSlaTableProps) {
                       year: '2-digit',
                     })}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <Input
                       type="number"
                       value={item.sla_mensal}
-                      onChange={e => handleChange(item.id, 'sla_mensal', e.target.value)}
-                      className="h-8"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      type="number"
-                      value={item.meta_sla}
-                      onChange={e => handleChange(item.id, 'meta_sla', e.target.value)}
-                      className="h-8"
+                      onChange={e => handleSlaChange(item.id, e.target.value)}
+                      className="h-8 w-32 ml-auto"
                     />
                   </TableCell>
                 </TableRow>

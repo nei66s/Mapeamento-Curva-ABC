@@ -8,22 +8,17 @@ import type { MaintenanceIndicator } from '@/lib/types';
 import { KpiCard } from '@/components/dashboard/indicators/kpi-card';
 import { CallsChart } from '@/components/dashboard/indicators/calls-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { ArrowUp, ArrowDown, TrendingUp } from 'lucide-react';
 import { EditableSlaTable } from '@/components/dashboard/indicators/editable-sla-table';
 import { EditableCallsTable } from '@/components/dashboard/indicators/editable-calls-table';
 import { EditableAgingTable } from '@/components/dashboard/indicators/editable-aging-table';
+import { SlaChart } from '@/components/dashboard/indicators/sla-chart';
 
 
 export default function IndicatorsPage() {
   const [indicators, setIndicators] = useState<MaintenanceIndicator[]>(mockMaintenanceIndicators);
   const [selectedMonth, setSelectedMonth] = useState<string>(mockMaintenanceIndicators[mockMaintenanceIndicators.length - 1].mes);
+  const [annualSlaGoal, setAnnualSlaGoal] = useState<number>(80);
 
   const selectedData = useMemo(() => {
     return indicators.find(d => d.mes === selectedMonth) || indicators[0];
@@ -35,6 +30,13 @@ export default function IndicatorsPage() {
       label: new Date(`${d.mes}-02`).toLocaleString('default', { month: 'long', year: 'numeric' })
     })).reverse();
   }, [indicators]);
+
+  const indicatorsWithGoal = useMemo(() => {
+    return indicators.map(indicator => ({
+      ...indicator,
+      meta_sla: annualSlaGoal,
+    }));
+  }, [indicators, annualSlaGoal]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -64,7 +66,7 @@ export default function IndicatorsPage() {
                     value={`${selectedData.sla_mensal}%`}
                     change={selectedData.crescimento_mensal_sla}
                     changeType={selectedData.crescimento_mensal_sla >= 0 ? 'increase' : 'decrease'}
-                    description={`Meta: ${selectedData.meta_sla}%`}
+                    description={`Meta: ${annualSlaGoal}%`}
                     icon={TrendingUp}
                 />
                  <KpiCard
@@ -83,9 +85,16 @@ export default function IndicatorsPage() {
             </div>
             
             <CallsChart data={indicators} />
+
+            <SlaChart data={indicatorsWithGoal} />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <EditableSlaTable data={indicators} setData={setIndicators} />
+                <EditableSlaTable 
+                  data={indicators} 
+                  setData={setIndicators} 
+                  annualSlaGoal={annualSlaGoal}
+                  setAnnualSlaGoal={setAnnualSlaGoal}
+                />
                 <EditableCallsTable data={indicators} setData={setIndicators} />
             </div>
 
