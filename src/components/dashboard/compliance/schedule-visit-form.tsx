@@ -1,10 +1,10 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { allStores } from '@/lib/mock-data';
 
 interface ScheduleVisitFormProps {
   onSubmit: (storeName: string, visitDate: Date) => void;
@@ -27,7 +29,7 @@ interface ScheduleVisitFormProps {
 }
 
 const formSchema = z.object({
-  storeName: z.string().min(3, { message: 'O nome da loja deve ter pelo menos 3 caracteres.' }),
+  storeName: z.string().min(1, { message: 'Por favor, selecione uma loja.' }),
   visitDate: z.date({ required_error: 'A data da visita é obrigatória.' }),
 });
 
@@ -55,9 +57,20 @@ export function ScheduleVisitForm({ onSubmit, onCancel, defaultDate }: ScheduleV
           render={({ field }) => (
             <FormItem>
               <FormLabel>Nome da Loja</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Loja 123 - Centro" {...field} />
-              </FormControl>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma loja" />
+                    </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                    {allStores.map(store => (
+                        <SelectItem key={store.id} value={store.name}>
+                        {store.name} - {store.city}
+                        </SelectItem>
+                    ))}
+                    </SelectContent>
+                </Select>
               <FormMessage />
             </FormItem>
           )}

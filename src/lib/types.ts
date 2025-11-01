@@ -1,3 +1,4 @@
+
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
@@ -36,6 +37,15 @@ export type Incident = {
   lat?: number;
   lng?: number;
 };
+
+export type Store = {
+  id: string;
+  name: string;
+  city: string;
+  lat: number;
+  lng: number;
+};
+
 
 export type ComplianceChecklistItem = {
     id: string;

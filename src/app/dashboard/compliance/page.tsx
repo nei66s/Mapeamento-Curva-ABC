@@ -1,10 +1,13 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { PageHeader } from '@/components/shared/page-header';
 import {
   mockComplianceChecklistItems,
   mockStoreComplianceData,
+  allStores,
 } from '@/lib/mock-data';
 import type { ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
 import { ComplianceChecklist } from '@/components/dashboard/compliance/compliance-checklist';
@@ -20,6 +23,7 @@ import { ptBR } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, PlusCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScheduleVisitForm } from '@/components/dashboard/compliance/schedule-visit-form';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CompliancePage() {
   const [checklistItems, setChecklistItems] = useState<ComplianceChecklistItem[]>(
@@ -34,6 +38,11 @@ export default function CompliancePage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const { toast } = useToast();
+
+  const ComplianceMap = useMemo(() => dynamic(() => import('@/components/dashboard/compliance/compliance-map'), {
+    ssr: false,
+    loading: () => <Skeleton className="h-[400px] w-full" />,
+  }), []);
 
   const scheduledDates = useMemo(() => {
     return storeData.map(d => new Date(d.visitDate));
@@ -107,8 +116,10 @@ export default function CompliancePage() {
   };
 
   const handleScheduleVisit = (storeName: string, visitDate: Date) => {
+    const storeDetails = allStores.find(s => s.name === storeName);
+    
     const newVisit: StoreComplianceData = {
-        storeId: `LOJA-${Date.now()}`,
+        storeId: storeDetails?.id || `LOJA-${Date.now()}`,
         storeName: storeName,
         visitDate: visitDate.toISOString(),
         items: checklistItems.map(item => ({ itemId: item.id, status: 'pending' })),
@@ -188,6 +199,16 @@ export default function CompliancePage() {
           </DialogContent>
         </Dialog>
       </PageHeader>
+
+      <Card>
+        <CardContent className='p-6'>
+           <ComplianceMap 
+              allStores={allStores}
+              scheduledVisits={filteredStoreData}
+           />
+        </CardContent>
+      </Card>
+
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
             <ComplianceSummary storeData={filteredStoreData} checklistItems={checklistItems} />
