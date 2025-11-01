@@ -62,3 +62,35 @@ export type User = {
   role: UserRole;
   avatarUrl?: string;
 };
+
+export type MaintenanceIndicator = {
+  id: string;
+  mes: string;
+  sla_mensal: number;
+  meta_sla: number;
+  crescimento_mensal_sla: number;
+  r2_tendencia: number;
+  chamados_abertos: number;
+  chamados_solucionados: number;
+  backlog: number;
+  valor_mensal: number;
+  variacao_percentual_valor: number;
+  aging: {
+    inferior_30: number;
+    entre_30_60: number;
+    entre_60_90: number;
+    superior_90: number;
+  };
+  criticidade: {
+    baixa: number;
+    media: number;
+    alta: number;
+    muito_alta: number;
+  };
+  prioridade: {
+    baixa: number;
+    media: number;
+    alta: number;
+    muito_alta: number;
+  };
+};

@@ -7,6 +7,7 @@ import {
   Settings,
   ListCollapse,
   ClipboardCheck,
+  Gauge,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +17,7 @@ const navLinks = [
     { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
     { href: "/dashboard/incidents", icon: ShieldAlert, label: "Incidentes" },
     { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Conformidade" },
+    { href: "/dashboard/indicators", icon: Gauge, label: "Indicadores" },
 ];
 
 export default function AppSidebar() {

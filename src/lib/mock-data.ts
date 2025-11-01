@@ -1,5 +1,5 @@
 
-import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
+import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -228,3 +228,57 @@ const generateStoreData = (): StoreComplianceData[] => {
 
 
 export const mockStoreComplianceData: StoreComplianceData[] = generateStoreData();
+
+
+export const mockMaintenanceIndicators: MaintenanceIndicator[] = [
+  {
+    "id": "1",
+    "mes": "2025-01",
+    "sla_mensal": 75.8, "meta_sla": 80.0, "crescimento_mensal_sla": -2.5, "r2_tendencia": 88.1,
+    "chamados_abertos": 1650, "chamados_solucionados": 1580, "backlog": 1050,
+    "valor_mensal": 1205678.90, "variacao_percentual_valor": 15.2,
+    "aging": { "inferior_30": 420, "entre_30_60": 180, "entre_60_90": 100, "superior_90": 350 },
+    "criticidade": { "baixa": 12, "media": 70, "alta": 170, "muito_alta": 80 },
+    "prioridade": { "baixa": 15.5, "media": 25.8, "alta": 40.2, "muito_alta": 18.5 }
+  },
+  {
+    "id": "2",
+    "mes": "2025-02",
+    "sla_mensal": 78.2, "meta_sla": 80.0, "crescimento_mensal_sla": 2.4, "r2_tendencia": 89.5,
+    "chamados_abertos": 1700, "chamados_solucionados": 1720, "backlog": 1030,
+    "valor_mensal": 1310987.50, "variacao_percentual_valor": 8.7,
+    "aging": { "inferior_30": 450, "entre_30_60": 170, "entre_60_90": 95, "superior_90": 315 },
+    "criticidade": { "baixa": 15, "media": 75, "alta": 180, "muito_alta": 85 },
+    "prioridade": { "baixa": 14.8, "media": 27.5, "alta": 38.9, "muito_alta": 18.8 }
+  },
+  {
+    "id": "3",
+    "mes": "2025-03",
+    "sla_mensal": 80.99, "meta_sla": 80.0, "crescimento_mensal_sla": 2.79, "r2_tendencia": 90.67,
+    "chamados_abertos": 1760, "chamados_solucionados": 1846, "backlog": 1145,
+    "valor_mensal": 1413859.36, "variacao_percentual_valor": 7.8,
+    "aging": { "inferior_30": 480, "entre_30_60": 189, "entre_60_90": 91, "superior_90": 385 },
+    "criticidade": { "baixa": 14, "media": 77, "alta": 185, "muito_alta": 91 },
+    "prioridade": { "baixa": 16.16, "media": 28.91, "alta": 37.82, "muito_alta": 17.12 }
+  },
+  {
+    "id": "4",
+    "mes": "2025-04",
+    "sla_mensal": 82.5, "meta_sla": 80.0, "crescimento_mensal_sla": 1.51, "r2_tendencia": 91.2,
+    "chamados_abertos": 1800, "chamados_solucionados": 1780, "backlog": 1165,
+    "valor_mensal": 1450000.00, "variacao_percentual_valor": 2.5,
+    "aging": { "inferior_30": 500, "entre_30_60": 200, "entre_60_90": 100, "superior_90": 365 },
+    "criticidade": { "baixa": 18, "media": 80, "alta": 190, "muito_alta": 95 },
+    "prioridade": { "baixa": 17.0, "media": 30.0, "alta": 36.0, "muito_alta": 17.0 }
+  },
+  {
+    "id": "5",
+    "mes": "2025-05",
+    "sla_mensal": 81.7, "meta_sla": 80.0, "crescimento_mensal_sla": -0.8, "r2_tendencia": 90.8,
+    "chamados_abertos": 1720, "chamados_solucionados": 1882, "backlog": 1003,
+    "valor_mensal": 1395432.10, "variacao_percentual_valor": -3.76,
+    "aging": { "inferior_30": 400, "entre_30_60": 160, "entre_60_90": 80, "superior_90": 363 },
+    "criticidade": { "baixa": 16, "media": 72, "alta": 175, "muito_alta": 89 },
+    "prioridade": { "baixa": 16.5, "media": 29.5, "alta": 37.0, "muito_alta": 17.0 }
+  }
+];
