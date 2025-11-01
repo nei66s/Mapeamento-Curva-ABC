@@ -1,13 +1,37 @@
+
 'use client';
 
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Incident } from '@/lib/types';
+import { allStores } from '@/lib/mock-data';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
 interface IncidentMapProps {
   incidents: Incident[];
 }
+
+const redIcon = new L.Icon({
+	iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+	iconSize: [25, 41],
+	iconAnchor: [12, 41],
+	popupAnchor: [1, -34],
+	shadowSize: [41, 41]
+});
+
+const blueIcon = new L.Icon({
+	iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+	shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+	iconSize: [25, 41],
+	iconAnchor: [12, 41],
+	popupAnchor: [1, -34],
+	shadowSize: [41, 41]
+});
+
 
 export default function IncidentMap({ incidents }: IncidentMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -18,24 +42,17 @@ export default function IncidentMap({ incidents }: IncidentMapProps) {
       return;
     }
     
-    // Este hack corrige o problema do ícone não encontrado no Next.js
-    // Ele força o Leaflet a usar o estilo CSS padrão em vez de tentar carregar uma imagem.
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+    }
 
-    const incidentsWithCoords = incidents.filter(
-      incident => incident.lat != null && incident.lng != null && (incident.status === 'Aberto' || incident.status === 'Em Andamento')
-    );
-
-    // Só inicializa o mapa se ele ainda não foi criado
-    if (!mapRef.current) {
-        const center: L.LatLngExpression =
-        incidentsWithCoords.length > 0
-          ? [incidentsWithCoords[0].lat!, incidentsWithCoords[0].lng!]
-          : [-14.235, -51.9253];
+    if (mapContainerRef.current && !mapRef.current) {
+        const center: L.LatLngExpression = [-22.8, -47.2];
 
         const map = L.map(mapContainerRef.current).setView(
             center,
-            incidentsWithCoords.length > 0 ? 5 : 4
+            9 
         );
         mapRef.current = map;
 
@@ -43,21 +60,30 @@ export default function IncidentMap({ incidents }: IncidentMapProps) {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         }).addTo(map);
 
+        const incidentsWithCoords = incidents.filter(
+            incident => incident.lat != null && incident.lng != null && (incident.status === 'Aberto' || incident.status === 'Em Andamento')
+        );
+
+        const incidentLocations = new Set(incidentsWithCoords.map(inc => `${inc.lat},${inc.lng}`));
+
+        // Add blue markers for all stores that DON'T have an active incident
+        allStores.forEach(store => {
+            const locationKey = `${store.lat},${store.lng}`;
+            if (!incidentLocations.has(locationKey)) {
+                 L.marker([store.lat, store.lng], { icon: blueIcon })
+                .addTo(map)
+                .bindPopup(`<b>${store.name}</b><br>${store.city}`);
+            }
+        });
+        
+        // Add red markers for incidents
         incidentsWithCoords.forEach(incident => {
-            L.marker([incident.lat!, incident.lng!])
+            L.marker([incident.lat!, incident.lng!], { icon: redIcon })
             .addTo(map)
-            .bindPopup(`<b>${incident.itemName}</b><br>${incident.location}`);
+            .bindPopup(`<b>${incident.location}</b><br>Item: ${incident.itemName}<br>Status: ${incident.status}`);
         });
     }
 
-
-    // Função de limpeza para destruir o mapa quando o componente for desmontado
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
   }, [incidents]);
 
   return (

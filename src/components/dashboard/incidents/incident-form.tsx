@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -23,6 +24,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import type { Item, Incident } from '@/lib/types';
+import { allStores } from '@/lib/mock-data';
 
 interface IncidentFormProps {
   items: Item[];
@@ -97,18 +99,29 @@ export function IncidentForm({ items, incident, onSubmit, onCancel }: IncidentFo
                 </FormItem>
             )}
             />
-            <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Localização</FormLabel>
-                <FormControl>
-                    <Input placeholder="Ex: Loja ABC" {...field} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
+             <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Localização</FormLabel>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecione uma loja" />
+                        </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                        {allStores.map(store => (
+                            <SelectItem key={store.id} value={store.name}>
+                            {store.name} - {store.city}
+                            </SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}
             />
         </div>
 

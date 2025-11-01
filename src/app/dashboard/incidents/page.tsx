@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -34,7 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { IncidentForm } from '@/components/dashboard/incidents/incident-form';
-import { mockIncidents, mockItems } from '@/lib/mock-data';
+import { mockIncidents, mockItems, allStores } from '@/lib/mock-data';
 import type { Item, Incident, Classification, IncidentStatus } from '@/lib/types';
 import { PlusCircle, Clock, Sparkles, Search, ListFilter, MoreVertical, Pencil, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -90,8 +91,15 @@ export default function IncidentsPage() {
   }, [incidents, searchTerm, statusFilters, classificationFilters, itemsMap]);
 
   const handleFormSubmit = (values: Omit<Incident, 'id' | 'openedAt' | 'status'|'lat'|'lng'>) => {
+    const store = allStores.find(s => s.name === values.location);
+
     if (selectedIncident) {
-      const updatedIncident = { ...selectedIncident, ...values };
+      const updatedIncident = { 
+        ...selectedIncident, 
+        ...values,
+        lat: store?.lat || selectedIncident.lat,
+        lng: store?.lng || selectedIncident.lng,
+      };
       setIncidents(incidents.map(inc => inc.id === selectedIncident.id ? updatedIncident : inc));
       toast({
         title: 'Incidente Atualizado!',
@@ -103,8 +111,8 @@ export default function IncidentsPage() {
         id: `INC-${Date.now()}`,
         openedAt: new Date().toISOString(),
         status: 'Aberto',
-        lat: 0,
-        lng: 0,
+        lat: store?.lat || 0,
+        lng: store?.lng || 0,
       };
       setIncidents([newIncident, ...incidents]);
       toast({
@@ -179,8 +187,8 @@ export default function IncidentsPage() {
       
       <Card>
         <CardHeader>
-            <CardTitle>Mapa de Incidentes Ativos</CardTitle>
-            <CardDescription>Visualização geográfica dos incidentes abertos ou em andamento.</CardDescription>
+            <CardTitle>Mapa de Lojas e Incidentes</CardTitle>
+            <CardDescription>Visualização geográfica de todas as lojas e incidentes ativos.</CardDescription>
         </CardHeader>
         <CardContent>
             <IncidentMap incidents={filteredIncidents} />

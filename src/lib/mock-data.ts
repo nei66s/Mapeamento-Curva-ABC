@@ -158,12 +158,34 @@ export const mockCategories: Category[] = rawCategories.map((category, index) =>
 
 
 export const mockIncidents: Incident[] = [
-  { id: 'INC-001', itemName: 'Rack de compressores / unidade condensadora', location: 'Loja A (SP)', status: 'Aberto', openedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: "Parada total do equipamento de refrigeração central, afetando a climatização de toda a área de vendas. A temperatura interna subiu 5°C em 1 hora.", lat: -23.5505, lng: -46.6333 },
-  { id: 'INC-002', itemName: 'Balcões refrigerados', location: 'Loja B (RJ)', status: 'Em Andamento', openedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: "Não está atingindo a temperatura ideal, risco de perda de produtos perecíveis. A temperatura está oscilando entre 8°C e 12°C.", lat: -22.9068, lng: -43.1729 },
-  { id: 'INC-003', itemName: 'QGBT / Quadro geral', location: 'Loja C (MG)', status: 'Resolvido', openedAt: new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString(), description: "Desarme do disjuntor principal causou interrupção total de energia na loja por 45 minutos. Todas as operações foram paralisadas.", lat: -19.9167, lng: -43.9345 },
-  { id: 'INC-004', itemName: 'Nobreak central / retificador', location: 'Depósito Central (BA)', status: 'Fechado', openedAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(), description: "Falha na bateria do nobreak durante uma queda de energia, resultando na perda de dados não salvos nos servidores administrativos.", lat: -12.9777, lng: -38.5016 },
-  { id: 'INC-005', itemName: 'Câmeras externas / perímetro', location: 'Loja D (RS)', status: 'Aberto', openedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: "Uma das câmeras do perímetro parou de gravar. A imagem está congelada.", lat: -30.0346, lng: -51.2177 },
+  { id: 'INC-001', itemName: 'Rack de compressores / unidade condensadora', location: 'Pague Menos - Loja 01', status: 'Aberto', openedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: "Parada total do equipamento de refrigeração central, afetando a climatização de toda a área de vendas. A temperatura interna subiu 5°C em 1 hora.", lat: -22.7532, lng: -47.3292 },
+  { id: 'INC-002', itemName: 'Balcões refrigerados', location: 'Pague Menos - Loja 02', status: 'Em Andamento', openedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: "Não está atingindo a temperatura ideal, risco de perda de produtos perecíveis. A temperatura está oscilando entre 8°C e 12°C.", lat: -22.7391, lng: -47.4005 },
+  { id: 'INC-003', itemName: 'QGBT / Quadro geral', location: 'Pague Menos - Loja 03', status: 'Resolvido', openedAt: new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString(), description: "Desarme do disjuntor principal causou interrupção total de energia na loja por 45 minutos. Todas as operações foram paralisadas.", lat: -22.8013, lng: -47.2185 },
+  { id: 'INC-004', itemName: 'Nobreak central / retificador', location: 'Pague Menos - Loja 04', status: 'Fechado', openedAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(), description: "Falha na bateria do nobreak durante uma queda de energia, resultando na perda de dados não salvos nos servidores administrativos.", lat: -22.9068, lng: -47.0616 },
+  { id: 'INC-005', itemName: 'Câmeras externas / perímetro', location: 'Pague Menos - Loja 05', status: 'Aberto', openedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: "Uma das câmeras do perímetro parou de gravar. A imagem está congelada.", lat: -22.5855, lng: -47.4153 },
 ];
+
+export const allStores = [
+    { id: "LOJA-01", name: "Loja 01", city: "Americana", lat: -22.7532, lng: -47.3292 },
+    { id: "LOJA-02", name: "Loja 02", city: "Santa Bárbara d'Oeste", lat: -22.7391, lng: -47.4005 },
+    { id: "LOJA-03", name: "Loja 03", city: "Nova Odessa", lat: -22.8013, lng: -47.2185 },
+    { id: "LOJA-04", name: "Loja 04", city: "Campinas", lat: -22.9068, lng: -47.0616 },
+    { id: "LOJA-05", name: "Loja 05", city: "Piracicaba", lat: -22.5855, lng: -47.4153 },
+    { id: "LOJA-06", name: "Loja 06", city: "Sumaré", lat: -22.8219, lng: -47.2669 },
+    { id: "LOJA-07", name: "Loja 07", city: "Hortolândia", lat: -22.8596, lng: -47.2203 },
+    { id: "LOJA-08", name: "Loja 08", city: "Paulinia", lat: -22.7634, lng: -47.1545 },
+    { id: "LOJA-09", name: "Loja 09", city: "Limeira", lat: -22.5647, lng: -47.4069 },
+    { id: "LOJA-10", name: "Loja 10", city: "Araras", lat: -22.3564, lng: -47.3828 },
+    { id: "LOJA-11", name: "Loja 11", city: "Indaiatuba", lat: -23.0867, lng: -47.2183 },
+    { id: "LOJA-12", name: "Loja 12", city: "Tietê", lat: -23.1022, lng: -47.7153 },
+    { id: "LOJA-13", name: "Loja 13", city: "Boituva", lat: -23.2842, lng: -47.6711 },
+    { id: "LOJA-14", name: "Loja 14", city: "Salto", lat: -23.2017, lng: -47.2883 },
+    { id: "LOJA-15", name: "Loja 15", city: "Itu", lat: -23.2644, lng: -47.2992 },
+    { id: "LOJA-16", name: "Loja 16", city: "Sorocaba", lat: -23.501, lng: -47.458 },
+    { id: "LOJA-17", name: "Loja 17", city: "Valinhos", lat: -22.9711, lng: -46.9961 },
+    { id: "LOJA-18", name: "Loja 18", city: "Mogi Mirim", lat: -22.4319, lng: -46.9564 },
+];
+
 
 const checklistItemCategoryMapping: Record<string, string[]> = {
   'Geradores': ['Energização / Geradores / Nobreaks'],
