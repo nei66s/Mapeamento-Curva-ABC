@@ -1,5 +1,5 @@
 
-import type { Item, Incident, Category, Classification, PreventiveVisit } from '@/lib/types';
+import type { Item, Incident, Category, Classification, PreventiveVisit, ComplianceChecklistItem, StoreComplianceData } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -201,3 +201,32 @@ export const mockPreventiveVisits: PreventiveVisit[] = [
     notes: 'Inspeção mensal dos cabos de aço e sistema de freios de emergência.'
   },
 ];
+
+export const mockComplianceChecklistItems: ComplianceChecklistItem[] = [
+  { id: 'CHK-01', name: 'Geradores' },
+  { id: 'CHK-02', name: 'Elevadores e Esteiras' },
+  { id: 'CHK-03', name: 'Rampas Hidráulicas' },
+  { id: 'CHK-04', name: 'AVCB' },
+  { id: 'CHK-05', name: 'Equipamentos de Produção' },
+  { id: 'CHK-06', name: 'Ar Cond. Central' },
+  { id: 'CHK-07', name: 'Ar Cond. Split' },
+];
+
+const generateStoreData = (): StoreComplianceData[] => {
+  const stores: StoreComplianceData[] = [];
+  for (let i = 1; i <= 45; i++) {
+    const store: StoreComplianceData = {
+      storeId: `LOJA-${String(i).padStart(3, '0')}`,
+      storeName: `Loja ${i}`,
+      items: mockComplianceChecklistItems.map(item => ({
+        itemId: item.id,
+        // ~70% chance of being completed for realistic mock data
+        completed: Math.random() < 0.7,
+      })),
+    };
+    stores.push(store);
+  }
+  return stores;
+};
+
+export const mockStoreComplianceData: StoreComplianceData[] = generateStoreData();

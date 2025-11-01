@@ -45,3 +45,17 @@ export type PreventiveVisit = {
   status: 'Agendada' | 'Concluída';
   notes: string;
 };
+
+export type ComplianceChecklistItem = {
+    id: string;
+    name: string;
+};
+
+export type StoreComplianceData = {
+    storeId: string;
+    storeName: string;
+    items: {
+        itemId: string;
+        completed: boolean;
+    }[];
+};

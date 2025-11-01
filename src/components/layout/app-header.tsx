@@ -9,6 +9,7 @@ import {
   BarChart3,
   ListCollapse,
   CalendarCheck,
+  ClipboardCheck,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -74,6 +75,13 @@ export default function AppHeader() {
             >
               <CalendarCheck className="h-5 w-5" />
               Preventivas
+            </Link>
+            <Link
+              href="/dashboard/compliance"
+              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+            >
+              <ClipboardCheck className="h-5 w-5" />
+              Conformidade
             </Link>
             <Link
               href="/dashboard/admin"

@@ -13,6 +13,7 @@ import {
   Settings,
   ListCollapse,
   CalendarCheck,
+  ClipboardCheck,
 } from "lucide-react";
 
 export default function AppSidebar() {
@@ -86,6 +87,18 @@ export default function AppSidebar() {
               </Link>
             </TooltipTrigger>
             <TooltipContent side="right">Preventivas</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="/dashboard/compliance"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              >
+                <ClipboardCheck className="h-5 w-5" />
+                <span className="sr-only">Conformidade</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Conformidade</TooltipContent>
           </Tooltip>
         </nav>
         <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
