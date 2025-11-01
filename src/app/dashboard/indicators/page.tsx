@@ -21,7 +21,7 @@ import { KpiAnalysis } from '@/components/dashboard/indicators/kpi-analysis';
 import { ParetoAnalysis } from '@/components/dashboard/indicators/pareto-analysis';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function DashboardPage() {
+export default function IndicatorsPage() {
   const [indicators, setIndicators] = useState<MaintenanceIndicator[]>(mockMaintenanceIndicators);
   const [selectedMonth, setSelectedMonth] = useState<string>(mockMaintenanceIndicators[mockMaintenanceIndicators.length - 1].mes);
   const [annualSlaGoal, setAnnualSlaGoal] = useState<number>(80);
@@ -107,8 +107,8 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title="Dashboard de Indicadores"
-        description="Painel com os principais indicadores de desempenho operacional."
+        title="Painel de Indicadores"
+        description="Análise detalhada dos principais indicadores de desempenho operacional."
       >
         <div className="flex items-center gap-2">
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>

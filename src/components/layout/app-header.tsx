@@ -12,6 +12,7 @@ import {
   Map,
   ClipboardList,
   Route,
+  LineChart,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -46,6 +47,22 @@ export default function AppHeader() {
             </Link>
             
             <Separator />
+            
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+            >
+              <LayoutDashboard className="h-5 w-5" />
+              Dashboard
+            </Link>
+
+             <Link
+              href="/dashboard/indicators"
+              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+            >
+              <LineChart className="h-5 w-5" />
+              Indicadores
+            </Link>
 
             <div>
               <h2 className="mb-2 flex items-center gap-2 px-2.5 text-lg font-semibold tracking-tight text-primary">
@@ -53,13 +70,7 @@ export default function AppHeader() {
                 Mapeamento
               </h2>
                <div className="grid gap-2">
-                 <Link
-                  href="/dashboard"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                >
-                  <LayoutDashboard className="h-5 w-5" />
-                  Dashboard
-                </Link>
+                 
                 <Link
                   href="/dashboard/categories"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"

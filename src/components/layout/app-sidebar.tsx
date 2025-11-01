@@ -10,11 +10,16 @@ import {
   Map,
   ClipboardList,
   Route,
+  LineChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const mappingLinks = [
+const topLevelLinks = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/dashboard/indicators", icon: LineChart, label: "Indicadores" },
+];
+
+const mappingLinks = [
     { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
     { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
     { href: "/dashboard/incidents", icon: ShieldAlert, label: "Incidentes" },
@@ -41,6 +46,20 @@ export default function AppSidebar() {
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-4 px-4">
              <nav className="flex flex-col gap-2">
+                 {topLevelLinks.map((link) => (
+                    <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted font-medium"
+                    )}
+                    >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                    </Link>
+                ))}
+            </nav>
+            <nav className="flex flex-col gap-2 mt-4">
                 <div className="px-3 py-2">
                     <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">
                         <Map className="h-5 w-5" />
