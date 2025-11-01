@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
-  loading: () => <Skeleton className="h-[600px] w-full" />,
+  loading: () => <Skeleton className="h-full w-full" />,
 });
 
 
@@ -298,5 +298,3 @@ export default function RoutingPage() {
     </div>
   );
 }
-
-    
