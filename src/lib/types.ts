@@ -36,3 +36,12 @@ export type Incident = {
   lat?: number;
   lng?: number;
 };
+
+export type PreventiveVisit = {
+  id: string;
+  date: string; // ISO date string
+  supplierName: string;
+  items: string[];
+  status: 'Agendada' | 'Concluída';
+  notes: string;
+};

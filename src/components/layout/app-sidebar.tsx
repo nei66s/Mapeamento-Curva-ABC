@@ -12,6 +12,7 @@ import {
   ShieldAlert,
   Settings,
   ListCollapse,
+  CalendarCheck,
 } from "lucide-react";
 
 export default function AppSidebar() {
@@ -73,6 +74,18 @@ export default function AppSidebar() {
               </Link>
             </TooltipTrigger>
             <TooltipContent side="right">Incidentes</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href="/dashboard/preventive"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+              >
+                <CalendarCheck className="h-5 w-5" />
+                <span className="sr-only">Preventivas</span>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Preventivas</TooltipContent>
           </Tooltip>
         </nav>
         <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
