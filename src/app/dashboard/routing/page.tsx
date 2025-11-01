@@ -25,6 +25,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
@@ -167,6 +168,7 @@ export default function RoutingPage() {
     return [{ ...distributionCenter, visitOrder: 0 }, ...sortedStops];
   }, [storesToVisit]);
 
+  const allLocations = useMemo(() => [...allStores, distributionCenter], []);
 
   return (
     <div className="flex flex-col gap-8">
@@ -309,7 +311,7 @@ export default function RoutingPage() {
               <CardDescription>Visualize a rota planejada no mapa a partir do CD.</CardDescription>
             </CardHeader>
             <CardContent className="h-full p-0">
-              <RoutingMap allStores={allStores} routeStops={routeWithCD} />
+              <RoutingMap allStores={allLocations} routeStops={routeWithCD} />
             </CardContent>
           </Card>
         </div>
