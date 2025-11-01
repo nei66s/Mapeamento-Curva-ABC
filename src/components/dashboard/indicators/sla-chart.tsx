@@ -86,7 +86,15 @@ export function SlaChart({ data }: SlaChartProps) {
                     strokeWidth={2}
                     dot={true}
                     name="SLA Mensal"
-                />
+                >
+                    <LabelList
+                        dataKey="sla"
+                        position="top"
+                        offset={4}
+                        className="fill-foreground font-medium text-xs"
+                        formatter={(value: number) => `${value}%`}
+                    />
+                </Line>
                  <Line 
                     type="monotone"
                     dataKey="meta"

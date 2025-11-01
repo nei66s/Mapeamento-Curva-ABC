@@ -76,8 +76,7 @@ export function CallsChart({ data }: CallsChartProps) {
                         <ChartTooltipContent 
                              formatter={(value, name) => {
                                 const key = name as keyof typeof chartConfig;
-                                const config = chartConfig[key];
-                                if (!config) return [value, name];
+                                const config = chartConfig[key] || { label: name, color: 'hsl(var(--foreground))' };
                                 
                                 const absValue = Math.abs(Number(value));
                                 return (
@@ -87,7 +86,6 @@ export function CallsChart({ data }: CallsChartProps) {
                                    </div>
                                 )
                             }}
-                             labelFormatter={(label) => new Date(label + ' 1, 2000').toLocaleString('default', { month: 'short' })}
                         />
                     }
                 />
