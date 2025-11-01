@@ -10,6 +10,8 @@ import {
   ListCollapse,
   ClipboardCheck,
   Gauge,
+  Map,
+  ClipboardList
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -21,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/layout/user-nav";
+import { Separator } from "../ui/separator";
 
 export default function AppHeader() {
   return (
@@ -41,48 +44,74 @@ export default function AppHeader() {
               <BarChart3 className="h-5 w-5 transition-all group-hover:scale-110" />
               <span className="sr-only">Curva ABC Pro</span>
             </Link>
+            
             <Link
-              href="/dashboard"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <LayoutDashboard className="h-5 w-5" />
-              Dashboard
-            </Link>
-             <Link
-              href="/dashboard/categories"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <ListCollapse className="h-5 w-5" />
-              Categorias
-            </Link>
-            <Link
-              href="/dashboard/matrix"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <Grid3x3 className="h-5 w-5" />
-              Matriz de Itens
-            </Link>
-            <Link
-              href="/dashboard/incidents"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <ShieldAlert className="h-5 w-5" />
-              Incidentes
-            </Link>
-            <Link
-              href="/dashboard/compliance"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <ClipboardCheck className="h-5 w-5" />
-              Conformidade
-            </Link>
-             <Link
               href="/dashboard/indicators"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-4 px-2.5 text-foreground"
             >
               <Gauge className="h-5 w-5" />
               Indicadores
             </Link>
+            
+            <Separator />
+
+            <div>
+              <h2 className="mb-2 flex items-center gap-2 px-2.5 text-lg font-semibold tracking-tight text-primary">
+                <Map className="h-5 w-5" />
+                Mapeamento
+              </h2>
+               <div className="grid gap-2">
+                 <Link
+                  href="/dashboard"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <LayoutDashboard className="h-5 w-5" />
+                  Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/categories"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <ListCollapse className="h-5 w-5" />
+                  Categorias
+                </Link>
+                <Link
+                  href="/dashboard/matrix"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Grid3x3 className="h-5 w-5" />
+                  Matriz de Itens
+                </Link>
+                <Link
+                  href="/dashboard/incidents"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <ShieldAlert className="h-5 w-5" />
+                  Incidentes
+                </Link>
+               </div>
+            </div>
+
+            <Separator />
+            
+             <div>
+              <h2 className="mb-2 flex items-center gap-2 px-2.5 text-lg font-semibold tracking-tight text-primary">
+                <ClipboardList className="h-5 w-5" />
+                Preventivas
+              </h2>
+               <div className="grid gap-2">
+                 <Link
+                  href="/dashboard/compliance"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <ClipboardCheck className="h-5 w-5" />
+                  Conformidade
+                </Link>
+               </div>
+            </div>
+            
+            <Separator />
+            
             <Link
               href="/dashboard/admin"
               className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
