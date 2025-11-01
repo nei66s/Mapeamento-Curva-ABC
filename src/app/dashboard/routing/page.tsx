@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
-  loading: () => <Skeleton className="h-[640px] w-full" />,
+  loading: () => <Skeleton className="h-full w-full" />,
 });
 
 function SortableStoreItem({ stop }: { stop: RouteStop }) {
@@ -192,7 +192,6 @@ export default function RoutingPage() {
   
   const fullRouteForMap = useMemo(() => {
     if (!startPoint) return [];
-    // Give startPoint a visitOrder of -1 to ensure it's always first
     return [{...startPoint, visitOrder: -1}, ...storesToVisit]
   }, [startPoint, storesToVisit]);
 
@@ -203,7 +202,8 @@ export default function RoutingPage() {
         description="Planeje e otimize as rotas de manutenção preventiva para suas equipes internas."
       />
 
-      <div className="w-full max-w-4xl mx-auto flex flex-col gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 flex flex-col gap-8">
             <Card>
                  <CardHeader>
                     <CardTitle>1. Selecione a Equipe e Data</CardTitle>
@@ -254,7 +254,7 @@ export default function RoutingPage() {
                     <CardDescription>Escolha a loja que servirá como ponto de início da rota.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || undefined}>
+                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || ''}>
                         <SelectTrigger>
                             <SelectValue placeholder="Selecione o ponto de partida..." />
                         </SelectTrigger>
@@ -345,9 +345,15 @@ export default function RoutingPage() {
                     )}
                 </CardContent>
             </Card>
+        </div>
+        <div className="lg:col-span-2">
+           <Card className="h-[calc(100vh-10rem)] min-h-[720px]">
+                <CardContent className="p-0 h-full">
+                    <RoutingMap allStores={allStores} routeStops={fullRouteForMap} />
+                </CardContent>
+           </Card>
+        </div>
       </div>
     </div>
   );
 }
-
-    
