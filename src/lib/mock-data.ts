@@ -8,30 +8,90 @@ function getRandomClassification() {
   return 'C';
 }
 
-const itemNames = [
-  "DVR / NVR Central", "Câmeras de frente de loja / cofres", "Sensores de presença / alarme",
-  "Câmeras externas / perímetro", "QGBT / Quadro geral", "Disjuntores / barramentos",
-  "Iluminação de área de vendas", "Iluminação externa / decorativa", "Rack de compressores / unidade condensadora",
-  "Evaporadores / câmaras frias", "Condensadoras / expositores", "Splits administrativos",
-  "Gerador principal", "Quadro de transferência automática (QTA)", "Nobreak central / retificador",
-  "Baterias de reserva / banco de energia", "Bomba de recalque / pressurização", "Reservatórios / caixa d’água",
-  "Torneiras / válvulas / sifões", "Elevador / monta-carga", "Portas corta-fogo / hidrantes / exaustores",
-  "Estruturas / revestimentos / pisos", "Serra fita", "Câmara fria / balcão refrigerado",
-  "Moedor / picador / fatiador", "Embaladora / seladora", "Forno combinado / fritadeira industrial",
-  "Estufa quente / expositor", "Coifa / exaustor industrial", "Forno turbo / esteira",
-  "Amassadeira / batedeira", "Seladora / balança produção", "Câmaras de climatização / umidificadores",
-  "Balcões refrigerados", "Nebulizadores / ventiladores", "Portas automáticas de doca", "Lavadora de piso",
-  "Enceradeira / aspirador industrial", "Cancela automática", "Iluminação de estacionamento",
-  "Portões automáticos / pedonais", "Climatizador / exaustor", "Iluminação / instalações elétricas",
-  "Equipamentos de cozinha / micro-ondas", "Painéis LED / letreiros", "Iluminação decorativa / fachadas",
-  "Ar Condicionado Central", "Câmera de Segurança 2", "Painel Elétrico Principal", "Freezer Horizontal",
-  "Sistema de Alarme", "Gerador de Energia", "Câmera de Segurança 5", "Balcão Refrigerado"
+const categories = [
+    "Segurança / CFTV / Alarme", "Elétrica / Iluminação", "Refrigeração / Climatização Central",
+    "Energização / Geradores / Nobreaks", "Hidráulica / Utilidades", "Infraestrutura Predial",
+    "Açougue / Frios", "Rotisserie / Cozinha", "Padaria / Confeitaria", "Hortifrúti / Floricultura",
+    "Depósito / Doca", "Limpeza e Apoio", "Estacionamento / Acessos / Cancelas",
+    "Refeitório / Vestiários / Áreas de Apoio ao Colaborador", "Logo/ Painéis / Iluminação decorativa"
 ];
 
-const categories = [
-  "Eletrônicos", "Segurança", "Elétrica", "Refrigeração", "Mecânica", "Hidráulica",
-  "Construção Civil", "Cozinha Industrial", "Padaria", "Logística", "Limpeza"
+const itemNames = [
+    "DVR / NVR Central", "Câmeras de frente de loja / cofres", "Sensores de presença / alarme",
+    "Câmeras externas / perímetro", "QGBT / Quadro geral", "Disjuntores / barramentos",
+    "Iluminação de área de vendas", "Iluminação externa / decorativa", "Rack de compressores / unidade condensadora",
+    "Evaporadores / câmaras frias", "Condensadoras / expositores", "Splits administrativos",
+    "Gerador principal", "Quadro de transferência automática (QTA)", "Nobreak central / retificador",
+    "Baterias de reserva / banco de energia", "Bomba de recalque / pressurização", "Reservatórios / caixa d’água",
+    "Torneiras / válvulas / sifões", "Elevador / monta-carga", "Portas corta-fogo / hidrantes / exaustores",
+    "Estruturas / revestimentos / pisos", "Serra fita", "Câmara fria / balcão refrigerado",
+    "Moedor / picador / fatiador", "Embaladora / seladora", "Forno combinado / fritadeira industrial",
+    "Estufa quente / expositor", "Coifa / exaustor industrial", "Forno turbo / esteira",
+    "Amassadeira / batedeira", "Seladora / balança produção", "Câmaras de climatização / umidificadores",
+    "Balcões refrigerados", "Nebulizadores / ventiladores", "Portas automáticas de doca",
+    "Lavadora de piso", "Enceradeira / aspirador industrial", "Cancela automática",
+    "Iluminação de estacionamento", "Portões automáticos / pedonais", "Climatizador / exaustor",
+    "Iluminação / instalações elétricas", "Equipamentos de cozinha / micro-ondas", "Painéis LED / letreiros",
+    "Iluminação decorativa / fachadas"
 ];
+
+const itemCategoryMap = {
+    "DVR / NVR Central": "Segurança / CFTV / Alarme",
+    "Câmeras de frente de loja / cofres": "Segurança / CFTV / Alarme",
+    "Sensores de presença / alarme": "Segurança / CFTV / Alarme",
+    "Câmeras externas / perímetro": "Segurança / CFTV / Alarme",
+    "QGBT / Quadro geral": "Elétrica / Iluminação",
+    "Disjuntores / barramentos": "Elétrica / Iluminação",
+    "Iluminação de área de vendas": "Elétrica / Iluminação",
+    "Iluminação externa / decorativa": "Elétrica / Iluminação",
+    "Rack de compressores / unidade condensadora": "Refrigeração / Climatização Central",
+    "Evaporadores / câmaras frias": "Refrigeração / Climatização Central",
+    "Condensadoras / expositores": "Refrigeração / Climatização Central",
+    "Splits administrativos": "Refrigeração / Climatização Central",
+    "Gerador principal": "Energização / Geradores / Nobreaks",
+    "Quadro de transferência automática (QTA)": "Energização / Geradores / Nobreaks",
+    "Nobreak central / retificador": "Energização / Geradores / Nobreaks",
+    "Baterias de reserva / banco de energia": "Energização / Geradores / Nobreaks",
+    "Bomba de recalque / pressurização": "Hidráulica / Utilidades",
+    "Reservatórios / caixa d’água": "Hidráulica / Utilidades",
+    "Torneiras / válvulas / sifões": "Hidráulica / Utilidades",
+    "Elevador / monta-carga": "Infraestrutura Predial",
+    "Portas corta-fogo / hidrantes / exaustores": "Infraestrutura Predial",
+    "Estruturas / revestimentos / pisos": "Infraestrutura Predial",
+    "Serra fita": "Açougue / Frios",
+    "Câmara fria / balcão refrigerado": "Açougue / Frios",
+    "Moedor / picador / fatiador": "Açougue / Frios",
+    "Embaladora / seladora": "Açougue / Frios",
+    "Forno combinado / fritadeira industrial": "Rotisserie / Cozinha",
+    "Estufa quente / expositor": "Rotisserie / Cozinha",
+    "Coifa / exaustor industrial": "Rotisserie / Cozinha",
+    "Forno turbo / esteira": "Padaria / Confeitaria",
+    "Amassadeira / batedeira": "Padaria / Confeitaria",
+    "Seladora / balança produção": "Padaria / Confeitaria",
+    "Câmaras de climatização / umidificadores": "Padaria / Confeitaria",
+    "Balcões refrigerados": "Hortifrúti / Floricultura",
+    "Nebulizadores / ventiladores": "Hortifrúti / Floricultura",
+    "Portas automáticas de doca": "Depósito / Doca",
+    "Lavadora de piso": "Limpeza e Apoio",
+    "Enceradeira / aspirador industrial": "Limpeza e Apoio",
+    "Cancela automática": "Estacionamento / Acessos / Cancelas",
+    "Iluminação de estacionamento": "Estacionamento / Acessos / Cancelas",
+    "Portões automáticos / pedonais": "Estacionamento / Acessos / Cancelas",
+    "Climatizador / exaustor": "Refeitório / Vestiários / Áreas de Apoio ao Colaborador",
+    "Iluminação / instalações elétricas": "Refeitório / Vestiários / Áreas de Apoio ao Colaborador",
+    "Equipamentos de cozinha / micro-ondas": "Refeitório / Vestiários / Áreas de Apoio ao Colaborador",
+    "Painéis LED / letreiros": "Logo/ Painéis / Iluminação decorativa",
+    "Iluminação decorativa / fachadas": "Logo/ Painéis / Iluminação decorativa",
+    "Ar Condicionado Central": "Refrigeração / Climatização Central",
+    "Câmera de Segurança 2": "Segurança / CFTV / Alarme",
+    "Painel Elétrico Principal": "Elétrica / Iluminação",
+    "Freezer Horizontal": "Refrigeração / Climatização Central",
+    "Sistema de Alarme": "Segurança / CFTV / Alarme",
+    "Gerador de Energia": "Energização / Geradores / Nobreaks",
+    "Câmera de Segurança 5": "Segurança / CFTV / Alarme",
+    "Balcão Refrigerado": "Açougue / Frios"
+};
+
 
 const contingencyPlans = [
   "Acionar equipe de manutenção interna.", "Contratar serviço de locação de equipamento similar.", "Isolar a área e aguardar o técnico especialista.",
@@ -40,14 +100,13 @@ const contingencyPlans = [
 
 const leadTimes = ["Imediato", "2 horas", "4 horas", "8 horas", "24 horas", "48 horas"];
 
-
 export const mockItems: Item[] = itemNames.map((name, index) => {
   const imageId = `item-image-${(index % 5) + 1}`;
   const image = PlaceHolderImages.find(img => img.id === imageId);
   return {
     id: `ITM-${String(index + 1).padStart(3, '0')}`,
     name: name,
-    category: categories[Math.floor(Math.random() * categories.length)],
+    category: (itemCategoryMap as Record<string, string>)[name] || "Geral",
     classification: getRandomClassification(),
     storeCount: Math.floor(Math.random() * 10) + 1,
     generalIndex: Math.floor(Math.random() * 10) + 1,
@@ -61,7 +120,7 @@ export const mockItems: Item[] = itemNames.map((name, index) => {
 
 export const mockIncidents: Incident[] = [
   { id: 'INC-001', itemName: 'Ar Condicionado Central', location: 'Loja A (SP)', status: 'Aberto', openedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: "Parada total do equipamento de refrigeração central, afetando a climatização de toda a área de vendas. A temperatura interna subiu 5°C em 1 hora.", lat: -23.5505, lng: -46.6333 },
-  { id: 'INC-002', itemName: 'Balcão Refrigerado', location: 'Loja B (RJ)', status: 'Em Andamento', openedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: "Não está atingindo a temperatura ideal, risco de perda de produtos perecíveis. A temperatura está oscilando entre 8°C e 12°C.", lat: -22.9068, lng: -43.1729 },
+  { id: 'INC-002', itemName: 'Balcões refrigerados', location: 'Loja B (RJ)', status: 'Em Andamento', openedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: "Não está atingindo a temperatura ideal, risco de perda de produtos perecíveis. A temperatura está oscilando entre 8°C e 12°C.", lat: -22.9068, lng: -43.1729 },
   { id: 'INC-003', itemName: 'QGBT / Quadro geral', location: 'Loja C (MG)', status: 'Resolvido', openedAt: new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString(), description: "Desarme do disjuntor principal causou interrupção total de energia na loja por 45 minutos. Todas as operações foram paralisadas.", lat: -19.9167, lng: -43.9345 },
   { id: 'INC-004', itemName: 'Nobreak central / retificador', location: 'Depósito Central (BA)', status: 'Fechado', openedAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(), description: "Falha na bateria do nobreak durante uma queda de energia, resultando na perda de dados não salvos nos servidores administrativos.", lat: -12.9777, lng: -38.5016 },
   { id: 'INC-005', itemName: 'Câmeras externas / perímetro', location: 'Loja D (RS)', status: 'Aberto', openedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: "Uma das câmeras do perímetro parou de gravar. A imagem está congelada.", lat: -30.0346, lng: -51.2177 },
