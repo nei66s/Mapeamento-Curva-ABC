@@ -8,7 +8,6 @@ import {
   Settings,
   BarChart3,
   ListCollapse,
-  CalendarCheck,
   ClipboardCheck,
 } from "lucide-react";
 import {
@@ -68,13 +67,6 @@ export default function AppHeader() {
             >
               <ShieldAlert className="h-5 w-5" />
               Incidentes
-            </Link>
-            <Link
-              href="/dashboard/preventive"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-            >
-              <CalendarCheck className="h-5 w-5" />
-              Preventivas
             </Link>
             <Link
               href="/dashboard/compliance"

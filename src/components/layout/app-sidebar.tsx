@@ -6,7 +6,6 @@ import {
   ShieldAlert,
   Settings,
   ListCollapse,
-  CalendarCheck,
   ClipboardCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,7 +15,6 @@ const navLinks = [
     { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
     { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
     { href: "/dashboard/incidents", icon: ShieldAlert, label: "Incidentes" },
-    { href: "/dashboard/preventive", icon: CalendarCheck, label: "Preventivas" },
     { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Conformidade" },
 ];
 

@@ -1,5 +1,5 @@
 
-import type { Item, Incident, Category, Classification, PreventiveVisit, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
+import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -163,42 +163,6 @@ export const mockIncidents: Incident[] = [
   { id: 'INC-003', itemName: 'QGBT / Quadro geral', location: 'Loja C (MG)', status: 'Resolvido', openedAt: new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString(), description: "Desarme do disjuntor principal causou interrupção total de energia na loja por 45 minutos. Todas as operações foram paralisadas.", lat: -19.9167, lng: -43.9345 },
   { id: 'INC-004', itemName: 'Nobreak central / retificador', location: 'Depósito Central (BA)', status: 'Fechado', openedAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(), description: "Falha na bateria do nobreak durante uma queda de energia, resultando na perda de dados não salvos nos servidores administrativos.", lat: -12.9777, lng: -38.5016 },
   { id: 'INC-005', itemName: 'Câmeras externas / perímetro', location: 'Loja D (RS)', status: 'Aberto', openedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: "Uma das câmeras do perímetro parou de gravar. A imagem está congelada.", lat: -30.0346, lng: -51.2177 },
-];
-
-
-export const mockPreventiveVisits: PreventiveVisit[] = [
-  { 
-    id: 'VISIT-001', 
-    date: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(),
-    supplierName: 'Refrigeração Polar',
-    items: ['Rack de compressores / unidade condensadora', 'Evaporadores / câmaras frias'],
-    status: 'Agendada',
-    notes: 'Verificação geral do sistema de refrigeração central. Checar pressão do gás e limpeza dos filtros.'
-  },
-  { 
-    id: 'VISIT-002', 
-    date: new Date(new Date().setDate(new Date().getDate() - 3)).toISOString(),
-    supplierName: 'Eletro Segura',
-    items: ['QGBT / Quadro geral'],
-    status: 'Concluída',
-    notes: 'Reaperto dos barramentos e medição de corrente. Tudo em conformidade.'
-  },
-  { 
-    id: 'VISIT-003', 
-    date: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString(),
-    supplierName: 'Segurança Total',
-    items: ['DVR / NVR Central', 'Câmeras externas / perímetro'],
-    status: 'Agendada',
-    notes: 'Limpeza das lentes das câmeras e verificação do armazenamento do NVR.'
-  },
-   { 
-    id: 'VISIT-004', 
-    date: new Date().toISOString(),
-    supplierName: 'Manutenção Preditiva Ltda.',
-    items: ['Elevador / monta-carga'],
-    status: 'Agendada',
-    notes: 'Inspeção mensal dos cabos de aço e sistema de freios de emergência.'
-  },
 ];
 
 export const mockComplianceChecklistItems: ComplianceChecklistItem[] = [
