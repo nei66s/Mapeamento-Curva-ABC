@@ -39,8 +39,7 @@ interface RoutingMapProps {
 export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const markersLayerRef = useRef<L.LayerGroup>(new L.LayerGroup());
-  const routeLineRef = useRef<L.Polyline | null>(null);
+  const layersRef = useRef<L.LayerGroup>(new L.LayerGroup());
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
@@ -52,11 +51,14 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
             shadowUrl: shadowUrl.src,
         });
 
-      mapRef.current = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
+      const map = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
+      mapRef.current = map;
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(mapRef.current);
-      markersLayerRef.current.addTo(mapRef.current);
+      }).addTo(map);
+
+      layersRef.current.addTo(map);
     }
   }, []);
 
@@ -65,11 +67,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     if (!map) return;
 
     // Clear previous markers and route line
-    markersLayerRef.current.clearLayers();
-    if (routeLineRef.current) {
-      map.removeLayer(routeLineRef.current);
-      routeLineRef.current = null;
-    }
+    layersRef.current.clearLayers();
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
 
@@ -86,14 +84,14 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
       L.marker([store.lat, store.lng], { icon })
         .bindPopup(popupText)
-        .addTo(markersLayerRef.current);
+        .addTo(layersRef.current);
     });
     
     // Draw route line if there are stops
     if (routeStops.length > 1) {
       const sortedStops = [...routeStops].sort((a,b) => a.visitOrder - b.visitOrder);
       const latLngs = sortedStops.map(stop => L.latLng(stop.lat, stop.lng));
-      routeLineRef.current = L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(map);
+      L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
     }
 
     // Fit map to show all stores if there are stops
