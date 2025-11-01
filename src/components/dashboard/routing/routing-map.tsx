@@ -117,5 +117,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     }
   }, [allStores, routeStops]);
 
-  return <div ref={mapContainerRef} className="h-full w-full" />;
+  return <div ref={mapContainerRef} className="w-full h-full" />;
 }
