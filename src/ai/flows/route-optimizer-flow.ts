@@ -17,16 +17,16 @@ const StoreSchema = z.object({
   lng: z.number(),
 });
 
-export const RouteOptimizerInputSchema = z.object({
+const RouteOptimizerInputSchema = z.object({
   stores: z.array(StoreSchema).describe('An array of store objects to be included in the route.'),
 });
-export type RouteOptimizerInput = z.infer<typeof RouteOptimizerInputSchema>;
+type RouteOptimizerInput = z.infer<typeof RouteOptimizerInputSchema>;
 
-export const RouteOptimizerOutputSchema = z.object({
+const RouteOptimizerOutputSchema = z.object({
   optimizedRoute: z.array(z.string()).describe('An array of store IDs in the optimized order.'),
   totalDistance: z.number().describe('The total distance of the optimized route in kilometers.'),
 });
-export type RouteOptimizerOutput = z.infer<typeof RouteOptimizerOutputSchema>;
+type RouteOptimizerOutput = z.infer<typeof RouteOptimizerOutputSchema>;
 
 
 export async function optimizeRoute(input: RouteOptimizerInput): Promise<RouteOptimizerOutput> {
