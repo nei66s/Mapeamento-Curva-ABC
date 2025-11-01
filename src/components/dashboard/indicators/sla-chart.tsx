@@ -92,7 +92,12 @@ export function SlaChart({ data }: SlaChartProps) {
                         position="top"
                         offset={4}
                         className="fill-foreground font-medium text-xs"
-                        formatter={(value: number) => `${value}%`}
+                        formatter={(value: number, index: number) => {
+                            if (index === chartData.length - 1) {
+                                return `${value}%`;
+                            }
+                            return '';
+                        }}
                     />
                 </Line>
                  <Line 
