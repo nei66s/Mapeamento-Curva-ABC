@@ -154,14 +154,13 @@ export default function RoutingPage() {
           startDate: startDate?.toISOString() ?? new Date().toISOString(),
       });
       
-      const storeVisitMap = new Map(storesForApi.map(s => [s.id, s]));
-      const validOptimizedRoute = response.optimizedRoute.filter(stop => storeVisitMap.has(stop.storeId));
+      const storeVisitMap = new Map(storesToVisit.map(s => [s.id, s]));
+      const validOptimizedRoute = response.optimizedRoute.filter(stop => storeVisitMap.has(stop.storeId) || stop.storeId === startPoint.id);
       
-      // First item is start point, should not have a visit date
       const startPointId = validOptimizedRoute[0]?.storeId;
 
       const reorderedStops = validOptimizedRoute
-        .slice(1) // Remove start point from optimized list
+        .slice(1) 
         .map((stop, index) => {
             const storeDetails = storeVisitMap.get(stop.storeId)!;
             return { ...storeDetails, visitOrder: index, visitDate: stop.visitDate };
@@ -255,13 +254,12 @@ export default function RoutingPage() {
                     <CardDescription>Escolha a loja que servirá como ponto de início da rota.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || ''}>
+                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || undefined}>
                         <SelectTrigger>
                             <SelectValue placeholder="Selecione o ponto de partida..." />
                         </SelectTrigger>
                         <SelectContent>
-                            {startPoint && <SelectItem value={startPoint.id}>{startPoint.name}</SelectItem>}
-                            {availableStores.map(store => (
+                            {allStores.map(store => (
                                 <SelectItem key={store.id} value={store.id}>{store.name}</SelectItem>
                             ))}
                         </SelectContent>
