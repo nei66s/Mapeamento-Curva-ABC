@@ -1,25 +1,7 @@
-import type { Item, Incident, Category } from '@/lib/types';
+
+import type { Item, Incident, Category, Classification } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import { impactFactors, ImpactFactor } from './impact-factors';
-
-function getRandomClassification(): Classification {
-  const rand = Math.random();
-  if (rand < 0.2) return 'A';
-  if (rand < 0.5) return 'B';
-  return 'C';
-}
-
-function getRandomImpactFactors(): ImpactFactor['id'][] {
-    const factors: ImpactFactor['id'][] = [];
-    const factorCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 factors
-
-    const shuffled = [...impactFactors].sort(() => 0.5 - Math.random());
-    
-    for (let i = 0; i < factorCount; i++) {
-        factors.push(shuffled[i].id);
-    }
-    return factors;
-}
 
 
 const contingencyPlans = [
@@ -97,28 +79,41 @@ const itemCategoryMap: Record<string, string> = {
     "Iluminação decorativa / fachadas": "Logo/ Painéis / Iluminação decorativa",
 };
 
+const getImpactFactorsAndClassification = (itemName: string): { impactFactors: ImpactFactor['id'][], classification: Classification } => {
+    // This is a deterministic way to assign impact factors based on item name for stable mock data
+    const seed = itemName.length % 5;
+    switch(seed) {
+        case 0:
+            return { impactFactors: ['safety', 'sales'], classification: 'A' };
+        case 1:
+            return { impactFactors: ['legal', 'brand'], classification: 'B' };
+        case 2:
+            return { impactFactors: ['cost'], classification: 'C' };
+        case 3:
+            return { impactFactors: ['sales', 'cost'], classification: 'A' };
+        case 4:
+            return { impactFactors: ['brand'], classification: 'B' };
+        default:
+            return { impactFactors: ['cost'], classification: 'C' };
+    }
+}
+
+
 export const mockItems: Item[] = itemNames.map((name, index) => {
   const imageId = `item-image-${(index % 5) + 1}`;
   const image = PlaceHolderImages.find(img => img.id === imageId);
-  const impactFactors = getRandomImpactFactors();
-  
-  let classification: Classification = 'C';
-  if (impactFactors.includes('safety') || impactFactors.includes('sales')) {
-    classification = 'A';
-  } else if (impactFactors.includes('legal') || impactFactors.includes('brand')) {
-    classification = 'B';
-  }
+  const { impactFactors, classification } = getImpactFactorsAndClassification(name);
 
   return {
     id: `ITM-${String(index + 1).padStart(3, '0')}`,
     name: name,
     category: (itemCategoryMap as Record<string, string>)[name] || "Geral",
     classification,
-    storeCount: Math.floor(Math.random() * 10) + 1,
+    storeCount: Math.floor(name.length % 10) * 3 + 1, // Deterministic store count
     impactFactors,
     status: Math.random() > 0.8 ? (Math.random() > 0.5 ? 'offline' : 'maintenance') : 'online',
-    contingencyPlan: contingencyPlans[Math.floor(Math.random() * contingencyPlans.length)],
-    leadTime: leadTimes[Math.floor(Math.random() * leadTimes.length)],
+    contingencyPlan: contingencyPlans[index % contingencyPlans.length],
+    leadTime: leadTimes[index % leadTimes.length],
     imageUrl: image?.imageUrl,
   }
 });
