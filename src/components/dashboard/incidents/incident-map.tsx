@@ -5,22 +5,20 @@ import type { Incident } from '@/lib/types';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Importa as imagens dos ícones para que o Webpack as processe corretamente.
+// Solução para o ícone padrão do Leaflet não aparecer corretamente no Next.js
+// Esta configuração é necessária para evitar problemas com o StrictMode e o hot-reloading.
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
-// Solução definitiva: Cria uma instância de ícone e a define como o padrão do Leaflet.
-// Isso evita a necessidade de manipular o protótipo do L.Icon.Default e resolve os
-// conflitos com o StrictMode do React e o hot-reloading do Next.js.
 const DefaultIcon = L.icon({
-  iconRetinaUrl: iconRetinaUrl.src,
-  iconUrl: iconUrl.src,
-  shadowUrl: shadowUrl.src,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+    iconRetinaUrl: iconRetinaUrl.src,
+    iconUrl: iconUrl.src,
+    shadowUrl: shadowUrl.src,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
