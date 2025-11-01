@@ -203,8 +203,7 @@ export default function RoutingPage() {
         description="Planeje e otimize as rotas de manutenção preventiva para suas equipes internas."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <div className="lg:col-span-1 flex flex-col gap-8">
+      <div className="w-full max-w-4xl mx-auto flex flex-col gap-8">
             <Card>
                  <CardHeader>
                     <CardTitle>1. Selecione a Equipe e Data</CardTitle>
@@ -346,20 +345,9 @@ export default function RoutingPage() {
                     )}
                 </CardContent>
             </Card>
-        </div>
-
-        <div className="lg:col-span-2">
-           <Card className="min-h-[720px] flex flex-col">
-             <CardHeader>
-              <CardTitle>Visão Geral do Mapa</CardTitle>
-              <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 p-0">
-              <RoutingMap allStores={allStores} routeStops={fullRouteForMap} />
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );
 }
+
+    
