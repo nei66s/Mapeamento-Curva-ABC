@@ -114,12 +114,24 @@ export default function CompliancePage() {
         items: checklistItems.map(item => ({ itemId: item.id, status: 'pending' })),
     };
 
-    setStoreData(prev => [...prev, newVisit]);
+    setStoreData(prev => [...prev, newVisit].sort((a, b) => new Date(a.visitDate).getTime() - new Date(b.visitDate).getTime()));
     toast({
         title: "Visita agendada!",
         description: `Visita para a ${storeName} agendada em ${format(visitDate, 'dd/MM/yyyy')}.`,
     });
     setIsFormOpen(false);
+  };
+  
+  const handleDeleteVisit = (storeId: string) => {
+    const deletedStore = storeData.find(d => d.storeId === storeId);
+    if (!deletedStore) return;
+
+    setStoreData(prevData => prevData.filter(d => d.storeId !== storeId));
+    toast({
+      variant: 'destructive',
+      title: 'Visita Removida!',
+      description: `A visita para a loja "${deletedStore.storeName}" foi removida.`,
+    });
   };
 
 
@@ -235,6 +247,7 @@ export default function CompliancePage() {
                     checklistItems={checklistItems}
                     storeData={filteredStoreData}
                     onStatusChange={handleStatusChange}
+                    onDeleteVisit={handleDeleteVisit}
                     currentDate={selectedDate || displayDate}
                     isDateView={!!selectedDate}
                 />

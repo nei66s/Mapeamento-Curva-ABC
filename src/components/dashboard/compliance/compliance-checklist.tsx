@@ -21,17 +21,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
-import { CheckCircle2, XCircle, CircleSlash } from 'lucide-react';
+import { CheckCircle2, XCircle, CircleSlash, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ClassificationBadge } from '@/components/shared/risk-badge';
+import { Button } from '@/components/ui/button';
 
 interface ComplianceChecklistProps {
   checklistItems: ComplianceChecklistItem[];
   storeData: StoreComplianceData[];
   onStatusChange: (storeId: string, itemId: string, status: ComplianceStatus) => void;
+  onDeleteVisit: (storeId: string) => void;
   currentDate: Date;
   isDateView: boolean;
 }
@@ -52,6 +65,7 @@ export function ComplianceChecklist({
   checklistItems,
   storeData,
   onStatusChange,
+  onDeleteVisit,
   currentDate,
   isDateView,
 }: ComplianceChecklistProps) {
@@ -73,7 +87,7 @@ export function ComplianceChecklist({
                 <Table>
                     <TableHeader>
                     <TableRow className="bg-muted/50 hover:bg-muted/50">
-                        <TableHead className="sticky left-0 bg-muted/50 z-10 font-semibold text-foreground">Loja</TableHead>
+                        <TableHead className="sticky left-0 bg-muted/50 z-10 font-semibold text-foreground w-[200px]">Loja</TableHead>
                         {checklistItems.map(item => (
                         <TableHead key={item.id} className="text-center min-w-[150px]">
                              <Tooltip>
@@ -94,7 +108,32 @@ export function ComplianceChecklist({
                     <TableBody>
                     {storeData.length > 0 ? storeData.map(store => (
                         <TableRow key={store.storeId}>
-                        <TableCell className="sticky left-0 bg-card z-10 font-medium">{store.storeName}</TableCell>
+                        <TableCell className="sticky left-0 bg-card z-10 font-medium w-[200px]">
+                          <div className="flex items-center justify-between">
+                            <span className="truncate">{store.storeName}</span>
+                             <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive/70 hover:text-destructive">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Excluir Visita Agendada?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Esta ação não pode ser desfeita. Isso removerá o agendamento de conformidade para a loja <span className="font-bold">{store.storeName}</span> neste dia.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => onDeleteVisit(store.storeId)}>
+                                    Excluir
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </TableCell>
                         {checklistItems.map(checklistItem => {
                             const itemStatus = store.items.find(i => i.itemId === checklistItem.id);
                             const currentStatus = itemStatus?.status || 'pending';
@@ -102,7 +141,7 @@ export function ComplianceChecklist({
                             <TableCell key={checklistItem.id} className="text-center">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <button className="flex items-center justify-center w-full h-full">
+                                        <button className="flex items-center justify-center w-full h-full p-2 rounded-md hover:bg-muted">
                                             {statusIcon[currentStatus]}
                                         </button>
                                     </DropdownMenuTrigger>
