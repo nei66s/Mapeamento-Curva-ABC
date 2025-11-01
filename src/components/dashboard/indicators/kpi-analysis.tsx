@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { summarizeKpi } from '@/ai/flows/summarize-kpi-flow';
 import type { MaintenanceIndicator } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,6 +42,14 @@ export function KpiAnalysis({ indicator }: KpiAnalysisProps) {
       setLoading(false);
     }
   }, [indicator]);
+
+  useEffect(() => {
+    // Reset state when the selected month (indicator) changes
+    setSummary(null);
+    setError(null);
+    setLoading(false);
+  }, [indicator]);
+
 
   const renderContent = () => {
     if (loading) {

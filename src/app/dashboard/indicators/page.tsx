@@ -3,7 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
-import { mockMaintenanceIndicators } from '@/lib/mock-data';
+import { mockMaintenanceIndicators, mockIncidents } from '@/lib/mock-data';
 import type { MaintenanceIndicator } from '@/lib/types';
 import { KpiCard } from '@/components/dashboard/indicators/kpi-card';
 import { CallsChart } from '@/components/dashboard/indicators/calls-chart';
@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { EditableAgingTableByCriticism } from '@/components/dashboard/indicators/editable-aging-table-by-criticism';
 import { AgingChart } from '@/components/dashboard/indicators/aging-chart';
 import { KpiAnalysis } from '@/components/dashboard/indicators/kpi-analysis';
+import { ParetoAnalysis } from '@/components/dashboard/indicators/pareto-analysis';
 
 
 export default function IndicatorsPage() {
@@ -45,6 +46,15 @@ export default function IndicatorsPage() {
       meta_sla: annualSlaGoal,
     }));
   }, [indicators, annualSlaGoal]);
+  
+  const incidentsForMonth = useMemo(() => {
+    const [year, month] = selectedMonth.split('-');
+    return mockIncidents.filter(incident => {
+        const incidentDate = new Date(incident.openedAt);
+        return incidentDate.getFullYear() === parseInt(year) && incidentDate.getMonth() === parseInt(month) - 1;
+    });
+  }, [selectedMonth]);
+
 
   const handleAddNewMonth = (year: number, month: number) => {
     const monthString = `${year}-${String(month).padStart(2, '0')}`;
@@ -167,6 +177,8 @@ export default function IndicatorsPage() {
             <SlaChart data={indicatorsWithGoal} />
 
             <AgingChart data={selectedData.aging} />
+
+            <ParetoAnalysis incidents={incidentsForMonth} />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <EditableSlaTable 
