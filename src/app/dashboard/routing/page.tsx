@@ -192,7 +192,15 @@ export default function RoutingPage() {
   
   const fullRouteForMap = useMemo(() => {
     if (!startPoint) return [];
-    return [{...startPoint, visitOrder: -1}, ...storesToVisit]
+    
+    // Combine and then sort to ensure correct order for polyline
+    const combinedStops = [
+        {...startPoint, visitOrder: -1}, 
+        ...storesToVisit
+    ];
+    
+    return combinedStops.sort((a, b) => a.visitOrder - b.visitOrder);
+    
   }, [startPoint, storesToVisit]);
 
   return (
@@ -254,7 +262,7 @@ export default function RoutingPage() {
                     <CardDescription>Escolha a loja que servirá como ponto de início da rota.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || ''}>
+                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || undefined}>
                         <SelectTrigger>
                             <SelectValue placeholder="Selecione o ponto de partida..." />
                         </SelectTrigger>
@@ -347,7 +355,7 @@ export default function RoutingPage() {
             </Card>
         </div>
         <div className="lg:col-span-2">
-           <Card className="h-[calc(100vh-10rem)] min-h-[720px]">
+           <Card className="h-full min-h-[720px]">
                 <CardContent className="p-0 h-full">
                     <RoutingMap allStores={allStores} routeStops={fullRouteForMap} />
                 </CardContent>
@@ -357,3 +365,5 @@ export default function RoutingPage() {
     </div>
   );
 }
+
+    

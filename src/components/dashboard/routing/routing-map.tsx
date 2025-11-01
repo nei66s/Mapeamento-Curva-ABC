@@ -93,20 +93,17 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
           .addTo(layersRef.current);
       }
     });
-
-    // Sort stops by visitOrder: -1 (start) first, then ascending order
-    const sortedRouteStops = [...routeStops].sort((a, b) => a.visitOrder - b.visitOrder);
-
-    // Draw markers and popups for stops in the route
-    sortedRouteStops.forEach((stop, index) => {
+    
+    // The routeStops are now guaranteed to be sorted by the parent component
+    routeStops.forEach((stop, index) => {
       let icon = greenIcon;
-      let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index} na rota</b>`;
+      let popupText = `<b>${stop.name}</b><br>${stop.city}`;
 
       if (stop.visitOrder === -1) { // Start Point
         icon = goldIcon;
-        popupText = `<b>${stop.name}</b><br>Ponto de Partida`;
+        popupText += `<br><b>Ponto de Partida</b>`;
       } else {
-        popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${stop.visitOrder + 1} na rota</b>`;
+        popupText += `<br><b>Visita #${stop.visitOrder + 1} na rota</b>`;
       }
       
       if (stop.visitDate && stop.visitOrder !== -1) {
@@ -119,12 +116,12 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     });
 
     // Draw polyline if there's a route
-    if (sortedRouteStops.length > 1) {
-      const latLngs = sortedRouteStops.map(stop => L.latLng(stop.lat, stop.lng));
+    if (routeStops.length > 1) {
+      const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
     }
     
-    const locationsToBound = sortedRouteStops.length > 0 ? sortedRouteStops : allStores;
+    const locationsToBound = routeStops.length > 0 ? routeStops : allStores;
     if (locationsToBound.length > 0) {
       const bounds = L.latLngBounds(locationsToBound.map(loc => [loc.lat, loc.lng]));
       if (bounds.isValid()) {
@@ -137,3 +134,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
 }
+
+    
