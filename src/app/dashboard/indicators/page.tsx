@@ -11,12 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowUp, ArrowDown, TrendingUp, PlusCircle } from 'lucide-react';
 import { EditableSlaTable } from '@/components/dashboard/indicators/editable-sla-table';
 import { EditableCallsTable } from '@/components/dashboard/indicators/editable-calls-table';
-import { EditableAgingTable } from '@/components/dashboard/indicators/editable-aging-table';
 import { SlaChart } from '@/components/dashboard/indicators/sla-chart';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AddMonthForm } from '@/components/dashboard/indicators/add-month-form';
 import { useToast } from '@/hooks/use-toast';
+import { EditableAgingTableByCriticism } from '@/components/dashboard/indicators/editable-aging-table-by-criticism';
+import { AgingChart } from '@/components/dashboard/indicators/aging-chart';
 
 
 export default function IndicatorsPage() {
@@ -67,7 +68,12 @@ export default function IndicatorsPage() {
         backlog: indicators[indicators.length - 1]?.backlog || 0,
         valor_mensal: 0,
         variacao_percentual_valor: 0,
-        aging: { inferior_30: 0, entre_30_60: 0, entre_60_90: 0, superior_90: 0 },
+        aging: {
+            inferior_30: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
+            entre_30_60: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
+            entre_60_90: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
+            superior_90: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
+        },
         criticidade: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
         prioridade: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
     };
@@ -78,6 +84,14 @@ export default function IndicatorsPage() {
         title: 'Mês Adicionado!',
         description: `O mês ${new Date(monthString + '-02').toLocaleString('default', { month: 'long', year: 'numeric' })} foi adicionado.`,
     });
+  };
+  
+  const handleAgingUpdate = (updatedAging: MaintenanceIndicator['aging']) => {
+    setIndicators(prevIndicators => prevIndicators.map(indicator => 
+        indicator.mes === selectedMonth 
+        ? { ...indicator, aging: updatedAging } 
+        : indicator
+    ));
   };
 
   return (
@@ -148,6 +162,8 @@ export default function IndicatorsPage() {
             <CallsChart data={indicators} />
 
             <SlaChart data={indicatorsWithGoal} />
+
+            <AgingChart data={selectedData.aging} />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <EditableSlaTable 
@@ -159,7 +175,7 @@ export default function IndicatorsPage() {
                 <EditableCallsTable data={indicators} setData={setIndicators} />
             </div>
 
-            <EditableAgingTable indicator={selectedData} />
+            <EditableAgingTableByCriticism indicator={selectedData} onUpdate={handleAgingUpdate} />
         </>
       )}
 

@@ -259,6 +259,21 @@ export const mockMaintenanceIndicators: MaintenanceIndicator[] = fullIndicatorDa
     const valor_mensal = (item.chamados_abertos * 700) + Math.random() * 100000;
     const prev_valor_mensal = (prevItem.chamados_abertos * 700) + Math.random() * 100000;
 
+    const totalCriticidade = (item.chamados_abertos);
+    const criticidade = {
+        baixa: Math.floor(totalCriticidade * (0.1 + Math.random() * 0.1)),
+        media: Math.floor(totalCriticidade * (0.4 + Math.random() * 0.1)),
+        alta: Math.floor(totalCriticidade * (0.3 + Math.random() * 0.1)),
+        muito_alta: Math.floor(totalCriticidade * (0.1 + Math.random() * 0.1))
+    };
+    
+    const generateAgingData = () => ({
+        baixa: Math.floor(Math.random() * 50),
+        media: Math.floor(Math.random() * 100),
+        alta: Math.floor(Math.random() * 150),
+        muito_alta: Math.floor(Math.random() * 80),
+    });
+
     return {
         id: String(index + 1),
         mes: item.mes,
@@ -272,17 +287,12 @@ export const mockMaintenanceIndicators: MaintenanceIndicator[] = fullIndicatorDa
         valor_mensal: parseFloat(valor_mensal.toFixed(2)),
         variacao_percentual_valor: parseFloat((((valor_mensal - prev_valor_mensal) / prev_valor_mensal) * 100).toFixed(2)),
         aging: {
-            inferior_30: Math.floor(item.backlog * 0.4),
-            entre_30_60: Math.floor(item.backlog * 0.3),
-            entre_60_90: Math.floor(item.backlog * 0.2),
-            superior_90: Math.floor(item.backlog * 0.1)
+            inferior_30: generateAgingData(),
+            entre_30_60: generateAgingData(),
+            entre_60_90: generateAgingData(),
+            superior_90: generateAgingData(),
         },
-        criticidade: {
-            baixa: Math.floor(item.chamados_abertos * 0.1),
-            media: Math.floor(item.chamados_abertos * 0.5),
-            alta: Math.floor(item.chamados_abertos * 0.3),
-            muito_alta: Math.floor(item.chamados_abertos * 0.1)
-        },
+        criticidade: criticidade,
         prioridade: {
             baixa: Math.random() * 20,
             media: Math.random() * 30,

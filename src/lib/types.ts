@@ -63,6 +63,13 @@ export type User = {
   avatarUrl?: string;
 };
 
+export type AgingCriticidade = {
+  baixa: number;
+  media: number;
+  alta: number;
+  muito_alta: number;
+};
+
 export type MaintenanceIndicator = {
   id: string;
   mes: string;
@@ -76,12 +83,12 @@ export type MaintenanceIndicator = {
   valor_mensal: number;
   variacao_percentual_valor: number;
   aging: {
-    inferior_30: number;
-    entre_30_60: number;
-    entre_60_90: number;
-    superior_90: number;
+    inferior_30: AgingCriticidade;
+    entre_30_60: AgingCriticidade;
+    entre_60_90: AgingCriticidade;
+    superior_90: AgingCriticidade;
   };
-  criticidade: {
+  criticidade: { // This might be redundant now or could represent totals
     baixa: number;
     media: number;
     alta: number;
