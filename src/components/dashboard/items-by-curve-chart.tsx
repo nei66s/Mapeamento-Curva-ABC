@@ -53,16 +53,16 @@ export function ItemsByCurveChart() {
         <div className="h-[250px] w-full">
           <ChartContainer config={chartConfig}>
             <PieChart>
-                <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltipContent />} />
+                <Tooltip cursor={{ fill: "hsl(var(--muted))" }} content={<ChartTooltipContent hideLabel />} />
                 <Pie
                   data={data}
                   dataKey="value"
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
+                  innerRadius={50}
+                  outerRadius={100}
+                  paddingAngle={2}
                   labelLine={false}
                   label={({
                     cx,
@@ -82,12 +82,12 @@ export function ItemsByCurveChart() {
                       <text
                         x={x}
                         y={y}
-                        fill={data[index].fill}
+                        fill="hsl(var(--foreground))"
                         textAnchor={x > cx ? "start" : "end"}
                         dominantBaseline="central"
-                        className="text-xs font-bold"
+                        className="text-sm font-medium"
                       >
-                        {`${data[index].name} (${value})`}
+                        {data[index].name} ({value})
                       </text>
                     );
                   }}
