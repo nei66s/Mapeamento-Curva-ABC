@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
-  loading: () => <Skeleton className="h-full w-full" />,
+  loading: () => <Skeleton className="h-[640px] w-full" />,
 });
 
 function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolean }) {
@@ -38,7 +38,7 @@ function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolea
     setNodeRef,
     transform,
     transition,
-  } = useSortable({id: stop.id});
+  } = useSortable({id: stop.id, disabled: isFirst});
   
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -302,5 +302,3 @@ export default function RoutingPage() {
     </div>
   );
 }
-
-    

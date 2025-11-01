@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import type { Store, RouteStop } from '@/lib/types';
 import { format } from 'date-fns';
 
+// Default icon fix
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -50,7 +51,6 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
-      // Fix for icon path issue with Next.js
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: iconRetinaUrl.src,
@@ -58,27 +58,25 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         shadowUrl: shadowUrl.src,
       });
 
-      const map = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
-      mapRef.current = map;
+      mapRef.current = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+      }).addTo(mapRef.current);
 
-      layersRef.current.addTo(map);
+      layersRef.current.addTo(mapRef.current);
     }
   }, []);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    
+
     map.invalidateSize();
     layersRef.current.clearLayers();
 
     const routeStoreIds = new Set(routeStops.map(stop => stop.id));
 
-    // Display all non-route stores
     allStores.forEach(store => {
       if (!routeStoreIds.has(store.id)) {
         L.marker([store.lat, store.lng], { icon: blueIcon })
@@ -87,7 +85,6 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       }
     });
 
-    // Display route stops
     routeStops.forEach((stop, index) => {
       let icon = greenIcon;
       let popupText = `<b>${stop.name}</b><br>${stop.city}<br><b>Visita #${index + 1} na rota</b>`;
@@ -106,13 +103,11 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
         .addTo(layersRef.current);
     });
 
-    // Draw polyline if there is a route
     if (routeStops.length > 1) {
       const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
       L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(layersRef.current);
     }
     
-    // Fit map to bounds
     const locations = routeStops.length > 0 ? routeStops : allStores;
     if (locations.length > 0) {
       const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]));
@@ -126,5 +121,3 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;
 }
-
-    
