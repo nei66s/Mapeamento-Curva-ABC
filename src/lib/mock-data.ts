@@ -1,0 +1,62 @@
+import type { Item, Incident } from '@/lib/types';
+
+function getRandomClassification() {
+  const rand = Math.random();
+  if (rand < 0.2) return 'A';
+  if (rand < 0.5) return 'B';
+  return 'C';
+}
+
+const itemNames = [
+  "DVR / NVR Central", "Câmeras de frente de loja / cofres", "Sensores de presença / alarme",
+  "Câmeras externas / perímetro", "QGBT / Quadro geral", "Disjuntores / barramentos",
+  "Iluminação de área de vendas", "Iluminação externa / decorativa", "Rack de compressores / unidade condensadora",
+  "Evaporadores / câmaras frias", "Condensadoras / expositores", "Splits administrativos",
+  "Gerador principal", "Quadro de transferência automática (QTA)", "Nobreak central / retificador",
+  "Baterias de reserva / banco de energia", "Bomba de recalque / pressurização", "Reservatórios / caixa d’água",
+  "Torneiras / válvulas / sifões", "Elevador / monta-carga", "Portas corta-fogo / hidrantes / exaustores",
+  "Estruturas / revestimentos / pisos", "Serra fita", "Câmara fria / balcão refrigerado",
+  "Moedor / picador / fatiador", "Embaladora / seladora", "Forno combinado / fritadeira industrial",
+  "Estufa quente / expositor", "Coifa / exaustor industrial", "Forno turbo / esteira",
+  "Amassadeira / batedeira", "Seladora / balança produção", "Câmaras de climatização / umidificadores",
+  "Balcões refrigerados", "Nebulizadores / ventiladores", "Portas automáticas de doca", "Lavadora de piso",
+  "Enceradeira / aspirador industrial", "Cancela automática", "Iluminação de estacionamento",
+  "Portões automáticos / pedonais", "Climatizador / exaustor", "Iluminação / instalações elétricas",
+  "Equipamentos de cozinha / micro-ondas", "Painéis LED / letreiros", "Iluminação decorativa / fachadas",
+  "Ar Condicionado Central", "Câmera de Segurança 2", "Painel Elétrico Principal", "Freezer Horizontal",
+  "Sistema de Alarme", "Gerador de Energia", "Câmera de Segurança 5", "Balcão Refrigerado"
+];
+
+const categories = [
+  "Eletrônicos", "Segurança", "Elétrica", "Refrigeração", "Mecânica", "Hidráulica",
+  "Construção Civil", "Cozinha Industrial", "Padaria", "Logística", "Limpeza"
+];
+
+const contingencyPlans = [
+  "Acionar equipe de manutenção interna.", "Contratar serviço de locação de equipamento similar.", "Isolar a área e aguardar o técnico especialista.",
+  "Utilizar equipamento reserva.", "Redirecionar fluxo de clientes.", "Iniciar operação em modo de contingência manual."
+];
+
+const leadTimes = ["Imediato", "2 horas", "4 horas", "8 horas", "24 horas", "48 horas"];
+
+
+export const mockItems: Item[] = itemNames.map((name, index) => ({
+  id: `ITM-${String(index + 1).padStart(3, '0')}`,
+  name: name,
+  category: categories[Math.floor(Math.random() * categories.length)],
+  classification: getRandomClassification(),
+  storeCount: Math.floor(Math.random() * 10) + 1,
+  generalIndex: Math.floor(Math.random() * 10) + 1,
+  status: Math.random() > 0.8 ? (Math.random() > 0.5 ? 'offline' : 'maintenance') : 'online',
+  contingencyPlan: contingencyPlans[Math.floor(Math.random() * contingencyPlans.length)],
+  leadTime: leadTimes[Math.floor(Math.random() * leadTimes.length)],
+}));
+
+
+export const mockIncidents: Incident[] = [
+  { id: 'INC-001', itemName: 'Ar Condicionado Central', location: 'Loja A (SP)', status: 'Aberto', openedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), description: "Parada total do equipamento de refrigeração central, afetando a climatização de toda a área de vendas. A temperatura interna subiu 5°C em 1 hora.", lat: -23.5505, lng: -46.6333 },
+  { id: 'INC-002', itemName: 'Balcão Refrigerado', location: 'Loja B (RJ)', status: 'Em Andamento', openedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), description: "Não está atingindo a temperatura ideal, risco de perda de produtos perecíveis. A temperatura está oscilando entre 8°C e 12°C.", lat: -22.9068, lng: -43.1729 },
+  { id: 'INC-003', itemName: 'QGBT / Quadro geral', location: 'Loja C (MG)', status: 'Resolvido', openedAt: new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString(), description: "Desarme do disjuntor principal causou interrupção total de energia na loja por 45 minutos. Todas as operações foram paralisadas.", lat: -19.9167, lng: -43.9345 },
+  { id: 'INC-004', itemName: 'Nobreak central / retificador', location: 'Depósito Central (BA)', status: 'Fechado', openedAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(), description: "Falha na bateria do nobreak durante uma queda de energia, resultando na perda de dados não salvos nos servidores administrativos.", lat: -12.9777, lng: -38.5016 },
+  { id: 'INC-005', itemName: 'Câmeras externas / perímetro', location: 'Loja D (RS)', status: 'Aberto', openedAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), description: "Uma das câmeras do perímetro parou de gravar. A imagem está congelada.", lat: -30.0346, lng: -51.2177 },
+];
