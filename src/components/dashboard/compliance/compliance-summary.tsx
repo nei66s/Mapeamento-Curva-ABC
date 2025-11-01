@@ -10,22 +10,32 @@ interface ComplianceSummaryProps {
 }
 
 export function ComplianceSummary({ storeData, checklistItems }: ComplianceSummaryProps) {
-  const totalPossibleItems = storeData.length * checklistItems.length;
-  
-  const totalCompletedItems = storeData.reduce((acc, store) => {
-    return acc + store.items.filter(item => item.completed).length;
-  }, 0);
 
-  const completionPercentage = totalPossibleItems > 0
-    ? Math.round((totalCompletedItems / totalPossibleItems) * 100)
+  const { totalCompleted, totalApplicable } = storeData.reduce(
+    (acc, store) => {
+      store.items.forEach(item => {
+        if (item.status !== 'not-applicable') {
+          acc.totalApplicable++;
+          if (item.status === 'completed') {
+            acc.totalCompleted++;
+          }
+        }
+      });
+      return acc;
+    },
+    { totalCompleted: 0, totalApplicable: 0 }
+  );
+
+  const completionPercentage = totalApplicable > 0
+    ? Math.round((totalCompleted / totalApplicable) * 100)
     : 0;
 
   return (
     <Card className="shadow-md h-full">
       <CardHeader>
-        <CardTitle>Desempenho Geral</CardTitle>
+        <CardTitle>Desempenho Geral de Conformidade</CardTitle>
         <CardDescription>
-          Progresso geral da conclusão das manutenções preventivas em todas as lojas.
+          Progresso de conclusão dos itens aplicáveis para o período selecionado.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -35,8 +45,8 @@ export function ComplianceSummary({ storeData, checklistItems }: ComplianceSumma
         </div>
         <Progress value={completionPercentage} className="h-3" />
         <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{totalCompletedItems.toLocaleString()} itens concluídos</span>
-            <span>de {totalPossibleItems.toLocaleString()} totais</span>
+            <span>{totalCompleted.toLocaleString()} itens concluídos</span>
+            <span>de {totalApplicable.toLocaleString()} itens aplicáveis</span>
         </div>
       </CardContent>
     </Card>

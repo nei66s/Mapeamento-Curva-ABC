@@ -1,5 +1,5 @@
 
-import type { Item, Incident, Category, Classification, PreventiveVisit, ComplianceChecklistItem, StoreComplianceData } from '@/lib/types';
+import type { Item, Incident, Category, Classification, PreventiveVisit, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -140,7 +140,6 @@ export const mockCategories: Category[] = rawCategories.map((category, index) =>
     const itemsInCategory = mockItems.filter(item => item.category === category.name);
     const itemCount = itemsInCategory.length;
     
-    // Simplistic risk index based on item classifications within the category
     const riskScoreMap: Record<Classification, number> = { 'A': 3, 'B': 2, 'C': 1 };
     const riskScore = itemsInCategory.reduce((acc, item) => acc + riskScoreMap[item.classification], 0);
 
@@ -213,20 +212,36 @@ export const mockComplianceChecklistItems: ComplianceChecklistItem[] = [
 ];
 
 const generateStoreData = (): StoreComplianceData[] => {
-  const stores: StoreComplianceData[] = [];
-  for (let i = 1; i <= 45; i++) {
-    const store: StoreComplianceData = {
-      storeId: `LOJA-${String(i).padStart(3, '0')}`,
-      storeName: `Loja ${i}`,
-      items: mockComplianceChecklistItems.map(item => ({
-        itemId: item.id,
-        // ~70% chance of being completed for realistic mock data
-        completed: Math.random() < 0.7,
-      })),
-    };
-    stores.push(store);
-  }
-  return stores;
+    const stores: StoreComplianceData[] = [];
+    const today = new Date();
+    
+    for (let i = 1; i <= 45; i++) {
+        // Distribute stores throughout the current month
+        const visitDay = (i % 28) + 1; // Keep it within a typical month
+        const visitDate = new Date(today.getFullYear(), today.getMonth(), visitDay);
+
+        const store: StoreComplianceData = {
+            storeId: `LOJA-${String(i).padStart(3, '0')}`,
+            storeName: `Loja ${i}`,
+            visitDate: visitDate.toISOString(),
+            items: mockComplianceChecklistItems.map((item, index) => {
+                let status: ComplianceStatus = 'pending';
+                const random = Math.random();
+                if (random < 0.7) {
+                    status = 'completed';
+                } else if (random < 0.8 && item.id !== 'CHK-04') { // Don't make AVCB N/A
+                    status = 'not-applicable';
+                }
+                return {
+                    itemId: item.id,
+                    status: status,
+                };
+            }),
+        };
+        stores.push(store);
+    }
+    return stores;
 };
+
 
 export const mockStoreComplianceData: StoreComplianceData[] = generateStoreData();

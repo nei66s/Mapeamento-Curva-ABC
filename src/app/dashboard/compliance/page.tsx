@@ -1,16 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import {
   mockComplianceChecklistItems,
   mockStoreComplianceData,
 } from '@/lib/mock-data';
-import type { ComplianceChecklistItem, StoreComplianceData } from '@/lib/types';
+import type { ComplianceChecklistItem, StoreComplianceData, ComplianceStatus } from '@/lib/types';
 import { ComplianceChecklist } from '@/components/dashboard/compliance/compliance-checklist';
 import { ComplianceSummary } from '@/components/dashboard/compliance/compliance-summary';
 import { ManageChecklistItems } from '@/components/dashboard/compliance/manage-checklist-items';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent } from '@/components/ui/card';
+import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format, getMonth, getYear, setMonth, setYear } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function CompliancePage() {
   const [checklistItems, setChecklistItems] = useState<ComplianceChecklistItem[]>(
@@ -20,16 +27,38 @@ export default function CompliancePage() {
     mockStoreComplianceData
   );
 
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [displayDate, setDisplayDate] = useState(new Date());
+
   const { toast } = useToast();
 
-  const handleStatusChange = (storeId: string, itemId: string, completed: boolean) => {
+  const scheduledDates = useMemo(() => {
+    return storeData.map(d => new Date(d.visitDate));
+  }, [storeData]);
+
+  const filteredStoreData = useMemo(() => {
+    if (selectedDate) {
+       return storeData.filter(d => format(new Date(d.visitDate), 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd'));
+    }
+    // Filter by month if no specific date is selected
+    return storeData.filter(d => 
+        new Date(d.visitDate).getMonth() === displayDate.getMonth() &&
+        new Date(d.visitDate).getFullYear() === displayDate.getFullYear()
+    );
+  }, [storeData, selectedDate, displayDate]);
+  
+  const handleStatusChange = (
+    storeId: string,
+    itemId: string,
+    newStatus: ComplianceStatus
+  ) => {
     setStoreData(prevData =>
       prevData.map(store => {
         if (store.storeId === storeId) {
           return {
             ...store,
             items: store.items.map(item =>
-              item.itemId === itemId ? { ...item, completed } : item
+              item.itemId === itemId ? { ...item, status: newStatus } : item
             ),
           };
         }
@@ -43,17 +72,13 @@ export default function CompliancePage() {
       id: `CHK-${Date.now()}`,
       name: itemName,
     };
-
     setChecklistItems(prev => [...prev, newItem]);
-
-    // Add the new item to all stores with a default status of not completed
     setStoreData(prevData =>
       prevData.map(store => ({
         ...store,
-        items: [...store.items, { itemId: newItem.id, completed: false }],
+        items: [...store.items, { itemId: newItem.id, status: 'pending' }],
       }))
     );
-
     toast({
       title: 'Item Adicionado!',
       description: `"${itemName}" foi adicionado ao checklist.`,
@@ -63,24 +88,47 @@ export default function CompliancePage() {
   const handleRemoveItem = (itemId: string) => {
     const itemToRemove = checklistItems.find(item => item.id === itemId);
     if (!itemToRemove) return;
-    
-    // Remove the item from the main list
     setChecklistItems(prev => prev.filter(item => item.id !== itemId));
-
-    // Remove the item from each store's tracking data
     setStoreData(prevData =>
       prevData.map(store => ({
         ...store,
         items: store.items.filter(item => item.itemId !== itemId),
       }))
     );
-
     toast({
       variant: 'destructive',
       title: 'Item Removido!',
       description: `"${itemToRemove.name}" foi removido do checklist.`,
     });
   };
+
+  const handleMonthChange = (month: number) => {
+    setDisplayDate(prev => setMonth(prev, month));
+  };
+
+  const handleYearChange = (year: number) => {
+    setDisplayDate(prev => setYear(prev, year));
+  };
+  
+  const goToPreviousMonth = () => {
+    setDisplayDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const goToNextMonth = () => {
+    setDisplayDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+  
+  const years = Array.from({ length: 5 }, (_, i) => getYear(new Date()) - 2 + i);
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    value: i,
+    label: format(new Date(0, i), 'MMMM', { locale: ptBR }),
+  }));
+
+  useEffect(() => {
+    if (!selectedDate) {
+        setDisplayDate(new Date());
+    }
+  }, [selectedDate]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -90,7 +138,7 @@ export default function CompliancePage() {
       />
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-            <ComplianceSummary storeData={storeData} checklistItems={checklistItems} />
+            <ComplianceSummary storeData={filteredStoreData} checklistItems={checklistItems} />
         </div>
         <div className="lg:col-span-1">
              <ManageChecklistItems
@@ -100,12 +148,59 @@ export default function CompliancePage() {
             />
         </div>
       </div>
-      
-      <ComplianceChecklist
-        checklistItems={checklistItems}
-        storeData={storeData}
-        onStatusChange={handleStatusChange}
-      />
+       <Card>
+         <CardContent className="p-6 grid gap-6 md:grid-cols-3">
+            <div className="md:col-span-1">
+                 <div className="flex items-center justify-between mb-4">
+                    <Button variant="outline" size="icon" onClick={goToPreviousMonth}>
+                        <ChevronLeft />
+                    </Button>
+                    <div className='flex items-center gap-2'>
+                        <Select value={String(getMonth(displayDate))} onValueChange={(v) => handleMonthChange(Number(v))}>
+                            <SelectTrigger className="w-[140px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {months.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                        <Select value={String(getYear(displayDate))} onValueChange={(v) => handleYearChange(Number(v))}>
+                            <SelectTrigger className="w-[100px]">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {years.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <Button variant="outline" size="icon" onClick={goToNextMonth}>
+                        <ChevronRight />
+                    </Button>
+                </div>
+                 <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    month={displayDate}
+                    onMonthChange={setDisplayDate}
+                    locale={ptBR}
+                    className="rounded-md border"
+                    modifiers={{ scheduled: scheduledDates }}
+                    modifiersStyles={{ scheduled: { color: 'hsl(var(--primary))', fontWeight: 'bold' } }}
+                 />
+                 <Button className='w-full mt-4' variant="secondary" onClick={() => setSelectedDate(undefined)}>Limpar seleção</Button>
+            </div>
+            <div className="md:col-span-2">
+                 <ComplianceChecklist
+                    checklistItems={checklistItems}
+                    storeData={filteredStoreData}
+                    onStatusChange={handleStatusChange}
+                    currentDate={selectedDate || displayDate}
+                    isDateView={!!selectedDate}
+                />
+            </div>
+         </CardContent>
+       </Card>
     </div>
   );
 }

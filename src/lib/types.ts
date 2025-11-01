@@ -51,11 +51,14 @@ export type ComplianceChecklistItem = {
     name: string;
 };
 
+export type ComplianceStatus = 'completed' | 'pending' | 'not-applicable';
+
 export type StoreComplianceData = {
     storeId: string;
     storeName: string;
+    visitDate: string; // ISO date string for the scheduled visit
     items: {
         itemId: string;
-        completed: boolean;
+        status: ComplianceStatus;
     }[];
 };
