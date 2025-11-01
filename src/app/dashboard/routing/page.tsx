@@ -6,149 +6,197 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, PlusCircle, Trash2, Sparkles, Loader2, Route as RouteIcon } from 'lucide-react';
-import { format } from 'date-fns';
+import { PlusCircle, Trash2, Edit } from 'lucide-react';
+import { format, getMonth, getYear, setMonth, setYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { allStores } from '@/lib/mock-data';
 import { mockTeams } from '@/lib/teams';
-import type { Store, Team, RouteStop } from '@/lib/types';
+import type { Store, Team } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { optimizeRoute } from '@/ai/flows/route-optimizer-flow';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const RoutingMap = dynamic(() => import('@/components/dashboard/routing/routing-map'), {
   ssr: false,
-  loading: () => <Skeleton className="h-[400px] w-full" />,
+  loading: () => <Skeleton className="h-full w-full" />,
 });
 
-function SortableRouteItem({ stop }: { stop: RouteStop }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: stop.id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+type Allocation = {
+  id: string;
+  date: Date;
+  teamId: string;
+  storeId: string;
+};
+
+const allocationSchema = z.object({
+  teamId: z.string().min(1, 'É necessário selecionar uma equipe.'),
+  storeId: z.string().min(1, 'É necessário selecionar uma loja.'),
+});
+
+type AllocationFormData = z.infer<typeof allocationSchema>;
+
+function AllocationForm({
+  onSubmit,
+  onCancel,
+  teams,
+  stores,
+  allocation,
+}: {
+  onSubmit: (data: AllocationFormData) => void;
+  onCancel: () => void;
+  teams: Team[];
+  stores: Store[];
+  allocation?: Allocation | null;
+}) {
+  const form = useForm<AllocationFormData>({
+    resolver: zodResolver(allocationSchema),
+    defaultValues: {
+      teamId: allocation?.teamId || '',
+      storeId: allocation?.storeId || '',
+    },
+  });
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="p-3 mb-2 flex items-center justify-between bg-background rounded-lg border cursor-grab active:cursor-grabbing">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-primary text-primary-foreground font-bold text-sm">
-          {stop.visitOrder}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="teamId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Equipe</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma equipe" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {teams.map(team => (
+                    <SelectItem key={team.id} value={team.id}>
+                      {team.name} ({team.region})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="storeId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Loja</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma loja" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {stores.map(store => (
+                    <SelectItem key={store.id} value={store.id}>
+                      {store.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end gap-2 pt-4">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit">Salvar Alocação</Button>
         </div>
-        <div>
-          <p className="font-semibold">{stop.name}</p>
-          <p className="text-sm text-muted-foreground">{stop.city}</p>
-        </div>
-      </div>
-    </div>
+      </form>
+    </Form>
   );
 }
 
 export default function RoutingPage() {
+  const [allocations, setAllocations] = useState<Allocation[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(mockTeams[0]?.id || null);
-  const [routeStops, setRouteStops] = useState<RouteStop[]>([]);
-  const [isOptimizing, setIsOptimizing] = useState(false);
-  const [optimizationResult, setOptimizationResult] = useState<{distance: number} | null>(null);
+  const [displayDate, setDisplayDate] = useState(new Date());
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedAllocation, setSelectedAllocation] = useState<Allocation | null>(null);
   const { toast } = useToast();
 
-  const sensors = useSensors(useSensor(PointerSensor));
-
-  const availableStores = useMemo(() => {
-    const routeStoreIds = new Set(routeStops.map(stop => stop.id));
-    return allStores.filter(store => !routeStoreIds.has(store.id));
-  }, [routeStops]);
-  
-  const handleOptimizeRoute = async () => {
-    if (routeStops.length < 2) {
-      toast({
-        variant: 'destructive',
-        title: 'Rota muito curta',
-        description: 'Adicione pelo menos duas lojas à rota para otimizá-la.',
-      });
-      return;
-    }
-    setIsOptimizing(true);
-    setOptimizationResult(null);
-    try {
-      const result = await optimizeRoute({ stores: routeStops });
-      const reorderedStops = result.optimizedRoute.map((storeId, index) => {
-        const originalStop = routeStops.find(s => s.id === storeId)!;
-        return { ...originalStop, visitOrder: index + 1 };
-      });
-      setRouteStops(reorderedStops);
-      setOptimizationResult({ distance: result.totalDistance });
-      toast({
-        title: 'Rota Otimizada!',
-        description: 'A ordem das visitas foi ajustada para máxima eficiência.',
-      });
-    } catch (error) {
-      console.error('Failed to optimize route:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Erro na Otimização',
-        description: 'Não foi possível otimizar a rota. Tente novamente.',
-      });
-    } finally {
-      setIsOptimizing(false);
-    }
+  const handleDayClick = (date: Date) => {
+    setSelectedDate(date);
+    const existingAllocation = allocations.find(
+      alloc => format(alloc.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+    );
+    setSelectedAllocation(existingAllocation || null);
+    setIsFormOpen(true);
   };
+  
+  const handleFormSubmit = (data: AllocationFormData) => {
+    if (!selectedDate) return;
 
-
-  const handleAddStoreToRoute = (storeId: string) => {
-    const storeToAdd = allStores.find(s => s.id === storeId);
-    if (storeToAdd) {
-      const newStop: RouteStop = {
-        ...storeToAdd,
-        visitOrder: routeStops.length + 1,
+    if (selectedAllocation) { // Editing existing allocation
+      setAllocations(allocs => allocs.map(alloc => alloc.id === selectedAllocation.id ? { ...alloc, ...data } : alloc));
+       toast({
+        title: 'Alocação Atualizada!',
+        description: `A equipe foi realocada para o dia ${format(selectedDate, 'dd/MM/yyyy')}.`,
+      });
+    } else { // Creating new allocation
+       const newAllocation: Allocation = {
+        id: `alloc-${Date.now()}`,
+        date: selectedDate,
+        ...data,
       };
-      setRouteStops(prev => [...prev, newStop]);
-      setOptimizationResult(null); // Clear old result
-      toast({
-        title: 'Loja Adicionada à Rota',
-        description: `${storeToAdd.name} foi adicionada ao roteiro.`,
+      setAllocations(prev => [...prev, newAllocation]);
+       toast({
+        title: 'Equipe Alocada!',
+        description: `Equipe alocada com sucesso para o dia ${format(selectedDate, 'dd/MM/yyyy')}.`,
       });
     }
-  };
-
-  const handleRemoveStoreFromRoute = (storeId: string) => {
-    const storeToRemove = routeStops.find(s => s.id === storeId);
-     if (storeToRemove) {
-      setRouteStops(prev => 
-        prev.filter(s => s.id !== storeId)
-            .map((stop, index) => ({ ...stop, visitOrder: index + 1 }))
-      );
-      setOptimizationResult(null); // Clear old result
-      toast({
-        variant: 'destructive',
-        title: 'Loja Removida da Rota',
-        description: `${storeToRemove.name} foi removida do roteiro.`,
-      });
-    }
+    setIsFormOpen(false);
+    setSelectedAllocation(null);
   };
   
-  const handleDragEnd = (event: any) => {
-    const {active, over} = event;
-    
-    if (active.id !== over.id) {
-      setRouteStops((items) => {
-        const oldIndex = items.findIndex(item => item.id === active.id);
-        const newIndex = items.findIndex(item => item.id === over.id);
-        const newArray = arrayMove(items, oldIndex, newIndex);
-        setOptimizationResult(null); // Clear old result
-        return newArray.map((item, index) => ({...item, visitOrder: index + 1}));
-      });
-    }
-  };
+  const handleDeleteAllocation = (allocationId: string) => {
+    setAllocations(allocs => allocs.filter(a => a.id !== allocationId));
+    toast({
+      variant: 'destructive',
+      title: 'Alocação Removida',
+      description: 'A alocação da equipe para este dia foi removida.',
+    });
+  }
 
-  const selectedTeam = mockTeams.find(t => t.id === selectedTeamId);
+  const allocatedDates = useMemo(() => allocations.map(a => a.date), [allocations]);
+  
+  const monthlyAllocations = useMemo(() => {
+    return allocations
+      .filter(a => getMonth(a.date) === getMonth(displayDate) && getYear(a.date) === getYear(displayDate))
+      .sort((a,b) => a.date.getTime() - b.date.getTime());
+  }, [allocations, displayDate]);
+  
+  const allocatedStores = useMemo(() => {
+    const storeIds = new Set(monthlyAllocations.map(a => a.storeId));
+    return allStores.filter(s => storeIds.has(s.id));
+  },[monthlyAllocations]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -157,135 +205,105 @@ export default function RoutingPage() {
         description="Planeje e otimize as rotas de manutenção preventiva para suas equipes internas."
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Controles de Roteirização</CardTitle>
-          <CardDescription>Selecione a data e a equipe para montar o roteiro de visitas.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <label className="text-sm font-medium">Data da Rota</label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={'outline'}
-                  className={cn('w-full justify-start text-left font-normal mt-2', !selectedDate && 'text-muted-foreground')}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {selectedDate ? format(selectedDate, 'PPP', { locale: ptBR }) : <span>Escolha uma data</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus locale={ptBR} />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="flex-1">
-            <label className="text-sm font-medium">Equipe Responsável</label>
-            <Select value={selectedTeamId || ''} onValueChange={setSelectedTeamId}>
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Selecione uma equipe" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockTeams.map(team => (
-                  <SelectItem key={team.id} value={team.id}>
-                    {team.name} ({team.region})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Mapa de Lojas</CardTitle>
-              <CardDescription>Visualize todas as lojas e as que estão na rota atual.</CardDescription>
+           <Card className="h-full min-h-[600px]">
+             <CardHeader>
+              <CardTitle>Agenda Mensal de Alocação</CardTitle>
+              <CardDescription>Clique em um dia para alocar uma equipe a uma loja.</CardDescription>
             </CardHeader>
             <CardContent>
-              <RoutingMap allStores={allStores} routeStops={routeStops} />
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                onDayClick={handleDayClick}
+                month={displayDate}
+                onMonthChange={setDisplayDate}
+                locale={ptBR}
+                className="rounded-md border"
+                modifiers={{ allocated: allocatedDates }}
+                modifiersStyles={{ allocated: { color: 'hsl(var(--primary))', fontWeight: 'bold' } }}
+              />
             </CardContent>
           </Card>
         </div>
+        
+        <div className='flex flex-col gap-8'>
+             <Card>
+                <CardHeader>
+                    <CardTitle>Visão Geral do Mapa</CardTitle>
+                    <CardDescription>Lojas com visitas agendadas neste mês.</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[250px]">
+                     <RoutingMap allStores={allStores} routeStops={allocatedStores.map(s => ({...s, visitOrder: 0}))} />
+                </CardContent>
+            </Card>
 
-        <div className="grid grid-rows-1 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>Lojas Disponíveis</CardTitle>
-              <CardDescription>Adicione lojas à rota da equipe.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-48">
-                {availableStores.map(store => (
-                  <div key={store.id} className="flex items-center justify-between p-2 hover:bg-muted rounded-md">
-                    <div>
-                      <p className="font-medium text-sm">{store.name}</p>
-                      <p className="text-xs text-muted-foreground">{store.city}</p>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Alocações do Mês</CardTitle>
+                    <CardDescription>Equipes alocadas em {format(displayDate, 'MMMM \'de\' yyyy', {locale: ptBR})}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-3">
+                        {monthlyAllocations.length > 0 ? monthlyAllocations.map(alloc => {
+                            const team = mockTeams.find(t => t.id === alloc.teamId);
+                            const store = allStores.find(s => s.id === alloc.storeId);
+                            if (!team || !store) return null;
+                            
+                            return (
+                                <div key={alloc.id} className="flex justify-between items-center p-2 rounded-md border bg-muted/50">
+                                    <div>
+                                        <p className="font-semibold">{format(alloc.date, 'dd/MM/yyyy')} - <span className="text-primary">{team.name}</span></p>
+                                        <p className="text-sm text-muted-foreground">{store.name}</p>
+                                    </div>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="text-destructive h-8 w-8">
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Tem certeza que deseja remover a alocação da equipe {team.name} para a loja {store.name} no dia {format(alloc.date, 'dd/MM/yyyy')}?
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDeleteAllocation(alloc.id)}>Excluir</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                            )
+                        }) : (
+                            <p className="text-sm text-muted-foreground text-center py-4">Nenhuma equipe alocada para este mês.</p>
+                        )}
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => handleAddStoreToRoute(store.id)}>
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Adicionar
-                    </Button>
-                  </div>
-                ))}
-              </ScrollArea>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                    <CardTitle>Rota do Dia</CardTitle>
-                    {selectedTeam && <CardDescription>Para a equipe <span className='font-semibold text-primary'>{selectedTeam.name}</span></CardDescription>}
-                </div>
-                 <Button onClick={handleOptimizeRoute} disabled={isOptimizing || routeStops.length < 2}>
-                  {isOptimizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                  Otimizar Rota
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-                {optimizationResult && (
-                    <Alert className="mb-4">
-                        <RouteIcon className="h-4 w-4" />
-                        <AlertTitle>Rota Otimizada!</AlertTitle>
-                        <AlertDescription>
-                            Distância total estimada do percurso: <span className="font-bold">{optimizationResult.distance.toFixed(2)} km</span>.
-                        </AlertDescription>
-                    </Alert>
-                )}
-              <ScrollArea className="h-48">
-                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                  <SortableContext items={routeStops} strategy={verticalListSortingStrategy}>
-                    {routeStops.length > 0 ? (
-                      routeStops.map(stop => (
-                        <div key={stop.id} className="relative group">
-                          <SortableRouteItem stop={stop} />
-                           <Button 
-                              variant="ghost" 
-                              size="icon"
-                              className="absolute top-1/2 right-2 -translate-y-1/2 h-7 w-7 text-destructive/70 opacity-0 group-hover:opacity-100"
-                              onClick={() => handleRemoveStoreFromRoute(stop.id)}
-                            >
-                                <Trash2 className="h-4 w-4"/>
-                            </Button>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
-                        Nenhuma loja na rota. Adicione lojas da lista ao lado.
-                      </div>
-                    )}
-                  </SortableContext>
-                </DndContext>
-              </ScrollArea>
-            </CardContent>
-          </Card>
+                </CardContent>
+            </Card>
         </div>
       </div>
+      
+       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent>
+            <DialogHeader>
+            <DialogTitle>
+                {selectedAllocation ? 'Editar Alocação' : 'Alocar Equipe para o dia'} {selectedDate && format(selectedDate, 'dd/MM/yyyy')}
+            </DialogTitle>
+            </DialogHeader>
+            <AllocationForm 
+                onSubmit={handleFormSubmit}
+                onCancel={() => setIsFormOpen(false)}
+                teams={mockTeams}
+                stores={allStores}
+                allocation={selectedAllocation}
+            />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
