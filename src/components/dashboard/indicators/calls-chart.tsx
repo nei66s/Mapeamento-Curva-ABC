@@ -71,11 +71,14 @@ export function CallsChart({ data }: CallsChartProps) {
                     content={
                         <ChartTooltipContent 
                              formatter={(value, name) => {
+                                const key = name as keyof typeof chartConfig;
+                                const config = chartConfig[key];
+                                if (!config) return null;
                                 const absValue = Math.abs(Number(value));
                                 return (
                                    <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full bg-[${chartConfig[name as keyof typeof chartConfig].color}]`}></div>
-                                        <span>{chartConfig[name as keyof typeof chartConfig].label}: {absValue.toLocaleString()}</span>
+                                        <div className={`w-2 h-2 rounded-full`} style={{backgroundColor: config.color}}></div>
+                                        <span>{config.label}: {absValue.toLocaleString()}</span>
                                    </div>
                                 )
                             }}
@@ -83,15 +86,15 @@ export function CallsChart({ data }: CallsChartProps) {
                     }
                 />
                 <Legend />
-                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name={chartConfig.abertos.label} stackId="a" />
-                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[4, 4, 0, 0]} name={chartConfig.solucionados.label} stackId="a" />
+                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name="Abertos" stackId="a" />
+                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[0, 0, 4, 4]} name="Solucionados" stackId="a" />
                 <Line 
                     type="monotone"
                     dataKey="backlog"
                     stroke={chartConfig.backlog.color}
                     strokeWidth={2}
                     dot={false}
-                    name={chartConfig.backlog.label}
+                    name="Backlog"
                 />
             </ComposedChart>
         </ChartContainer>
