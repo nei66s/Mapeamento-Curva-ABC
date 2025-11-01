@@ -47,11 +47,19 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
             iconUrl: iconUrl.src,
             shadowUrl: shadowUrl.src,
         });
+
       mapRef.current = L.map(mapContainerRef.current).setView([-22.8, -47.2], 9);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(mapRef.current);
       markersLayerRef.current.addTo(mapRef.current);
+    }
+
+    return () => {
+        if (mapRef.current) {
+            mapRef.current.remove();
+            mapRef.current = null;
+        }
     }
   }, []);
 
@@ -86,7 +94,8 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     
     // Draw route line if there are stops
     if (routeStops.length > 1) {
-      const latLngs = routeStops.map(stop => L.latLng(stop.lat, stop.lng));
+      const sortedStops = [...routeStops].sort((a,b) => a.visitOrder - b.visitOrder);
+      const latLngs = sortedStops.map(stop => L.latLng(stop.lat, stop.lng));
       routeLineRef.current = L.polyline(latLngs, { color: 'hsl(var(--primary))', weight: 3 }).addTo(map);
     }
 
