@@ -49,9 +49,11 @@ function SortableStoreItem({ stop, isFirst }: { stop: RouteStop, isFirst: boolea
   return (
     <div ref={setNodeRef} style={style} className={cn("flex items-center justify-between p-2 rounded-md border", isFirst ? "bg-primary/10 border-primary" : "bg-background")}>
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab h-8 w-8">
-            <GripVertical className="h-5 w-5 text-muted-foreground" />
-        </Button>
+        {!isFirst ? (
+            <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab h-8 w-8">
+                <GripVertical className="h-5 w-5 text-muted-foreground" />
+            </Button>
+        ) : <div className="w-8 h-8"/>}
         <div>
             <p className={cn("font-semibold", isFirst ? "text-primary": "")}>{isFirst && <Warehouse className="inline-block h-4 w-4 mr-2" />} {stop.name}</p>
             <p className="text-sm text-muted-foreground">{isFirst ? "Ponto de Partida" : stop.city}</p>
@@ -106,6 +108,8 @@ export default function RoutingPage() {
       setStoresToVisit((items) => {
         const oldIndex = items.findIndex(item => item.id === active.id);
         const newIndex = items.findIndex(item => item.id === over.id);
+        // Prevent the start point from being moved
+        if (oldIndex === 0 || newIndex === 0) return items;
         const newOrder = arrayMove(items, oldIndex, newIndex);
         return newOrder.map((item, index) => ({...item, visitOrder: index}));
       });
@@ -130,9 +134,13 @@ export default function RoutingPage() {
           startDate: startDate?.toISOString() ?? new Date().toISOString(),
       });
       
-      const reorderedStops = response.optimizedRoute
+      const storeVisitMap = new Map(storesToVisit.map(s => [s.id, s]));
+
+      const validOptimizedRoute = response.optimizedRoute.filter(stop => storeVisitMap.has(stop.storeId));
+
+      const reorderedStops = validOptimizedRoute
         .map((stop, index) => {
-            const storeDetails = storesToVisit.find(s => s.id === stop.storeId)!;
+            const storeDetails = storeVisitMap.get(stop.storeId)!;
             return { ...storeDetails, visitOrder: index, visitDate: stop.visitDate };
         });
       
@@ -157,10 +165,6 @@ export default function RoutingPage() {
   
   const selectedTeam = useMemo(() => mockTeams.find(t => t.id === selectedTeamId), [selectedTeamId]);
   
-  const routeWithCD = useMemo(() => {
-    return [...storesToVisit].sort((a,b) => a.visitOrder - b.visitOrder);
-  }, [storesToVisit]);
-
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
@@ -271,9 +275,9 @@ export default function RoutingPage() {
                                     {storesToVisit.map((stop, index) => (
                                       <div key={stop.id} className="flex items-center gap-2">
                                         <SortableStoreItem stop={stop} isFirst={index === 0} />
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeStoreFromRoute(stop.id)}>
+                                        {index > 0 && <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeStoreFromRoute(stop.id)}>
                                           <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        </Button>}
                                       </div>
                                     ))}
                                 </div>
@@ -288,13 +292,13 @@ export default function RoutingPage() {
         </div>
 
         <div className="lg:col-span-2">
-           <Card className="min-h-[720px]">
+           <Card className="min-h-[720px] flex flex-col">
              <CardHeader>
               <CardTitle>Visão Geral do Mapa</CardTitle>
               <CardDescription>Visualize a rota planejada no mapa.</CardDescription>
             </CardHeader>
-            <CardContent className="h-[640px] p-0">
-              <RoutingMap allStores={allStores} routeStops={routeWithCD} />
+            <CardContent className="flex-1 p-0">
+              <RoutingMap allStores={allStores} routeStops={storesToVisit} />
             </CardContent>
           </Card>
         </div>
