@@ -103,17 +103,17 @@ export function AgingChart({ data }: AgingChartProps) {
                     />}
                 />
                 <Legend />
-                <Bar yAxisId="left" dataKey="baixa" stackId="a" fill={chartConfig.baixa.color} name="Baixa">
-                    <LabelList dataKey="baixa" position="center" className="fill-card" fontSize={12}/>
+                <Bar yAxisId="left" dataKey="baixa" fill={chartConfig.baixa.color} name="Baixa" radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey="baixa" position="top" className="fill-foreground" fontSize={11} />
                 </Bar>
-                <Bar yAxisId="left" dataKey="media" stackId="a" fill={chartConfig.media.color} name="Média">
-                    <LabelList dataKey="media" position="center" className="fill-card" fontSize={12} />
+                <Bar yAxisId="left" dataKey="media" fill={chartConfig.media.color} name="Média" radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey="media" position="top" className="fill-foreground" fontSize={11} />
                 </Bar>
-                <Bar yAxisId="left" dataKey="alta" stackId="a" fill={chartConfig.alta.color} name="Alta">
-                    <LabelList dataKey="alta" position="center" className="fill-card" fontSize={12} />
+                <Bar yAxisId="left" dataKey="alta" fill={chartConfig.alta.color} name="Alta" radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey="alta" position="top" className="fill-foreground" fontSize={11} />
                 </Bar>
-                <Bar yAxisId="left" dataKey="muitoAlta" stackId="a" fill={chartConfig.muitoAlta.color} name="Muito Alta" radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey="muitoAlta" position="center" className="fill-card" fontSize={12} />
+                <Bar yAxisId="left" dataKey="muitoAlta" fill={chartConfig.muitoAlta.color} name="Muito Alta" radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey="muitoAlta" position="top" className="fill-foreground" fontSize={11} />
                 </Bar>
                 <Line 
                     yAxisId="right" 
