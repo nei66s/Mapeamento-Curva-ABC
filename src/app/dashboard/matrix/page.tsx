@@ -40,7 +40,7 @@ import { ClassificationBadge } from '@/components/shared/risk-badge';
 import { ItemForm } from '@/components/dashboard/matrix/item-form';
 import { mockItems, mockCategories } from '@/lib/mock-data';
 import type { Item } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Trademark, Wrench } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +52,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { impactFactors, ImpactFactor } from '@/lib/impact-factors';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+
+const factorIconMap: Record<ImpactFactor['id'], React.ElementType> = {
+  safety: Shield,
+  sales: ShoppingCart,
+  legal: Scale,
+  brand: Trademark,
+  cost: Wrench,
+};
 
 
 export default function MatrixPage() {
@@ -188,86 +200,110 @@ export default function MatrixPage() {
            </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Item</TableHead>
-                <TableHead>Classificação</TableHead>
-                <TableHead>Lead Time</TableHead>
-                <TableHead className="hidden md:table-cell">Plano de Contingência</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map(item => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        {item.imageUrl ? (
-                          <AvatarImage src={item.imageUrl} alt={item.name} data-ai-hint="item image"/>
-                        ) : (
-                          <AvatarFallback>
-                            <ImageIcon className="text-muted-foreground" />
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {item.category}
+           <TooltipProvider>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Item</TableHead>
+                    <TableHead>Classificação</TableHead>
+                    <TableHead>Fatores de Impacto</TableHead>
+                    <TableHead className="hidden md:table-cell">Plano de Contingência</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredItems.map(item => (
+                    <TableRow key={item.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar>
+                            {item.imageUrl ? (
+                              <AvatarImage src={item.imageUrl} alt={item.name} data-ai-hint="item image"/>
+                            ) : (
+                              <AvatarFallback>
+                                <ImageIcon className="text-muted-foreground" />
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div>
+                            <div className="font-medium">{item.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.category}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <ClassificationBadge classification={item.classification} />
-                  </TableCell>
-                  <TableCell>{item.leadTime}</TableCell>
-                  <TableCell className="hidden md:table-cell">{item.contingencyPlan}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onSelect={() => openEditDialog(item)}>
-                          <Pencil className="mr-2" /> Editar
-                        </DropdownMenuItem>
-                         <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                               <Trash2 className="mr-2 text-destructive" /> 
-                               <span className="text-destructive">Excluir</span>
+                      </TableCell>
+                      <TableCell>
+                        <ClassificationBadge classification={item.classification} />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-2">
+                          {item.impactFactors.map(factorId => {
+                            const factor = impactFactors.find(f => f.id === factorId);
+                            if (!factor) return null;
+                            const Icon = factorIconMap[factor.id];
+                            return (
+                               <Tooltip key={factor.id}>
+                                <TooltipTrigger asChild>
+                                  <Badge variant="secondary" className="gap-1 px-2 py-1">
+                                    <Icon className="h-3.5 w-3.5" />
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{factor.label}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">{item.contingencyPlan}</TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onSelect={() => openEditDialog(item)}>
+                              <Pencil className="mr-2" /> Editar
                             </DropdownMenuItem>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Essa ação não pode ser desfeita. Isso excluirá permanentemente o item
-                                <span className="font-bold"> {item.name}</span>.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteItem(item.id)}>
-                                Excluir
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                  <Trash2 className="mr-2 text-destructive" /> 
+                                  <span className="text-destructive">Excluir</span>
+                                </DropdownMenuItem>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Essa ação não pode ser desfeita. Isso excluirá permanentemente o item
+                                    <span className="font-bold"> {item.name}</span>.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleDeleteItem(item.id)}>
+                                    Excluir
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TooltipProvider>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+    
