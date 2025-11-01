@@ -5,8 +5,10 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { Store, RouteStop } from '@/lib/types';
-import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+
+// Import marker icons
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
 
@@ -35,13 +37,14 @@ interface RoutingMapProps {
 
 
 export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
-  const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup>(new L.LayerGroup());
   const routeLineRef = useRef<L.Polyline | null>(null);
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
+        // Fix for icon path issue with Next.js
         delete (L.Icon.Default.prototype as any)._getIconUrl;
         L.Icon.Default.mergeOptions({
             iconRetinaUrl: iconRetinaUrl.src,
