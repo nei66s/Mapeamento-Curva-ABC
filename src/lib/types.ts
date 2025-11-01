@@ -124,4 +124,8 @@ export type Team = {
 export type RouteStop = Store & {
   visitOrder: number;
   visitDate?: string;
+  distanceToNext?: number;
+  timeToNext?: number;
 };
+
+    

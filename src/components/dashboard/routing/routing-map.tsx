@@ -44,22 +44,15 @@ interface RoutingMapProps {
   routeStops: RouteStop[];
 }
 
-const haversineDistance = (coords1: {lat: number, lng: number}, coords2: {lat: number, lng: number}): number => {
-    const toRad = (x: number) => (x * Math.PI) / 180;
-    const R = 6371; // Earth radius in km
+function formatDuration(minutes: number): string {
+    const h = Math.floor(minutes / 60);
+    const m = Math.round(minutes % 60);
+    if (h > 0) {
+        return `${h}h ${m}min`;
+    }
+    return `~${m} min`;
+}
 
-    const dLat = toRad(coords2.lat - coords1.lat);
-    const dLon = toRad(coords2.lng - coords1.lng);
-    const lat1 = toRad(coords1.lat);
-    const lat2 = toRad(coords2.lat);
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
-};
 
 export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -107,7 +100,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
     });
     
     // Draw markers for stores in the route
-    routeStops.forEach((stop, index) => {
+    routeStops.forEach((stop) => {
       let icon = greenIcon;
       let popupText = `<b>${stop.name}</b><br>${stop.city}`;
 
@@ -130,16 +123,21 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
       for (let i = 0; i < routeStops.length - 1; i++) {
         const start = routeStops[i];
-        const end = routeStops[i+1];
-        const distance = haversineDistance(start, end);
-        const midPoint = L.latLng((start.lat + end.lat) / 2, (start.lng + end.lng) / 2);
         
-        const distanceMarker = L.divIcon({
-            className: 'distance-marker',
-            html: `<div>${distance.toFixed(1)} km</div>`
-        });
-        
-        L.marker(midPoint, { icon: distanceMarker }).addTo(layersRef.current);
+        if (start.distanceToNext && start.distanceToNext > 0) {
+            const end = routeStops[i+1];
+            const midPoint = L.latLng((start.lat + end.lat) / 2, (start.lng + end.lng) / 2);
+            
+            const distanceText = `${start.distanceToNext.toFixed(1)} km`;
+            const timeText = start.timeToNext ? formatDuration(start.timeToNext) : '';
+
+            const distanceMarker = L.divIcon({
+                className: 'distance-marker',
+                html: `<div>${distanceText}<br/>${timeText}</div>`
+            });
+            
+            L.marker(midPoint, { icon: distanceMarker }).addTo(layersRef.current);
+        }
       }
     }
     
@@ -172,6 +170,7 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
             text-align: center;
             white-space: nowrap;
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            line-height: 1.2;
         }
         `;
         document.head.appendChild(style);
@@ -180,3 +179,5 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />;
 }
+
+    

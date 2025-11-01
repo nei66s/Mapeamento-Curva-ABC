@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trash2, GripVertical, Warehouse, Route as RouteIcon } from 'lucide-react';
+import { Trash2, GripVertical, Warehouse, Route as RouteIcon, Clock } from 'lucide-react';
 import { allStores } from '@/lib/mock-data';
 import { mockTeams } from '@/lib/teams';
 import type { Store, Team, RouteStop } from '@/lib/types';
@@ -65,6 +65,37 @@ const StartPointItem = ({ stop }: { stop: RouteStop }) => (
     </div>
 );
 
+const haversineDistance = (coords1: {lat: number, lng: number}, coords2: {lat: number, lng: number}): number => {
+    const toRad = (x: number) => (x * Math.PI) / 180;
+    const R = 6371; // Earth radius in km
+
+    const dLat = toRad(coords2.lat - coords1.lat);
+    const dLon = toRad(coords2.lng - coords1.lng);
+    const lat1 = toRad(coords1.lat);
+    const lat2 = toRad(coords2.lat);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+};
+
+const calculateTravelTime = (distance: number): number => {
+    const AVERAGE_SPEED_KMH = 50;
+    return (distance / AVERAGE_SPEED_KMH) * 60; // Return in minutes
+};
+
+function formatDuration(minutes: number): string {
+    const h = Math.floor(minutes / 60);
+    const m = Math.round(minutes % 60);
+    if (h > 0) {
+        return `${h}h ${m}min`;
+    }
+    return `${m} min`;
+}
+
 
 export default function RoutingPage() {
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
@@ -80,33 +111,41 @@ export default function RoutingPage() {
     const storesInRouteIds = new Set([...storesToVisit.map(s => s.id), startPoint?.id]);
     return allStores.filter(s => !storesInRouteIds.has(s.id)).sort((a,b) => a.name.localeCompare(b.name));
   }, [storesToVisit, startPoint]);
+  
+  const fullRouteForMap = useMemo(() => {
+    if (!startPoint) return [];
+    
+    const combinedStops: (Store | RouteStop)[] = [
+        {...startPoint, visitOrder: -1}, 
+        ...storesToVisit
+    ];
 
-  const haversineDistance = (coords1: {lat: number, lng: number}, coords2: {lat: number, lng: number}): number => {
-    const toRad = (x: number) => (x * Math.PI) / 180;
-    const R = 6371; // Earth radius in km
+    const sortedStops = combinedStops.sort((a, b) => (a as RouteStop).visitOrder - (b as RouteStop).visitOrder);
 
-    const dLat = toRad(coords2.lat - coords1.lat);
-    const dLon = toRad(coords2.lng - coords1.lng);
-    const lat1 = toRad(coords1.lat);
-    const lat2 = toRad(coords2.lat);
+    const stopsWithLegData: RouteStop[] = sortedStops.map((stop, index) => {
+        let distanceToNext = 0;
+        let timeToNext = 0;
+        if (index < sortedStops.length - 1) {
+            const nextStop = sortedStops[index+1];
+            distanceToNext = haversineDistance(stop, nextStop);
+            timeToNext = calculateTravelTime(distanceToNext);
+        }
+        return {
+            ...(stop as RouteStop),
+            distanceToNext,
+            timeToNext
+        };
+    });
 
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
-  };
-
-  const totalDistance = useMemo(() => {
-    if (!startPoint || storesToVisit.length === 0) return 0;
-    const fullRoute = [startPoint, ...storesToVisit];
-    let distance = 0;
-    for (let i = 0; i < fullRoute.length - 1; i++) {
-        distance += haversineDistance(fullRoute[i], fullRoute[i+1]);
-    }
-    return distance;
+    return stopsWithLegData;
   }, [startPoint, storesToVisit]);
+  
+  const routeSummary = useMemo(() => {
+    const totalDistance = fullRouteForMap.reduce((acc, stop) => acc + (stop.distanceToNext || 0), 0);
+    const totalTime = fullRouteForMap.reduce((acc, stop) => acc + (stop.timeToNext || 0), 0);
+    return { totalDistance, totalTime };
+  }, [fullRouteForMap]);
+
 
   const handleSetStartPoint = (storeId: string) => {
     const store = allStores.find(s => s.id === storeId);
@@ -141,14 +180,6 @@ export default function RoutingPage() {
   
   const selectedTeam = useMemo(() => mockTeams.find(t => t.id === selectedTeamId), [selectedTeamId]);
   
-  const fullRouteForMap = useMemo(() => {
-    if (!startPoint) return [];
-    const combinedStops = [
-        {...startPoint, visitOrder: -1}, 
-        ...storesToVisit
-    ];
-    return combinedStops.sort((a, b) => a.visitOrder - b.visitOrder);
-  }, [startPoint, storesToVisit]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -184,7 +215,7 @@ export default function RoutingPage() {
                     <CardTitle>2. Ponto de Partida</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || undefined}>
+                    <Select onValueChange={handleSetStartPoint} value={startPoint?.id || ''}>
                         <SelectTrigger>
                             <SelectValue placeholder="Selecione o ponto de partida..." />
                         </SelectTrigger>
@@ -219,16 +250,26 @@ export default function RoutingPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>4. Sequência de Visitas</CardTitle>
-                    <CardDescription>Ordene os destinos para definir a rota.</CardDescription>
+                    <CardTitle>4. Sequência e Resumo da Rota</CardTitle>
+                    <CardDescription>Ordene os destinos e veja o resumo.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {totalDistance > 0 && (
+                    {routeSummary.totalDistance > 0 && (
                       <Alert className="mb-4">
-                        <RouteIcon className="h-4 w-4" />
-                        <AlertTitle>Distância Total da Rota</AlertTitle>
-                        <AlertDescription>
-                           <b>{totalDistance.toFixed(2)} km</b>
+                        <AlertTitle className="flex items-center gap-2">
+                            Resumo da Rota
+                        </AlertTitle>
+                        <AlertDescription className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
+                           <span className="flex items-center gap-2 font-medium">
+                            <RouteIcon className="h-4 w-4" />
+                            Distância Total:
+                           </span>
+                           <span className="text-right font-semibold">{routeSummary.totalDistance.toFixed(2)} km</span>
+                           <span className="flex items-center gap-2 font-medium">
+                            <Clock className="h-4 w-4" />
+                            Tempo de Viagem:
+                           </span>
+                           <span className="text-right font-semibold">{formatDuration(routeSummary.totalTime)}</span>
                         </AlertDescription>
                       </Alert>
                     )}
@@ -273,3 +314,5 @@ export default function RoutingPage() {
     </div>
   );
 }
+
+    
