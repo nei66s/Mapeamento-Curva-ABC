@@ -55,13 +55,6 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
       }).addTo(mapRef.current);
       markersLayerRef.current.addTo(mapRef.current);
     }
-
-    return () => {
-        if (mapRef.current) {
-            mapRef.current.remove();
-            mapRef.current = null;
-        }
-    }
   }, []);
 
   useEffect(() => {
@@ -116,5 +109,3 @@ export default function RoutingMap({ allStores, routeStops }: RoutingMapProps) {
 
   return <div ref={mapContainerRef} style={{ height: '100%', width: '100%', borderRadius: 'var(--radius)' }} />;
 }
-
-    
