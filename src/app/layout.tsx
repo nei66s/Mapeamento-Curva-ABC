@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Curva ABC Pro',
-  description: 'Gerenciamento e classificação de itens pela metodologia da Curva ABC.',
+  title: 'Manutenção',
+  description: 'Plataforma de Gestão de Manutenção.',
 };
 
 export default function RootLayout({

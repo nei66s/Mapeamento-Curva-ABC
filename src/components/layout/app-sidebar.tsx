@@ -33,7 +33,7 @@ export default function AppSidebar() {
           className="group flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-lg font-semibold text-primary md:text-base"
         >
           <BarChart3 className="h-5 w-5 text-primary transition-all group-hover:scale-110" />
-          <span className="font-bold text-xl text-primary">Curva ABC Pro</span>
+          <span className="font-bold text-xl text-primary">Manutenção</span>
         </Link>
         <nav className="flex flex-col gap-2">
             <Link

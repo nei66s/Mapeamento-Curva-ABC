@@ -47,11 +47,11 @@ export default function LoginPage() {
           <div className="flex justify-center items-center gap-2">
             <BarChart3 className="h-8 w-8 text-primary" />
             <CardTitle className="text-3xl font-bold font-headline">
-              Curva ABC Pro
+              Manutenção
             </CardTitle>
           </div>
           <CardDescription>
-            Faça login para gerenciar a classificação de itens
+            Faça login para acessar a plataforma
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
