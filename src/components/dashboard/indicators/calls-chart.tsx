@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, ComposedChart, Line } from "recharts";
 import {
   Card,
   CardContent,
@@ -36,19 +36,23 @@ export function CallsChart({ data }: CallsChartProps) {
   const chartData = data.map(item => ({
       name: new Date(`${item.mes}-02`).toLocaleString('default', { month: 'short' }),
       abertos: item.chamados_abertos,
-      solucionados: item.chamados_solucionados,
+      // Make 'solucionados' negative for downward bars
+      solucionados: -item.chamados_solucionados,
       backlog: item.backlog,
   }));
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Chamados e Backlog</CardTitle>
-        <CardDescription>Volume de chamados abertos, solucionados e backlog acumulado.</CardDescription>
+        <CardTitle>Fluxo de Chamados e Backlog</CardTitle>
+        <CardDescription>Entrada (Abertos) vs. Saída (Solucionados) e a linha de tendência do backlog.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
-            <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+            <ComposedChart 
+                data={chartData} 
+                margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
+            >
                 <CartesianGrid vertical={false} />
                 <XAxis 
                     dataKey="name"
@@ -59,19 +63,39 @@ export function CallsChart({ data }: CallsChartProps) {
                 <YAxis 
                     tickLine={false}
                     axisLine={false}
+                    // Format ticks to show absolute values
+                    tickFormatter={(value) => Math.abs(value).toString()}
                 />
                 <Tooltip 
-                    content={<ChartTooltipContent />}
                     cursor={{ fill: 'hsl(var(--muted))' }}
+                    content={
+                        <ChartTooltipContent 
+                             formatter={(value, name) => {
+                                const absValue = Math.abs(Number(value));
+                                return (
+                                   <div className="flex items-center gap-2">
+                                        <div className={`w-2 h-2 rounded-full bg-[${chartConfig[name as keyof typeof chartConfig].color}]`}></div>
+                                        <span>{chartConfig[name as keyof typeof chartConfig].label}: {absValue.toLocaleString()}</span>
+                                   </div>
+                                )
+                            }}
+                        />
+                    }
                 />
                 <Legend />
-                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name={chartConfig.abertos.label} />
-                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[4, 4, 0, 0]} name={chartConfig.solucionados.label} />
-                <Bar dataKey="backlog" fill={chartConfig.backlog.color} radius={[4, 4, 0, 0]} name={chartConfig.backlog.label} />
-            </BarChart>
+                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name={chartConfig.abertos.label} stackId="a" />
+                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[4, 4, 0, 0]} name={chartConfig.solucionados.label} stackId="a" />
+                <Line 
+                    type="monotone"
+                    dataKey="backlog"
+                    stroke={chartConfig.backlog.color}
+                    strokeWidth={2}
+                    dot={false}
+                    name={chartConfig.backlog.label}
+                />
+            </ComposedChart>
         </ChartContainer>
       </CardContent>
     </Card>
   );
 }
-
