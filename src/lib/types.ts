@@ -12,6 +12,7 @@ export type Item = {
   status: 'online' | 'offline' | 'maintenance';
   contingencyPlan: string;
   leadTime: string;
+  imageUrl?: string;
 };
 
 export type Incident = {

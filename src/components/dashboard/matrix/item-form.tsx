@@ -38,6 +38,7 @@ const formSchema = z.object({
   status: z.enum(['online', 'offline', 'maintenance']),
   leadTime: z.string().min(1, { message: 'O lead time é obrigatório.' }),
   contingencyPlan: z.string().min(10, { message: 'O plano de contingência deve ter pelo menos 10 caracteres.' }),
+  imageUrl: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).optional().or(z.literal('')),
   id: z.string().optional(),
 });
 
@@ -55,6 +56,7 @@ export function ItemForm({ item, onSubmit, onCancel }: ItemFormProps) {
       status: item?.status || 'online',
       leadTime: item?.leadTime || '',
       contingencyPlan: item?.contingencyPlan || '',
+      imageUrl: item?.imageUrl || '',
       id: item?.id || '',
     },
   });
@@ -87,6 +89,19 @@ export function ItemForm({ item, onSubmit, onCancel }: ItemFormProps) {
               <FormLabel>Categoria</FormLabel>
               <FormControl>
                 <Input placeholder="Ex: Refrigeração" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+         <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL da Imagem</FormLabel>
+              <FormControl>
+                <Input placeholder="https://exemplo.com/imagem.png" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

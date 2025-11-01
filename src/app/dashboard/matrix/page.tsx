@@ -40,7 +40,7 @@ import { ClassificationBadge } from '@/components/shared/risk-badge';
 import { ItemForm } from '@/components/dashboard/matrix/item-form';
 import { mockItems } from '@/lib/mock-data';
 import type { Item } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,6 +48,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 
 export default function MatrixPage() {
   const [items, setItems] = useState<Item[]>(mockItems);
@@ -149,9 +151,22 @@ export default function MatrixPage() {
               {items.map(item => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {item.category}
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        {item.imageUrl ? (
+                          <AvatarImage src={item.imageUrl} alt={item.name} data-ai-hint="item image"/>
+                        ) : (
+                          <AvatarFallback>
+                            <ImageIcon className="text-muted-foreground" />
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{item.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {item.category}
+                        </div>
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>

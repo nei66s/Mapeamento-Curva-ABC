@@ -1,4 +1,5 @@
 import type { Item, Incident } from '@/lib/types';
+import { PlaceHolderImages } from './placeholder-images';
 
 function getRandomClassification() {
   const rand = Math.random();
@@ -40,17 +41,22 @@ const contingencyPlans = [
 const leadTimes = ["Imediato", "2 horas", "4 horas", "8 horas", "24 horas", "48 horas"];
 
 
-export const mockItems: Item[] = itemNames.map((name, index) => ({
-  id: `ITM-${String(index + 1).padStart(3, '0')}`,
-  name: name,
-  category: categories[Math.floor(Math.random() * categories.length)],
-  classification: getRandomClassification(),
-  storeCount: Math.floor(Math.random() * 10) + 1,
-  generalIndex: Math.floor(Math.random() * 10) + 1,
-  status: Math.random() > 0.8 ? (Math.random() > 0.5 ? 'offline' : 'maintenance') : 'online',
-  contingencyPlan: contingencyPlans[Math.floor(Math.random() * contingencyPlans.length)],
-  leadTime: leadTimes[Math.floor(Math.random() * leadTimes.length)],
-}));
+export const mockItems: Item[] = itemNames.map((name, index) => {
+  const imageId = `item-image-${(index % 5) + 1}`;
+  const image = PlaceHolderImages.find(img => img.id === imageId);
+  return {
+    id: `ITM-${String(index + 1).padStart(3, '0')}`,
+    name: name,
+    category: categories[Math.floor(Math.random() * categories.length)],
+    classification: getRandomClassification(),
+    storeCount: Math.floor(Math.random() * 10) + 1,
+    generalIndex: Math.floor(Math.random() * 10) + 1,
+    status: Math.random() > 0.8 ? (Math.random() > 0.5 ? 'offline' : 'maintenance') : 'online',
+    contingencyPlan: contingencyPlans[Math.floor(Math.random() * contingencyPlans.length)],
+    leadTime: leadTimes[Math.floor(Math.random() * leadTimes.length)],
+    imageUrl: image?.imageUrl,
+  }
+});
 
 
 export const mockIncidents: Incident[] = [
