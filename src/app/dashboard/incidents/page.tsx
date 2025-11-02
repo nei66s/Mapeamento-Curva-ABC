@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { IncidentForm } from '@/components/dashboard/incidents/incident-form';
+import { IncidentBulkForm } from '@/components/dashboard/incidents/incident-bulk-form';
 import { mockIncidents, mockItems, allStores } from '@/lib/mock-data';
 import type { Item, Incident, Classification, IncidentStatus } from '@/lib/types';
 import { PlusCircle, Clock, Sparkles, Search, ListFilter, MoreVertical, Pencil, Tag } from 'lucide-react';
@@ -58,6 +59,7 @@ const allClassifications: Classification[] = ['A', 'B', 'C'];
 export default function IncidentsPage() {
   const [incidents, setIncidents] = useState<Incident[]>(mockIncidents);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkFormOpen, setIsBulkFormOpen] = useState(false);
   const { toast } = useToast();
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
@@ -125,14 +127,35 @@ export default function IncidentsPage() {
     setSelectedIncident(null);
   };
   
+  const handleBulkSubmit = (newIncidents: Omit<Incident, 'id' | 'openedAt' | 'status'>[]) => {
+      const incidentsToAdd: Incident[] = newIncidents.map(inc => {
+          const store = allStores.find(s => s.name === inc.location);
+          return {
+            ...inc,
+            id: `INC-${Date.now()}-${Math.random()}`,
+            openedAt: new Date().toISOString(),
+            status: 'Aberto',
+            lat: store?.lat || 0,
+            lng: store?.lng || 0,
+          }
+      });
+      setIncidents(prev => [...incidentsToAdd, ...prev]);
+      toast({
+          title: 'Incidentes Registrados!',
+          description: `${incidentsToAdd.length} novos incidentes foram adicionados.`
+      });
+      setIsBulkFormOpen(false);
+  }
+
+
   const openEditDialog = (incident: Incident) => {
     setSelectedIncident(incident);
     setIsFormOpen(true);
   };
 
-  const openNewDialog = () => {
+  const openNewBulkDialog = () => {
     setSelectedIncident(null);
-    setIsFormOpen(true);
+    setIsBulkFormOpen(true);
   }
 
   const handleAnalysisClick = (incident: Incident) => {
@@ -164,22 +187,21 @@ export default function IncidentsPage() {
         title="Registro de Incidentes"
         description="Registre e acompanhe eventos específicos para análise futura."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog open={isBulkFormOpen} onOpenChange={setIsBulkFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openNewDialog} className="flex gap-2">
+            <Button onClick={openNewBulkDialog} className="flex gap-2">
               <PlusCircle />
-              Registrar Incidente
+              Registrar Incidentes
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-              <DialogTitle>{selectedIncident ? 'Editar Incidente' : 'Registrar Novo Incidente'}</DialogTitle>
+              <DialogTitle>Registrar Novos Incidentes em Massa</DialogTitle>
             </DialogHeader>
-            <IncidentForm
+            <IncidentBulkForm
               items={mockItems}
-              incident={selectedIncident}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setIsFormOpen(false)}
+              onSubmit={handleBulkSubmit}
+              onCancel={() => setIsBulkFormOpen(false)}
             />
           </DialogContent>
         </Dialog>
@@ -325,6 +347,20 @@ export default function IncidentsPage() {
           </div>
         </CardContent>
       </Card>
+      
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{selectedIncident ? 'Editar Incidente' : 'Registrar Novo Incidente'}</DialogTitle>
+            </DialogHeader>
+            <IncidentForm
+              items={mockItems}
+              incident={selectedIncident}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setIsFormOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
       
        <Dialog open={isAnalysisOpen} onOpenChange={setIsAnalysisOpen}>
           <DialogContent className="sm:max-w-3xl">
