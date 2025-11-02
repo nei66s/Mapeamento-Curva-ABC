@@ -35,7 +35,6 @@ const modules = [
     { id: 'item-matrix', label: 'Matriz de Itens (Adicionar/Editar)' },
     { id: 'categories', label: 'Gerenciamento de Categorias' },
     { id: 'compliance-checklist', label: 'Gerenciamento de Checklist (Conformidade)' },
-    { id: 'routing', label: 'Roteirização de Equipes' },
 ];
 
 export default function AdminPage() {
@@ -45,7 +44,6 @@ export default function AdminPage() {
     'item-matrix': true,
     'categories': true,
     'compliance-checklist': false,
-    'routing': true,
   });
   const { toast } = useToast();
 
