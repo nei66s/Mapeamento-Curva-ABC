@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useCallback, useEffect } from 'react';
 import { summarizeKpi } from '@/ai/flows/summarize-kpi-flow';
@@ -31,8 +32,6 @@ export function KpiAnalysis({ indicator }: KpiAnalysisProps) {
         chamados_abertos: currentIndicator.chamados_abertos,
         chamados_solucionados: currentIndicator.chamados_solucionados,
         backlog: currentIndicator.backlog,
-        valor_mensal: currentIndicator.valor_mensal,
-        variacao_percentual_valor: currentIndicator.variacao_percentual_valor,
       });
       setSummary(response.summary);
     } catch (e) {

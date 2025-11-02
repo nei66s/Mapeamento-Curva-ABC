@@ -17,7 +17,6 @@ import { SummaryCards } from '@/components/dashboard/summary-cards';
 import { ClassificationTable } from '@/components/dashboard/classification-table';
 import { ItemsByCurveChart } from '@/components/dashboard/items-by-curve-chart';
 import { Separator } from '@/components/ui/separator';
-import { CostChart } from '@/components/dashboard/indicators/cost-chart';
 import { AgingChart } from '@/components/dashboard/indicators/aging-chart';
 
 
@@ -98,7 +97,7 @@ export default function IndicatorsPage() {
                 <LineChart />
                 Indicadores Operacionais do Mês
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <KpiCard
                     title="SLA Mensal"
                     value={`${selectedData.sla_mensal}%`}
@@ -119,15 +118,6 @@ export default function IndicatorsPage() {
                     description={`${selectedData.chamados_abertos} abertos no mês`}
                     icon={selectedData.chamados_solucionados > selectedData.chamados_abertos ? ArrowUp : ArrowDown}
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
-                />
-                 <KpiCard
-                    title="Custo Mensal"
-                    value={selectedData.valor_mensal}
-                    change={selectedData.variacao_percentual_valor}
-                    changeType={selectedData.variacao_percentual_valor >= 0 ? 'decrease' : 'increase'}
-                    description={`Orçado: ${selectedData.valor_orcado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`}
-                    icon={DollarSign}
-                    formatAsCurrency
                 />
             </div>
             
@@ -150,10 +140,6 @@ export default function IndicatorsPage() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
               <CallsChart data={indicators} />
               <SlaChart data={indicatorsWithGoal} />
-            </div>
-
-            <div className='mt-8'>
-              <CostChart data={indicators} />
             </div>
 
             <div className='mt-8'>

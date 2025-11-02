@@ -1,3 +1,4 @@
+
 import type { ImpactFactor } from './impact-factors';
 
 export type Classification = 'A' | 'B' | 'C';
@@ -94,9 +95,6 @@ export type MaintenanceIndicator = {
   chamados_abertos: number;
   chamados_solucionados: number;
   backlog: number;
-  valor_mensal: number;
-  valor_orcado: number;
-  variacao_percentual_valor: number;
   aging: {
     inferior_30: AgingCriticidade;
     entre_30_60: AgingCriticidade;

@@ -14,7 +14,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AddMonthForm } from '@/components/dashboard/indicators/add-month-form';
 import { useToast } from '@/hooks/use-toast';
 import { EditableAgingTableByCriticism } from '@/components/dashboard/indicators/editable-aging-table-by-criticism';
-import { EditableCostTable } from '@/components/dashboard/indicators/editable-cost-table';
 
 
 export default function ReleasesPage() {
@@ -56,9 +55,6 @@ export default function ReleasesPage() {
         chamados_abertos: 0,
         chamados_solucionados: 0,
         backlog: indicators[indicators.length - 1]?.backlog || 0,
-        valor_mensal: 0,
-        valor_orcado: 0,
-        variacao_percentual_valor: 0,
         aging: {
             inferior_30: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
             entre_30_60: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
@@ -126,7 +122,7 @@ export default function ReleasesPage() {
       
       {selectedData && (
         <section className='space-y-8'>
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 <EditableSlaTable 
                   data={indicators} 
                   setData={setIndicators} 
@@ -134,7 +130,6 @@ export default function ReleasesPage() {
                   setAnnualSlaGoal={setAnnualSlaGoal}
                 />
                 <EditableCallsTable data={indicators} setData={setIndicators} />
-                <EditableCostTable data={indicators} setData={setIndicators} />
             </div>
             <div >
                 <EditableAgingTableByCriticism indicator={selectedData} onUpdate={handleAgingUpdate} />

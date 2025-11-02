@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Provides an AI-powered summary of monthly maintenance KPIs.
@@ -8,8 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import { MaintenanceIndicator } from '@/lib/types';
+import {z} from 'zod';
 
 // We can't directly import the type from lib/types because it's client-side.
 // So we redefine the necessary parts of the schema for the AI flow.
@@ -21,8 +21,6 @@ const KpiSummaryInputSchema = z.object({
   chamados_abertos: z.number().describe('Number of new tickets opened.'),
   chamados_solucionados: z.number().describe('Number of tickets resolved.'),
   backlog: z.number().describe('Number of pending tickets at the end of the month.'),
-  valor_mensal: z.number().describe('Total maintenance cost for the month.'),
-  variacao_percentual_valor: z.number().describe('Percentage variation in cost compared to the previous month.'),
 });
 
 export type KpiSummaryInput = z.infer<typeof KpiSummaryInputSchema>;
@@ -56,8 +54,6 @@ const kpiSummaryPrompt = ai.definePrompt({
   - Chamados Abertos: {{{chamados_abertos}}}
   - Chamados Solucionados: {{{chamados_solucionados}}}
   - Saldo de Backlog: {{{backlog}}}
-  - Custo de Manutenção: R$ {{{valor_mensal}}}
-  - Variação do Custo vs. Mês Anterior: {{{variacao_percentual_valor}}}%
 
   Generate the summary below.
   `,
