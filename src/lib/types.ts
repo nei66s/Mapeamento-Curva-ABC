@@ -92,6 +92,7 @@ export type MaintenanceIndicator = {
   chamados_solucionados: number;
   backlog: number;
   valor_mensal: number;
+  valor_orcado: number;
   variacao_percentual_valor: number;
   aging: {
     inferior_30: AgingCriticidade;

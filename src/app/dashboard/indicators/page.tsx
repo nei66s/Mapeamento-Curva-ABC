@@ -8,7 +8,7 @@ import type { MaintenanceIndicator } from '@/lib/types';
 import { KpiCard } from '@/components/dashboard/indicators/kpi-card';
 import { CallsChart } from '@/components/dashboard/indicators/calls-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUp, ArrowDown, TrendingUp, PlusCircle, BrainCircuit, BarChart3, LineChart } from 'lucide-react';
+import { ArrowUp, ArrowDown, TrendingUp, PlusCircle, BrainCircuit, BarChart3, LineChart, DollarSign } from 'lucide-react';
 import { EditableSlaTable } from '@/components/dashboard/indicators/editable-sla-table';
 import { EditableCallsTable } from '@/components/dashboard/indicators/editable-calls-table';
 import { SlaChart } from '@/components/dashboard/indicators/sla-chart';
@@ -25,6 +25,9 @@ import { SummaryCards } from '@/components/dashboard/summary-cards';
 import { ClassificationTable } from '@/components/dashboard/classification-table';
 import { ItemsByCurveChart } from '@/components/dashboard/items-by-curve-chart';
 import { Separator } from '@/components/ui/separator';
+import { CostChart } from '@/components/dashboard/indicators/cost-chart';
+import { EditableCostTable } from '@/components/dashboard/indicators/editable-cost-table';
+
 
 export default function IndicatorsPage() {
   const [indicators, setIndicators] = useState<MaintenanceIndicator[]>(mockMaintenanceIndicators);
@@ -82,6 +85,7 @@ export default function IndicatorsPage() {
         chamados_solucionados: 0,
         backlog: indicators[indicators.length - 1]?.backlog || 0,
         valor_mensal: 0,
+        valor_orcado: 0,
         variacao_percentual_valor: 0,
         aging: {
             inferior_30: { baixa: 0, media: 0, alta: 0, muito_alta: 0 },
@@ -172,7 +176,7 @@ export default function IndicatorsPage() {
                 <LineChart />
                 Indicadores Operacionais do Mês
             </h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <KpiCard
                     title="SLA Mensal"
                     value={`${selectedData.sla_mensal}%`}
@@ -193,6 +197,15 @@ export default function IndicatorsPage() {
                     description={`${selectedData.chamados_abertos} abertas no mês`}
                     icon={selectedData.chamados_solucionados > selectedData.chamados_abertos ? ArrowUp : ArrowDown}
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
+                />
+                 <KpiCard
+                    title="Custo Mensal"
+                    value={selectedData.valor_mensal}
+                    change={selectedData.variacao_percentual_valor}
+                    changeType={selectedData.variacao_percentual_valor >= 0 ? 'decrease' : 'increase'}
+                    description={`Orçado: ${selectedData.valor_orcado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`}
+                    icon={DollarSign}
+                    formatAsCurrency
                 />
             </div>
             
@@ -218,10 +231,14 @@ export default function IndicatorsPage() {
             </div>
 
             <div className='mt-8'>
+              <CostChart data={indicators} />
+            </div>
+
+            <div className='mt-8'>
               <AgingChart data={selectedData.aging} />
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
                 <EditableSlaTable 
                   data={indicators} 
                   setData={setIndicators} 
@@ -229,6 +246,7 @@ export default function IndicatorsPage() {
                   setAnnualSlaGoal={setAnnualSlaGoal}
                 />
                 <EditableCallsTable data={indicators} setData={setIndicators} />
+                <EditableCostTable data={indicators} setData={setIndicators} />
             </div>
             <div className='mt-8'>
                 <EditableAgingTableByCriticism indicator={selectedData} onUpdate={handleAgingUpdate} />

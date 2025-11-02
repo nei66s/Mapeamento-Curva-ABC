@@ -317,6 +317,7 @@ export const mockMaintenanceIndicators: MaintenanceIndicator[] = fullIndicatorDa
     const crescimento_mensal_sla = sla_mensal - (78 + Math.sin(index - 1) * 5);
     const valor_mensal = (item.chamados_abertos * 700) + Math.random() * 100000;
     const prev_valor_mensal = (prevItem.chamados_abertos * 700) + Math.random() * 100000;
+    const valor_orcado = valor_mensal * (1 + (Math.random() - 0.4) * 0.2); // +/- 20% of actual
 
     const totalCriticidade = (item.chamados_abertos);
     const criticidade = {
@@ -344,6 +345,7 @@ export const mockMaintenanceIndicators: MaintenanceIndicator[] = fullIndicatorDa
         chamados_solucionados: item.chamados_solucionados,
         backlog: item.backlog,
         valor_mensal: parseFloat(valor_mensal.toFixed(2)),
+        valor_orcado: parseFloat(valor_orcado.toFixed(2)),
         variacao_percentual_valor: parseFloat((((valor_mensal - prev_valor_mensal) / prev_valor_mensal) * 100).toFixed(2)),
         aging: {
             inferior_30: generateAgingData(),
