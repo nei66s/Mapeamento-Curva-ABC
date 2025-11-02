@@ -1,3 +1,4 @@
+
 import { User, UserRole } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
@@ -8,7 +9,7 @@ export const mockUsers: User[] = [
   {
     id: 'user-001',
     name: 'Ana Silva',
-    email: 'admin@example.com',
+    email: 'admin@gmail.com',
     role: 'admin',
     password: 'admin',
     avatarUrl: userAvatar?.imageUrl,
