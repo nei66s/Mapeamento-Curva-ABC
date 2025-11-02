@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Archive,
   FileWarning,
+  Construction,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ const preventiveLinks = [
 const resourceLinks = [
     { href: "/dashboard/suppliers", icon: Users, label: "Fornecedores" },
     { href: "/dashboard/warranty", icon: ShieldCheck, label: "Garantias" },
+    { href: "/dashboard/tools", icon: Construction, label: "Almoxarifado" },
 ];
 
 export default function AppSidebar() {

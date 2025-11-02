@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Archive,
   FileWarning,
+  Construction,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -139,6 +140,13 @@ export default function AppHeader() {
                 >
                   <ShieldCheck className="h-5 w-5" />
                   Garantias
+                </Link>
+                <Link
+                  href="/dashboard/tools"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Construction className="h-5 w-5" />
+                  Almoxarifado
                 </Link>
                </div>
             </div>

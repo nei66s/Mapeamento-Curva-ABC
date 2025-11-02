@@ -1,5 +1,6 @@
 
 
+
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
@@ -147,5 +148,18 @@ export type RNC = {
     status: RncStatus;
     classification: RncClassification;
     createdAt: string; // ISO date string
+};
+
+export type ToolStatus = 'Disponível' | 'Em Uso' | 'Em Manutenção';
+
+export type Tool = {
+  id: string;
+  name: string;
+  category: 'Manual' | 'Elétrica' | 'Medição' | 'EPI';
+  serialNumber?: string;
+  status: ToolStatus;
+  assignedTo?: string; // User ID
+  purchaseDate: string; // ISO date string
+  lastMaintenance?: string; // ISO date string
 };
     
