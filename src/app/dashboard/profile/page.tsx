@@ -70,12 +70,12 @@ export default function ProfilePage() {
             <CardContent className="space-y-8">
               <div className="flex items-center gap-6">
                   <Avatar className="h-20 w-20">
-                      {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
+                      {form.watch('avatarUrl') && <AvatarImage src={form.watch('avatarUrl')} alt={user.name} />}
                       <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="grid gap-1">
-                      <h3 className="text-lg font-semibold">{user.name}</h3>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                      <h3 className="text-lg font-semibold">{form.watch('name')}</h3>
+                      <p className="text-sm text-muted-foreground">{form.watch('email')}</p>
                       <p className="text-sm font-medium text-primary capitalize">{user.role}</p>
                   </div>
               </div>
