@@ -46,18 +46,21 @@ export default function ProfilePage() {
         return;
     }
     
-    // In a real app, this would be an API call.
+    // In a real app, this would be an API call to a database.
     // Here, we update the mock data object for session persistence.
+    // NOTE: This change only persists for the current user session.
+    // A page refresh will revert to the original data in `src/lib/users.ts`.
+    // To make a permanent change, the file `src/lib/users.ts` must be edited.
     const userIndex = mockUsers.findIndex(u => u.id === user.id);
     
     if (userIndex !== -1) {
         const updatedUser = { ...mockUsers[userIndex], ...data };
-        mockUsers[userIndex] = updatedUser; // Persist in the mock "DB"
+        mockUsers[userIndex] = updatedUser; // Persist in the mock "DB" for this session
         setUser(updatedUser); // Update local state for immediate feedback
         
         toast({
           title: 'Perfil Atualizado!',
-          description: 'Suas informações foram salvas com sucesso. Atualize a página para ver as mudanças refletidas em todo o app.',
+          description: 'Suas informações foram salvas com sucesso. Para uma alteração permanente, o arquivo fonte precisa ser modificado.',
         });
     } else {
          toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível salvar as alterações.' });
@@ -85,7 +88,7 @@ export default function ProfilePage() {
               <div className="flex items-center gap-6">
                   <Avatar className="h-20 w-20">
                       {form.watch('avatarUrl') && <AvatarImage src={form.watch('avatarUrl')} alt={user.name} />}
-                      <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>{form.watch('name').charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="grid gap-1">
                       <h3 className="text-lg font-semibold">{form.watch('name')}</h3>

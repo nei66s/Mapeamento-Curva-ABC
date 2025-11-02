@@ -4,10 +4,11 @@ import { PlaceHolderImages } from './placeholder-images';
 
 const userAvatar = PlaceHolderImages.find(img => img.id === "user-avatar-1");
 
+// This is our "database". Changes to user profiles should be made here to be persistent.
 export const mockUsers: User[] = [
   {
     id: 'user-00',
-    name: 'Admin User',
+    name: 'Líder Admin',
     email: 'admin@gmail.com',
     role: 'admin',
     password: 'admin',
