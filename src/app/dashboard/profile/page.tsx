@@ -6,18 +6,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { mockUsers } from '@/lib/users';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
 const profileSchema = z.object({
   name: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres.'),
   email: z.string().email('Por favor, insira um e-mail válido.'),
+  avatarUrl: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).optional().or(z.literal('')),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -31,18 +32,27 @@ export default function ProfilePage() {
     defaultValues: {
       name: user.name,
       email: user.email,
+      avatarUrl: user.avatarUrl || '',
     },
   });
 
   const onSubmit = (data: ProfileFormData) => {
-    setUser(prevUser => ({ ...prevUser, ...data }));
+    // In a real app, this would be an API call.
+    // Here, we update the local state and the mock data object for session persistence.
+    const updatedUser = { ...user, ...data };
+    setUser(updatedUser);
+
+    // Update the mock data source
+    const userIndex = mockUsers.findIndex(u => u.id === user.id);
+    if (userIndex !== -1) {
+        mockUsers[userIndex] = updatedUser;
+    }
+    
     toast({
       title: 'Perfil Atualizado!',
       description: 'Suas informações foram salvas com sucesso.',
     });
   };
-  
-  const userAvatar = PlaceHolderImages.find(img => img.id === "user-avatar-1");
 
   return (
     <div className="flex flex-col gap-8">
@@ -50,47 +60,74 @@ export default function ProfilePage() {
         title="Meu Perfil"
         description="Visualize e edite suas informações pessoais."
       />
-      <Card>
-        <CardHeader>
-          <CardTitle>Informações do Perfil</CardTitle>
-          <CardDescription>Mantenha seus dados sempre atualizados.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="flex items-center gap-6">
-                <Avatar className="h-20 w-20">
-                    {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt={user.name} data-ai-hint={userAvatar.imageHint} />}
-                    <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-1">
-                    <h3 className="text-lg font-semibold">{user.name}</h3>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
-                    <p className="text-sm font-medium text-primary capitalize">{user.role}</p>
-                </div>
-            </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Informações do Perfil</CardTitle>
+              <CardDescription>Mantenha seus dados sempre atualizados.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              <div className="flex items-center gap-6">
+                  <Avatar className="h-20 w-20">
+                      {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
+                      <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="grid gap-1">
+                      <h3 className="text-lg font-semibold">{user.name}</h3>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                      <p className="text-sm font-medium text-primary capitalize">{user.role}</p>
+                  </div>
+              </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-                 <div className="grid gap-2">
-                    <Label htmlFor="name">Nome</Label>
-                    <Input id="name" {...form.register('name')} />
-                    {form.formState.errors.name && (
-                    <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
-                    )}
-                </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" {...form.register('email')} />
-                     {form.formState.errors.email && (
-                    <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
-                    )}
-                </div>
-            </div>
-
-            <Button type="submit">Salvar Alterações</Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="grid md:grid-cols-2 gap-6">
+                   <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label>Nome</Label>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label>Email</Label>
+                          <FormControl>
+                            <Input type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+              </div>
+               <FormField
+                  control={form.control}
+                  name="avatarUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label>URL da Imagem do Avatar</Label>
+                      <FormControl>
+                        <Input placeholder="https://exemplo.com/sua-imagem.png" {...field} />
+                      </FormControl>
+                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </CardContent>
+             <CardFooter>
+                <Button type="submit">Salvar Alterações</Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form>
     </div>
   );
 }
-
