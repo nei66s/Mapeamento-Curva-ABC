@@ -23,10 +23,13 @@ import { Badge } from '@/components/ui/badge';
 import { RncForm } from '@/components/dashboard/rncs/rnc-form';
 import { mockRncs, mockSuppliers, mockIncidents } from '@/lib/mock-data';
 import type { RNC, RncStatus } from '@/lib/types';
-import { PlusCircle, Clock, MoreVertical, Pencil, FileWarning, Users, AlertTriangle, Workflow } from 'lucide-react';
+import { PlusCircle, Clock, MoreVertical, Pencil, FileWarning, Users, AlertTriangle, Workflow, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { RncPdfDocument } from '@/components/dashboard/rncs/rnc-pdf-document';
 
 const statusVariantMap: Record<RncStatus, 'destructive' | 'accent' | 'success' | 'default'> = {
   Aberta: 'destructive',
@@ -40,6 +43,7 @@ export default function RncPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedRnc, setSelectedRnc] = useState<RNC | null>(null);
   const { toast } = useToast();
+  const [rncToPrint, setRncToPrint] = useState<RNC | null>(null);
 
   const suppliersMap = useMemo(() => new Map(mockSuppliers.map(s => [s.id, s.name])), []);
 
@@ -76,6 +80,38 @@ export default function RncPage() {
   const openNewDialog = () => {
     setSelectedRnc(null);
     setIsFormOpen(true);
+  };
+
+  const handleDownloadPdf = async (rnc: RNC) => {
+    setRncToPrint(rnc);
+
+    // Allow time for the hidden component to render with the correct data
+    setTimeout(async () => {
+      const input = document.getElementById(`pdf-content-${rnc.id}`);
+      if (input) {
+        try {
+          const canvas = await html2canvas(input, { scale: 2 });
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`RNC-${rnc.id}.pdf`);
+          toast({
+            title: 'PDF Gerado!',
+            description: `O download do RNC ${rnc.id} foi iniciado.`,
+          });
+        } catch (error) {
+          console.error("Error generating PDF:", error);
+          toast({
+            variant: 'destructive',
+            title: 'Erro ao Gerar PDF',
+            description: 'Não foi possível gerar o arquivo PDF.',
+          });
+        }
+      }
+       setRncToPrint(null);
+    }, 100);
   };
 
   return (
@@ -124,9 +160,14 @@ export default function RncPage() {
                         {suppliersMap.get(rnc.supplierId) || 'Fornecedor desconhecido'}
                       </CardDescription>
                     </div>
-                     <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2" onClick={() => openEditDialog(rnc)}>
-                        <Pencil className="h-4 w-4" />
-                    </Button>
+                     <div className="flex items-center -mt-2 -mr-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(rnc)}>
+                            <Pencil className="h-4 w-4" />
+                        </Button>
+                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDownloadPdf(rnc)}>
+                            <Download className="h-4 w-4" />
+                        </Button>
+                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="flex-grow space-y-4">
@@ -162,6 +203,15 @@ export default function RncPage() {
           </div>
         </CardContent>
       </Card>
+      
+      {rncToPrint && (
+        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+          <RncPdfDocument 
+            rnc={rncToPrint} 
+            supplierName={suppliersMap.get(rncToPrint.supplierId) || 'N/A'}
+          />
+        </div>
+      )}
     </div>
   );
 }
