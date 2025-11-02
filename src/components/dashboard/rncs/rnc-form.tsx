@@ -135,7 +135,6 @@ export function RncForm({ rnc, suppliers, incidents, onSubmit, onCancel }: RncFo
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">Nenhum</SelectItem>
                     {incidents.map(i => (
                       <SelectItem key={i.id} value={i.id}>{i.id} - {i.itemName}</SelectItem>
                     ))}
