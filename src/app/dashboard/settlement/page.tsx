@@ -121,7 +121,7 @@ export default function SettlementPage() {
             <p className="text-sm text-muted-foreground line-clamp-2">
                 {letter.description}
             </p>
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-wrap items-center justify-between gap-2'>
                 <Button variant="outline" size="sm" onClick={() => handleDownloadPdf(letter)}>
                     <Download className="mr-2 h-4 w-4" />
                     Imprimir Modelo
