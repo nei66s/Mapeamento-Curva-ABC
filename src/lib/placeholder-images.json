@@ -3,7 +3,7 @@
     {
       "id": "app-logo",
       "description": "The main logo for the application",
-      "imageUrl": "https://storage.googleapis.com/stabl-media/6f13ed5b-2169-429a-8868-968e73431102.png",
+      "imageUrl": "/logo.png",
       "imageHint": "company logo"
     },
     {
