@@ -232,7 +232,7 @@ export default function CompliancePage() {
       </PageHeader>
 
       <Card>
-        <CardContent className='p-6'>
+        <CardContent className='p-4 sm:p-6'>
            <ComplianceMap 
               allStores={allStores}
               scheduledVisits={filteredStoreData}
@@ -241,10 +241,10 @@ export default function CompliancePage() {
       </Card>
 
       <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-1">
             <ComplianceSummary storeData={filteredStoreData} checklistItems={checklistItems} />
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
              <ManageChecklistItems
                 items={checklistItems}
                 onAddItem={handleAddItem}
@@ -253,7 +253,7 @@ export default function CompliancePage() {
         </div>
       </div>
        <Card>
-         <CardContent className="p-6 grid gap-6 md:grid-cols-3">
+         <CardContent className="p-4 sm:p-6 grid gap-6 md:grid-cols-3">
             <div className="md:col-span-1">
                  <div className="flex items-center justify-between mb-4">
                     <Button variant="outline" size="icon" onClick={goToPreviousMonth}>

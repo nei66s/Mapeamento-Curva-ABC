@@ -176,7 +176,7 @@ export default function IndicatorsPage() {
                 <LineChart />
                 Indicadores Operacionais do Mês
             </h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <KpiCard
                     title="SLA Mensal"
                     value={`${selectedData.sla_mensal}%`}
@@ -238,7 +238,7 @@ export default function IndicatorsPage() {
               <AgingChart data={selectedData.aging} />
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-8">
                 <EditableSlaTable 
                   data={indicators} 
                   setData={setIndicators} 
