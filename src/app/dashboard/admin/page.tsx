@@ -5,8 +5,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from '@/hooks/use-toast';
 import { mockUsers as initialUsers } from '@/lib/users';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -28,38 +27,73 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Shield } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
-const currentUserRole: UserRole = 'admin'; // For demonstration purposes
+const currentUserRole: UserRole = 'admin'; 
+
+const roles: UserRole[] = ['admin', 'gestor', 'regional', 'viewer'];
 
 const modules = [
-    { id: 'indicators-tables', label: 'Tabelas Editáveis (Indicadores)' },
-    { id: 'item-matrix', label: 'Matriz de Itens (Adicionar/Editar)' },
-    { id: 'categories', label: 'Gerenciamento de Categorias' },
-    { id: 'compliance-checklist', label: 'Gerenciamento de Checklist (Conformidade)' },
+    { id: 'indicators', label: 'Painel de Indicadores' },
+    { id: 'releases', label: 'Lançamentos Mensais' },
+    { id: 'incidents', label: 'Registro de Incidentes' },
+    { id: 'rncs', label: 'Registros de Não Conformidade' },
+    { id: 'categories', label: 'Categorias de Itens' },
+    { id: 'matrix', label: 'Matriz de Itens' },
+    { id: 'compliance', label: 'Cronograma de Preventivas' },
+    { id: 'suppliers', label: 'Gestão de Fornecedores' },
+    { id: 'warranty', label: 'Controle de Garantias' },
+    { id: 'tools', label: 'Almoxarifado de Ferramentas' },
+    { id: 'profile', label: 'Meu Perfil' },
+    { id: 'settings', label: 'Configurações' },
+    { id: 'about', label: 'Sobre a Plataforma' },
 ];
+
+const initialPermissions: Record<UserRole, Record<string, boolean>> = {
+  admin: Object.fromEntries(modules.map(m => [m.id, true])),
+  gestor: {
+    'indicators': true, 'releases': true, 'incidents': true, 'rncs': true,
+    'categories': true, 'matrix': true, 'compliance': true, 'suppliers': true,
+    'warranty': true, 'tools': true, 'profile': true, 'settings': true, 'about': true,
+  },
+  regional: {
+    'indicators': true, 'releases': false, 'incidents': true, 'rncs': true,
+    'categories': false, 'matrix': true, 'compliance': true, 'suppliers': false,
+    'warranty': true, 'tools': true, 'profile': true, 'settings': true, 'about': true,
+  },
+  viewer: {
+    'indicators': true, 'releases': false, 'incidents': false, 'rncs': false,
+    'categories': false, 'matrix': false, 'compliance': false, 'suppliers': false,
+    'warranty': false, 'tools': false, 'profile': true, 'settings': false, 'about': true,
+  }
+};
+
 
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>(initialUsers);
-  const [permissions, setPermissions] = useState<Record<string, boolean>>({
-    'indicators-tables': true,
-    'item-matrix': true,
-    'categories': true,
-    'compliance-checklist': false,
-  });
+  const [permissions, setPermissions] = useState(initialPermissions);
   const { toast } = useToast();
 
   const handleRoleChange = (userId: string, newRole: UserRole) => {
     setUsers(users.map(u => (u.id === userId ? { ...u, role: newRole } : u)));
     toast({
-      title: 'Role Atualizada!',
-      description: `O usuário foi atualizado para ${newRole}.`,
+      title: 'Perfil Atualizado!',
+      description: `O perfil do usuário foi atualizado para ${newRole}.`,
     });
   };
 
-  const handlePermissionChange = (moduleId: string, newPermission: boolean) => {
-    setPermissions(prev => ({ ...prev, [moduleId]: newPermission }));
-     toast({
+  const handlePermissionChange = (role: UserRole, moduleId: string, checked: boolean) => {
+    if (role === 'admin') return;
+
+    setPermissions(prev => ({
+        ...prev,
+        [role]: {
+            ...prev[role],
+            [moduleId]: checked
+        }
+    }));
+
+    toast({
       title: 'Permissão Alterada!',
-      description: `O acesso ao módulo foi ${newPermission ? 'habilitado' : 'desabilitado'}.`,
+      description: `O acesso do perfil ${role} ao módulo foi ${checked ? 'concedido' : 'revogado'}.`,
     });
   };
 
@@ -85,49 +119,37 @@ export default function AdminPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Administração"
-        description="Gerencie usuários, perfis e configurações do sistema."
+        description="Gerencie usuários, perfis e permissões do sistema."
       />
       
       <Card>
         <CardHeader>
-          <CardTitle>Gerenciamento de Usuários</CardTitle>
-          <CardDescription>Altere as roles dos usuários do sistema.</CardDescription>
+          <CardTitle>Gerenciamento de Perfis de Acesso</CardTitle>
+          <CardDescription>Defina quais módulos cada perfil de usuário pode acessar.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Usuário</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead className="text-right">Role</TableHead>
+                <TableHead className="w-[250px]">Módulo</TableHead>
+                {roles.map(role => (
+                  <TableHead key={role} className="text-center capitalize">{role}</TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map(user => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        {user.avatarUrl && <AvatarImage src={user.avatarUrl} />}
-                        <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <span className="font-medium">{user.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{user.email}</TableCell>
-                  <TableCell className="text-right">
-                    <Select value={user.role} onValueChange={(value) => handleRoleChange(user.id, value as UserRole)}>
-                      <SelectTrigger className="w-32 ml-auto">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="gestor">Gestor</SelectItem>
-                        <SelectItem value="regional">Regional</SelectItem>
-                        <SelectItem value="viewer">Viewer</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
+              {modules.map(module => (
+                <TableRow key={module.id}>
+                  <TableCell className="font-medium">{module.label}</TableCell>
+                  {roles.map(role => (
+                    <TableCell key={role} className="text-center">
+                      <Checkbox 
+                        checked={permissions[role]?.[module.id] ?? false}
+                        onCheckedChange={(checked) => handlePermissionChange(role, module.id, Boolean(checked))}
+                        disabled={role === 'admin'}
+                      />
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
@@ -139,22 +161,47 @@ export default function AdminPage() {
 
       <Card>
         <CardHeader>
-            <CardTitle>Permissões de Módulos</CardTitle>
-            <CardDescription>Habilite ou desabilite o acesso a módulos específicos para usuários não-administradores.</CardDescription>
+          <CardTitle>Gerenciamento de Usuários</CardTitle>
+          <CardDescription>Altere os perfis dos usuários do sistema.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-6">
-            {modules.map(module => (
-                <div key={module.id} className="flex items-center justify-between space-x-2 rounded-lg border p-4">
-                    <Label htmlFor={module.id} className="flex flex-col space-y-1">
-                    <span>{module.label}</span>
-                    </Label>
-                    <Switch
-                        id={module.id}
-                        checked={permissions[module.id]}
-                        onCheckedChange={(checked) => handlePermissionChange(module.id, checked)}
-                    />
-                </div>
-            ))}
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Usuário</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead className="text-right w-[150px]">Perfil</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map(user => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="person avatar"/>}
+                        <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{user.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                  <TableCell className="text-right">
+                    <Select value={user.role} onValueChange={(value) => handleRoleChange(user.id, value as UserRole)}>
+                      <SelectTrigger className="ml-auto">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roles.map(role => (
+                             <SelectItem key={role} value={role} className="capitalize">{role}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
