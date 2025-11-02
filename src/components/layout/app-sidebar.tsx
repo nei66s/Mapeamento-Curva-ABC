@@ -30,7 +30,7 @@ const mappingLinks = [
 ];
 
 const preventiveLinks = [
-    { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Conformidade" },
+    { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Preventivas" },
 ];
 
 export default function AppSidebar() {
@@ -141,3 +141,5 @@ export default function AppSidebar() {
     </aside>
   );
 }
+
+    

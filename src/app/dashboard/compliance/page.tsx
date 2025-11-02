@@ -18,7 +18,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format, getMonth, getYear, setMonth, setYear } from 'date-fns';
+import { format, getMonth, getYear, setMonth, setYear, isBefore, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, PlusCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -44,8 +44,39 @@ export default function CompliancePage() {
     loading: () => <Skeleton className="h-[400px] w-full" />,
   }), []);
 
-  const scheduledDates = useMemo(() => {
-    return storeData.map(d => new Date(d.visitDate));
+  const { scheduledDates, completedDates, pendingDates, futureDates } = useMemo(() => {
+    const statusByDate: Record<string, 'completed' | 'pending'> = {};
+    
+    storeData.forEach(d => {
+      const dateStr = format(new Date(d.visitDate), 'yyyy-MM-dd');
+      const hasPending = d.items.some(item => item.status === 'pending');
+      
+      if (!statusByDate[dateStr] || hasPending) {
+        statusByDate[dateStr] = hasPending ? 'pending' : 'completed';
+      }
+    });
+
+    const scheduled = new Set<Date>();
+    const completed = new Set<Date>();
+    const pending = new Set<Date>();
+    const future = new Set<Date>();
+    const today = startOfDay(new Date());
+
+    for (const dateStr in statusByDate) {
+      const date = new Date(dateStr + 'T00:00:00');
+      scheduled.add(date);
+      if (isBefore(date, today)) {
+        if (statusByDate[dateStr] === 'completed') {
+          completed.add(date);
+        } else {
+          pending.add(date);
+        }
+      } else {
+         future.add(date);
+      }
+    }
+
+    return { scheduledDates: Array.from(scheduled), completedDates: Array.from(completed), pendingDates: Array.from(pending), futureDates: Array.from(future) };
   }, [storeData]);
 
   const filteredStoreData = useMemo(() => {
@@ -177,7 +208,7 @@ export default function CompliancePage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title="Conformidade Preventiva"
+        title="Cronograma de Preventivas"
         description="Acompanhe a conclusão dos itens de manutenção essenciais em todas as lojas."
       >
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
@@ -258,8 +289,20 @@ export default function CompliancePage() {
                     onMonthChange={setDisplayDate}
                     locale={ptBR}
                     className="rounded-md border"
-                    modifiers={{ scheduled: scheduledDates }}
-                    modifiersStyles={{ scheduled: { color: 'hsl(var(--primary))', fontWeight: 'bold' } }}
+                    modifiers={{ 
+                      scheduled: scheduledDates,
+                      completed: completedDates,
+                      pending: pendingDates,
+                      future: futureDates,
+                    }}
+                    modifiersClassNames={{
+                      completed: 'bg-green-100 dark:bg-green-900',
+                      pending: 'bg-orange-100 dark:bg-orange-900',
+                      future: 'bg-blue-100 dark:bg-blue-900',
+                    }}
+                    modifiersStyles={{ 
+                      scheduled: { color: 'hsl(var(--primary))', fontWeight: 'bold' }
+                    }}
                  />
                  <Button className='w-full mt-4' variant="secondary" onClick={() => setSelectedDate(undefined)}>Limpar seleção</Button>
             </div>
@@ -278,3 +321,5 @@ export default function CompliancePage() {
     </div>
   );
 }
+
+    
