@@ -81,10 +81,6 @@ export default function SettlementPage() {
   
   const handleMarkAsReceived = (letterId: string) => {
       setLetters(prev => prev.map(l => l.id === letterId ? { ...l, status: 'Recebida', receivedDate: new Date().toISOString() } : l));
-      toast({
-          title: 'Carta Recebida!',
-          description: 'O status da carta de quitação foi atualizado.',
-      });
   };
   
   const handleFileUploadSimulation = (letterId: string) => {
@@ -154,14 +150,8 @@ export default function SettlementPage() {
                     <Download className="mr-2 h-4 w-4" />
                     Imprimir Modelo
                 </Button>
-                {letter.status === 'Pendente' && currentUser?.role === 'admin' && (
-                    <Button size="sm" onClick={() => handleMarkAsReceived(letter.id)}>
-                        <Check className="mr-2 h-4 w-4" />
-                        Marcar como Recebido
-                    </Button>
-                )}
-                 {letter.status === 'Pendente' && currentUser?.role === 'fornecedor' && (
-                    <Button size="sm" onClick={() => handleFileUploadSimulation(letter.id)}>
+                {letter.status === 'Pendente' && (currentUser?.role === 'admin' || currentUser?.role === 'fornecedor') && (
+                     <Button size="sm" onClick={() => handleFileUploadSimulation(letter.id)}>
                         <UploadCloud className="mr-2 h-4 w-4" />
                         Anexar Quitação Assinada
                     </Button>

@@ -1,7 +1,3 @@
-
-
-
-
 import type { ImpactFactor } from './impact-factors';
 
 export type Classification = 'A' | 'B' | 'C';
@@ -170,6 +166,6 @@ export type SettlementLetter = {
   requestDate: string; // ISO date string
   receivedDate?: string; // ISO date string
   status: SettlementStatus;
-  periodStartDate?: string; // ISO date string
-  periodEndDate?: string; // ISO date string
+  periodStartDate: string; // ISO date string
+  periodEndDate: string; // ISO date string
 };
