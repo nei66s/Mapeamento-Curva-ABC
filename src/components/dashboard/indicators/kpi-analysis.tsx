@@ -14,25 +14,25 @@ interface KpiAnalysisProps {
 
 export function KpiAnalysis({ indicator }: KpiAnalysisProps) {
   const [summary, setSummary] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAnalysis = useCallback(async () => {
+  const fetchAnalysis = useCallback(async (currentIndicator: MaintenanceIndicator) => {
     setLoading(true);
     setError(null);
     setSummary(null);
 
     try {
       const response = await summarizeKpi({
-        mes: indicator.mes,
-        sla_mensal: indicator.sla_mensal,
-        meta_sla: indicator.meta_sla,
-        crescimento_mensal_sla: indicator.crescimento_mensal_sla,
-        chamados_abertos: indicator.chamados_abertos,
-        chamados_solucionados: indicator.chamados_solucionados,
-        backlog: indicator.backlog,
-        valor_mensal: indicator.valor_mensal,
-        variacao_percentual_valor: indicator.variacao_percentual_valor,
+        mes: currentIndicator.mes,
+        sla_mensal: currentIndicator.sla_mensal,
+        meta_sla: currentIndicator.meta_sla,
+        crescimento_mensal_sla: currentIndicator.crescimento_mensal_sla,
+        chamados_abertos: currentIndicator.chamados_abertos,
+        chamados_solucionados: currentIndicator.chamados_solucionados,
+        backlog: currentIndicator.backlog,
+        valor_mensal: currentIndicator.valor_mensal,
+        variacao_percentual_valor: currentIndicator.variacao_percentual_valor,
       });
       setSummary(response.summary);
     } catch (e) {
@@ -41,14 +41,13 @@ export function KpiAnalysis({ indicator }: KpiAnalysisProps) {
     } finally {
       setLoading(false);
     }
-  }, [indicator]);
+  }, []);
 
   useEffect(() => {
-    // Reset state when the selected month (indicator) changes
-    setSummary(null);
-    setError(null);
-    setLoading(false);
-  }, [indicator]);
+    if (indicator) {
+      fetchAnalysis(indicator);
+    }
+  }, [indicator, fetchAnalysis]);
 
 
   const renderContent = () => {
@@ -78,26 +77,23 @@ export function KpiAnalysis({ indicator }: KpiAnalysisProps) {
     }
     return (
         <div className="text-sm text-muted-foreground text-center py-10">
-            Clique no botão para gerar uma análise de desempenho com IA.
+            Não há dados para gerar a análise.
         </div>
     );
   };
 
   return (
     <Card className="h-full">
-      <CardHeader className="flex-row items-start justify-between">
-        <div>
+      <CardHeader>
+          <div>
           <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
             Análise de Desempenho
           </CardTitle>
           <CardDescription>
             Resumo executivo dos KPIs do mês.
           </CardDescription>
         </div>
-        <Button onClick={fetchAnalysis} disabled={loading}>
-          <Sparkles className="mr-2 h-4 w-4" />
-          {loading ? 'Analisando...' : 'Analisar Mês'}
-        </Button>
       </CardHeader>
         <CardContent>
             {renderContent()}

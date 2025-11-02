@@ -1,13 +1,11 @@
-
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { analyzeIncidentsForPareto } from '@/ai/flows/pareto-analysis-flow';
 import type { Incident } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BarChart, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { ParetoChart } from './pareto-chart';
 
 interface ParetoAnalysisProps {
@@ -21,25 +19,33 @@ type ParetoData = {
 
 export function ParetoAnalysis({ incidents }: ParetoAnalysisProps) {
   const [analysis, setAnalysis] = useState<ParetoData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAnalysis = useCallback(async () => {
+  const fetchAnalysis = useCallback(async (currentIncidents: Incident[]) => {
     setLoading(true);
     setError(null);
     setAnalysis(null);
 
     try {
-      const incidentDescriptions = incidents.map(inc => `${inc.itemName}: ${inc.description}`);
-      const response = await analyzeIncidentsForPareto({ incidents: incidentDescriptions });
-      setAnalysis(response.analysis);
+      const incidentDescriptions = currentIncidents.map(inc => `${inc.itemName}: ${inc.description}`);
+      if (incidentDescriptions.length > 0) {
+        const response = await analyzeIncidentsForPareto({ incidents: incidentDescriptions });
+        setAnalysis(response.analysis);
+      } else {
+        setAnalysis([]); // No incidents, so analysis is empty
+      }
     } catch (e) {
       console.error(e);
       setError('Ocorreu um erro ao gerar a análise de Pareto.');
     } finally {
       setLoading(false);
     }
-  }, [incidents]);
+  }, []);
+
+  useEffect(() => {
+    fetchAnalysis(incidents);
+  }, [incidents, fetchAnalysis]);
 
   const renderContent = () => {
     if (loading) {
@@ -59,28 +65,25 @@ export function ParetoAnalysis({ incidents }: ParetoAnalysisProps) {
        }
       return <ParetoChart data={analysis} />;
     }
-    return (
+     return (
         <div className="text-sm text-muted-foreground text-center py-10">
-            Clique no botão para gerar uma análise de Pareto das causas raiz.
+            Análise de Pareto não disponível.
         </div>
     );
   };
 
   return (
     <Card className="h-full">
-      <CardHeader className="flex-row items-start justify-between">
+      <CardHeader>
         <div>
           <CardTitle className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
             Análise de Pareto (Causa Raiz)
           </CardTitle>
           <CardDescription>
             Identifique as causas mais frequentes.
           </CardDescription>
         </div>
-        <Button onClick={fetchAnalysis} disabled={loading}>
-          <Sparkles className="mr-2 h-4 w-4" />
-          {loading ? 'Analisando...' : 'Gerar Pareto'}
-        </Button>
       </CardHeader>
         <CardContent>
             {renderContent()}
