@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
-import { mockMaintenanceIndicators, mockIncidents } from '@/lib/mock-data';
+import { mockMaintenanceIndicators, mockIncidents, mockItems } from '@/lib/mock-data';
 import type { MaintenanceIndicator } from '@/lib/types';
 import { KpiCard } from '@/components/dashboard/indicators/kpi-card';
 import { CallsChart } from '@/components/dashboard/indicators/calls-chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowUp, ArrowDown, TrendingUp, PlusCircle, BrainCircuit } from 'lucide-react';
+import { ArrowUp, ArrowDown, TrendingUp, PlusCircle, BrainCircuit, BarChart3, LineChart } from 'lucide-react';
 import { EditableSlaTable } from '@/components/dashboard/indicators/editable-sla-table';
 import { EditableCallsTable } from '@/components/dashboard/indicators/editable-calls-table';
 import { SlaChart } from '@/components/dashboard/indicators/sla-chart';
@@ -20,6 +20,10 @@ import { AgingChart } from '@/components/dashboard/indicators/aging-chart';
 import { KpiAnalysis } from '@/components/dashboard/indicators/kpi-analysis';
 import { ParetoAnalysis } from '@/components/dashboard/indicators/pareto-analysis';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { SummaryCards } from '@/components/dashboard/summary-cards';
+import { ClassificationTable } from '@/components/dashboard/classification-table';
+import { ItemsByCurveChart } from '@/components/dashboard/items-by-curve-chart';
+import { Separator } from '@/components/ui/separator';
 
 export default function IndicatorsPage() {
   const [indicators, setIndicators] = useState<MaintenanceIndicator[]>(mockMaintenanceIndicators);
@@ -108,7 +112,7 @@ export default function IndicatorsPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Painel de Indicadores"
-        description="Análise detalhada dos principais indicadores de desempenho operacional."
+        description="Análise consolidada dos principais indicadores de desempenho da manutenção."
       >
         <div className="flex items-center gap-2">
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
@@ -143,8 +147,30 @@ export default function IndicatorsPage() {
         </div>
       </PageHeader>
       
+      <section>
+        <h2 className="text-2xl font-bold text-primary flex items-center gap-2 mb-4">
+            <BarChart3 />
+            Indicadores Gerais
+        </h2>
+        <SummaryCards />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+            <div className="lg:col-span-2">
+                <ClassificationTable />
+            </div>
+            <div className="lg:col-span-1">
+                <ItemsByCurveChart />
+            </div>
+        </div>
+      </section>
+
+      <Separator />
+
       {selectedData && (
-        <>
+        <section>
+             <h2 className="text-2xl font-bold text-primary flex items-center gap-2 mb-4">
+                <LineChart />
+                Indicadores Operacionais do Mês
+            </h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <KpiCard
                     title="SLA Mensal"
@@ -169,7 +195,7 @@ export default function IndicatorsPage() {
                 />
             </div>
             
-            <Card className="border-primary border-2">
+            <Card className="border-primary border-2 mt-8">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-primary">
                         <BrainCircuit className="h-6 w-6" />
@@ -185,14 +211,16 @@ export default function IndicatorsPage() {
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
               <CallsChart data={indicators} />
               <SlaChart data={indicatorsWithGoal} />
             </div>
 
-            <AgingChart data={selectedData.aging} />
+            <div className='mt-8'>
+              <AgingChart data={selectedData.aging} />
+            </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
                 <EditableSlaTable 
                   data={indicators} 
                   setData={setIndicators} 
@@ -201,9 +229,10 @@ export default function IndicatorsPage() {
                 />
                 <EditableCallsTable data={indicators} setData={setIndicators} />
             </div>
-
-            <EditableAgingTableByCriticism indicator={selectedData} onUpdate={handleAgingUpdate} />
-        </>
+            <div className='mt-8'>
+                <EditableAgingTableByCriticism indicator={selectedData} onUpdate={handleAgingUpdate} />
+            </div>
+        </section>
       )}
 
     </div>

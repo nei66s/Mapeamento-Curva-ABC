@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   BarChart3,
-  LayoutDashboard,
   Grid3x3,
   ShieldAlert,
   Settings,
@@ -15,7 +14,6 @@ import {
 import { cn } from "@/lib/utils";
 
 const topLevelLinks = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/dashboard/indicators", icon: LineChart, label: "Indicadores" },
 ];
 
@@ -35,7 +33,7 @@ export default function AppSidebar() {
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-card sm:flex">
       <div className="flex flex-col gap-4 px-4 sm:py-5">
         <Link
-          href="/dashboard"
+          href="/dashboard/indicators"
           className="group flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-lg font-semibold text-primary md:text-base"
         >
           <BarChart3 className="h-5 w-5 text-primary transition-all group-hover:scale-110" />
