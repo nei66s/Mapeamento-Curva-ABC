@@ -25,11 +25,6 @@ export type Item = {
   contingencyPlan: string;
   leadTime: string;
   imageUrl?: string;
-  // Financial and Lifecycle Data
-  valorAtivo: number;
-  dataInicioOperacao: string; // ISO Date String
-  vidaUtilEstimada: number; // In years
-  dataFimGarantia: string; // ISO Date String
 };
 
 export type Incident = {

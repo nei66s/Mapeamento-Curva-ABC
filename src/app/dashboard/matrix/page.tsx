@@ -41,7 +41,7 @@ import { ClassificationBadge } from '@/components/shared/risk-badge';
 import { ItemForm } from '@/components/dashboard/matrix/item-form';
 import { mockItems, mockCategories } from '@/lib/mock-data';
 import type { Item } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Landmark, Wrench, CalendarDays } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Landmark, Wrench } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +56,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { impactFactors, ImpactFactor } from '@/lib/impact-factors';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { format } from 'date-fns';
 
 
 const factorIconMap: Record<ImpactFactor['id'], React.ElementType> = {
@@ -208,7 +207,7 @@ export default function MatrixPage() {
                   <TableRow>
                     <TableHead>Item</TableHead>
                     <TableHead>Classificação</TableHead>
-                    <TableHead>Fim da Garantia</TableHead>
+                    <TableHead>Fatores de Impacto</TableHead>
                     <TableHead className="hidden md:table-cell">Lead Time</TableHead>
                     <TableHead className="hidden md:table-cell">Plano de Contingência</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
@@ -240,9 +239,22 @@ export default function MatrixPage() {
                         <ClassificationBadge classification={item.classification} />
                       </TableCell>
                        <TableCell>
-                        <div className="flex items-center gap-2">
-                          <CalendarDays />
-                          <span>{format(new Date(item.dataFimGarantia), 'dd/MM/yyyy')}</span>
+                        <div className="flex items-center gap-1.5">
+                          {item.impactFactors.map(factorId => {
+                            const factorInfo = impactFactors.find(f => f.id === factorId);
+                            if (!factorInfo) return null;
+                            const Icon = factorIconMap[factorId];
+                            return (
+                               <Tooltip key={factorId}>
+                                  <TooltipTrigger asChild>
+                                    <Badge variant="secondary" className="p-1.5"><Icon className="h-4 w-4" /></Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>{factorInfo.label}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                            )
+                          })}
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{item.leadTime}</TableCell>

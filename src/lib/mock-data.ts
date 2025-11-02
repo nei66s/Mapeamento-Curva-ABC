@@ -103,9 +103,6 @@ export const mockItems: Item[] = itemNames.map((name, index) => {
   const imageId = `item-image-${(index % 5) + 1}`;
   const image = PlaceHolderImages.find(img => img.id === imageId);
   const { impactFactors, classification } = getImpactFactorsAndClassification(name);
-  const startDate = new Date(2020 - (index % 5), index % 12, (index % 28) + 1);
-  const warrantyYears = (index % 3) + 1;
-  const warrantyEnd = new Date(startDate.getFullYear() + warrantyYears, startDate.getMonth(), startDate.getDate());
 
   return {
     id: `ITM-${String(index + 1).padStart(3, '0')}`,
@@ -118,10 +115,6 @@ export const mockItems: Item[] = itemNames.map((name, index) => {
     contingencyPlan: contingencyPlans[index % contingencyPlans.length],
     leadTime: leadTimes[index % leadTimes.length],
     imageUrl: image?.imageUrl,
-    valorAtivo: (20 - (index % 10)) * 5000 + Math.random() * 1000,
-    dataInicioOperacao: startDate.toISOString(),
-    vidaUtilEstimada: (index % 10) + 5,
-    dataFimGarantia: warrantyEnd.toISOString(),
   }
 });
 
