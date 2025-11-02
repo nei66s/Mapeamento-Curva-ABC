@@ -16,6 +16,7 @@ import {
   Construction,
   Info,
   ClipboardPaste,
+  Handshake,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -57,6 +58,7 @@ const navSections = [
             { href: "/dashboard/suppliers", icon: Users, label: "Fornecedores" },
             { href: "/dashboard/warranty", icon: ShieldCheck, label: "Garantias" },
             { href: "/dashboard/tools", icon: Construction, label: "Almoxarifado" },
+            { href: "/dashboard/settlement", icon: Handshake, label: "Quitação" },
         ]
     }
 ];

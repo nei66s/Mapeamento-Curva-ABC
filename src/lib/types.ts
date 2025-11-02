@@ -1,5 +1,6 @@
 
 
+
 import type { ImpactFactor } from './impact-factors';
 
 export type Classification = 'A' | 'B' | 'C';
@@ -9,6 +10,7 @@ export type ComplianceStatus = 'completed' | 'pending' | 'not-applicable';
 export type RncStatus = 'Aberta' | 'Em Análise' | 'Concluída' | 'Cancelada';
 export type RncClassification = 'Crítica' | 'Moderada' | 'Baixa';
 export type ToolStatus = 'Disponível' | 'Em Uso' | 'Em Manutenção';
+export type SettlementStatus = 'Pendente' | 'Recebida';
 
 
 export type Category = {
@@ -156,4 +158,14 @@ export type Tool = {
   assignedTo?: string; // User ID
   purchaseDate: string; // ISO date string
   lastMaintenance?: string; // ISO date string
+};
+
+export type SettlementLetter = {
+  id: string;
+  supplierId: string;
+  contractId: string;
+  description: string;
+  requestDate: string; // ISO date string
+  receivedDate?: string; // ISO date string
+  status: SettlementStatus;
 };

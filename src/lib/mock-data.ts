@@ -4,7 +4,8 @@
 
 
 
-import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier, WarrantyItem, RNC, RncStatus, RncClassification, Tool } from '@/lib/types';
+
+import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier, WarrantyItem, RNC, RncStatus, RncClassification, Tool, SettlementLetter } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -453,5 +454,33 @@ export const mockTools: Tool[] = [
   { id: 'TOOL-006', name: 'Lixadeira Orbital', category: 'Elétrica', serialNumber: 'LO-11223', status: 'Disponível', purchaseDate: '2023-11-12' },
   { id: 'TOOL-007', name: 'Termômetro Infravermelho', category: 'Medição', serialNumber: 'TI-99887', status: 'Em Uso', assignedTo: 'user-005', purchaseDate: '2023-09-30', lastMaintenance: new Date('2024-05-15').toISOString() },
   { id: 'TOOL-008', name: 'Cinto de Segurança (Talabarte)', category: 'EPI', status: 'Disponível', purchaseDate: '2024-02-18' },
+];
+
+export const mockSettlementLetters: SettlementLetter[] = [
+  {
+    id: 'SET-001',
+    supplierId: 'SUP-004',
+    contractId: 'CT-2023-INFRA-01',
+    description: 'Serviço de reforma da fachada da Loja 04.',
+    requestDate: new Date('2024-06-01').toISOString(),
+    status: 'Recebida',
+    receivedDate: new Date('2024-06-15').toISOString(),
+  },
+  {
+    id: 'SET-002',
+    supplierId: 'SUP-001',
+    contractId: 'CT-2024-REFRIG-05',
+    description: 'Instalação do novo sistema de refrigeração da Loja 05.',
+    requestDate: new Date().toISOString(),
+    status: 'Pendente',
+  },
+  {
+    id: 'SET-003',
+    supplierId: 'SUP-002',
+    contractId: 'CT-2024-ELET-12',
+    description: 'Troca do quadro elétrico principal da Loja 12.',
+    requestDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'Pendente',
+  }
 ];
     

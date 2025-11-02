@@ -17,6 +17,7 @@ import {
   Construction,
   Info,
   ClipboardPaste,
+  Handshake,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -156,6 +157,13 @@ export default function AppHeader() {
                 >
                   <Construction className="h-5 w-5" />
                   Almoxarifado
+                </Link>
+                <Link
+                  href="/dashboard/settlement"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Handshake className="h-5 w-5" />
+                  Quitação
                 </Link>
                </div>
             </div>
