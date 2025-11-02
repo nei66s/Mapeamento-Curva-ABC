@@ -38,7 +38,7 @@ export default function AppHeader() {
         <SheetContent side="left" className="sm:max-w-xs">
           <nav className="grid gap-6 text-lg font-medium">
             <Link
-              href="/dashboard/indicators"
+              href="/dashboard"
               className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
             >
               <BarChart3 className="h-5 w-5 transition-all group-hover:scale-110" />
@@ -48,7 +48,7 @@ export default function AppHeader() {
             <Separator />
             
             <Link
-              href="/dashboard/indicators"
+              href="/dashboard"
               className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
             >
               <LineChart className="h-5 w-5" />
@@ -120,7 +120,7 @@ export default function AppHeader() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard/indicators">Indicadores</Link>
+              <Link href="/dashboard">Indicadores</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>

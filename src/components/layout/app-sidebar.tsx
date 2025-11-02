@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const topLevelLinks = [
-    { href: "/dashboard/indicators", icon: LineChart, label: "Indicadores" },
+    { href: "/dashboard", icon: LineChart, label: "Indicadores" },
 ];
 
 const mappingLinks = [
@@ -32,7 +32,7 @@ export default function AppSidebar() {
     <aside className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-card sm:flex">
       <div className="flex flex-col gap-4 px-4 sm:py-5">
         <Link
-          href="/dashboard/indicators"
+          href="/dashboard"
           className="group flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-lg font-semibold text-primary md:text-base"
         >
           <BarChart3 className="h-5 w-5 text-primary transition-all group-hover:scale-110" />
