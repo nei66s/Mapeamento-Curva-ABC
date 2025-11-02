@@ -25,7 +25,6 @@ const mappingLinks = [
 
 const preventiveLinks = [
     { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Conformidade" },
-    { href: "/dashboard/routing", icon: Route, label: "Roteirização" },
 ];
 
 export default function AppSidebar() {

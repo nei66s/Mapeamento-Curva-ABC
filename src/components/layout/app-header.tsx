@@ -101,13 +101,6 @@ export default function AppHeader() {
                   <ClipboardCheck className="h-5 w-5" />
                   Conformidade
                 </Link>
-                 <Link
-                  href="/dashboard/routing"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                >
-                  <Route className="h-5 w-5" />
-                  Roteirização
-                </Link>
                </div>
             </div>
             
