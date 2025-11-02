@@ -1,6 +1,7 @@
 
 
 
+
 import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier, WarrantyItem, RNC, RncStatus, RncClassification, Tool } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
@@ -445,14 +446,17 @@ export const mockRncs: RNC[] = [
     },
 ];
 
+const sevenMonthsAgo = new Date();
+sevenMonthsAgo.setMonth(sevenMonthsAgo.getMonth() - 7);
+
 export const mockTools: Tool[] = [
-  { id: 'TOOL-001', name: 'Furadeira de Impacto', category: 'Elétrica', serialNumber: 'FI-12345', status: 'Disponível', purchaseDate: '2023-01-10' },
+  { id: 'TOOL-001', name: 'Furadeira de Impacto', category: 'Elétrica', serialNumber: 'FI-12345', status: 'Disponível', purchaseDate: '2023-01-10', lastMaintenance: new Date().toISOString() },
   { id: 'TOOL-002', name: 'Multímetro Digital', category: 'Medição', serialNumber: 'MD-67890', status: 'Em Uso', assignedTo: 'user-002', purchaseDate: '2023-03-15' },
   { id: 'TOOL-003', name: 'Chave de Grifo 18"', category: 'Manual', status: 'Em Manutenção', purchaseDate: '2022-05-20', lastMaintenance: '2024-07-20' },
-  { id: 'TOOL-004', name: 'Alicate Amperímetro', category: 'Medição', serialNumber: 'AA-54321', status: 'Disponível', purchaseDate: '2023-08-01' },
+  { id: 'TOOL-004', name: 'Alicate Amperímetro', category: 'Medição', serialNumber: 'AA-54321', status: 'Disponível', purchaseDate: '2023-08-01', lastMaintenance: sevenMonthsAgo.toISOString() },
   { id: 'TOOL-005', name: 'Capacete de Segurança', category: 'EPI', status: 'Em Uso', assignedTo: 'user-003', purchaseDate: '2024-01-05' },
   { id: 'TOOL-006', name: 'Lixadeira Orbital', category: 'Elétrica', serialNumber: 'LO-11223', status: 'Disponível', purchaseDate: '2023-11-12' },
-  { id: 'TOOL-007', name: 'Termômetro Infravermelho', category: 'Medição', serialNumber: 'TI-99887', status: 'Em Uso', assignedTo: 'user-005', purchaseDate: '2023-09-30' },
+  { id: 'TOOL-007', name: 'Termômetro Infravermelho', category: 'Medição', serialNumber: 'TI-99887', status: 'Em Uso', assignedTo: 'user-005', purchaseDate: '2023-09-30', lastMaintenance: new Date('2024-05-15').toISOString() },
   { id: 'TOOL-008', name: 'Cinto de Segurança (Talabarte)', category: 'EPI', status: 'Disponível', purchaseDate: '2024-02-18' },
 ];
     
