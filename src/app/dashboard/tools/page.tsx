@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PageHeader } from '@/components/shared/page-header';
 import { ToolForm } from '@/components/dashboard/tools/tool-form';
+import { ToolBulkForm } from '@/components/dashboard/tools/tool-bulk-form';
 import { mockTools } from '@/lib/mock-data';
 import { mockUsers } from '@/lib/users';
 import type { Tool, ToolStatus } from '@/lib/types';
@@ -62,7 +63,8 @@ const allStatuses: ToolStatus[] = ['Disponível', 'Em Uso', 'Em Manutenção'];
 export default function ToolsPage() {
   const [tools, setTools] = useState<Tool[]>(mockTools);
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+  const [isBulkFormOpen, setIsBulkFormOpen] = useState(false);
   const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState('');
@@ -81,7 +83,7 @@ export default function ToolsPage() {
   }, [tools, searchTerm, showNeedsReview]);
 
 
-  const handleFormSubmit = (values: Omit<Tool, 'id' | 'status' | 'assignedTo' | 'lastMaintenance'>) => {
+  const handleEditSubmit = (values: Omit<Tool, 'id' | 'status' | 'assignedTo' | 'lastMaintenance'>) => {
     if (selectedTool) {
       const updatedTool = { ...selectedTool, ...values };
       setTools(tools.map(tool => (tool.id === selectedTool.id ? updatedTool : tool)));
@@ -89,30 +91,28 @@ export default function ToolsPage() {
         title: 'Ferramenta Atualizada!',
         description: `A ferramenta "${values.name}" foi atualizada.`,
       });
-    } else {
-      const newTool: Tool = {
-        ...values,
-        id: `TOOL-${Date.now()}`,
-        status: 'Disponível',
-      };
-      setTools([newTool, ...tools]);
-      toast({
-        title: 'Ferramenta Adicionada!',
-        description: `A ferramenta "${values.name}" foi adicionada ao almoxarifado.`,
-      });
     }
-    setIsFormOpen(false);
+    setIsEditFormOpen(false);
     setSelectedTool(null);
   };
+  
+  const handleBulkSubmit = (newTools: Omit<Tool, 'id'|'status'>[]) => {
+      const toolsToAdd: Tool[] = newTools.map(t => ({
+          ...t,
+          id: `TOOL-${Date.now()}-${Math.random()}`,
+          status: 'Disponível',
+      }));
+      setTools(prev => [...toolsToAdd, ...prev]);
+      toast({
+          title: 'Ferramentas Adicionadas!',
+          description: `${toolsToAdd.length} novas ferramentas foram adicionadas ao almoxarifado.`
+      });
+      setIsBulkFormOpen(false);
+  }
 
   const openEditDialog = (tool: Tool) => {
     setSelectedTool(tool);
-    setIsFormOpen(true);
-  };
-
-  const openNewDialog = () => {
-    setSelectedTool(null);
-    setIsFormOpen(true);
+    setIsEditFormOpen(true);
   };
 
   const handleStatusChange = (toolId: string, status: ToolStatus) => {
@@ -165,21 +165,22 @@ export default function ToolsPage() {
         title="Almoxarifado de Ferramentas"
         description="Gerencie o inventário e a alocação de ferramentas para os técnicos."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openNewDialog} className="flex gap-2">
-              <PlusCircle />
-              Adicionar Ferramenta
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle>
-                {selectedTool ? 'Editar Ferramenta' : 'Adicionar Nova Ferramenta'}
-              </DialogTitle>
-            </DialogHeader>
-            <ToolForm tool={selectedTool} onSubmit={handleFormSubmit} onCancel={() => setIsFormOpen(false)} />
-          </DialogContent>
+        <Dialog open={isBulkFormOpen} onOpenChange={setIsBulkFormOpen}>
+            <DialogTrigger asChild>
+                <Button className="flex gap-2">
+                    <PlusCircle />
+                    Adicionar Ferramentas
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>Adicionar Novas Ferramentas</DialogTitle>
+                </DialogHeader>
+                <ToolBulkForm 
+                    onSubmit={handleBulkSubmit}
+                    onCancel={() => setIsBulkFormOpen(false)}
+                />
+            </DialogContent>
         </Dialog>
       </PageHeader>
       <Card>
@@ -310,8 +311,19 @@ export default function ToolsPage() {
           </TooltipProvider>
         </CardContent>
       </Card>
+      
+       <Dialog open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Editar Ferramenta</DialogTitle>
+            </DialogHeader>
+            <ToolForm 
+                tool={selectedTool} 
+                onSubmit={handleEditSubmit} 
+                onCancel={() => setIsEditFormOpen(false)} 
+            />
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }
-
-    
