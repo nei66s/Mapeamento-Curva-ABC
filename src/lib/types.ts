@@ -1,7 +1,4 @@
 
-
-
-
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
@@ -28,6 +25,11 @@ export type Item = {
   contingencyPlan: string;
   leadTime: string;
   imageUrl?: string;
+  // Financial and Lifecycle Data
+  valorAtivo: number;
+  dataInicioOperacao: string; // ISO Date String
+  vidaUtilEstimada: number; // In years
+  dataFimGarantia: string; // ISO Date String
 };
 
 export type Incident = {
@@ -114,5 +116,14 @@ export type MaintenanceIndicator = {
     alta: number;
     muito_alta: number;
   };
+};
+
+export type Supplier = {
+  id: string;
+  name: string;
+  contactName: string;
+  contactEmail: string;
+  cnpj: string;
+  specialty: string;
 };
     

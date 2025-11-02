@@ -1,8 +1,5 @@
 
-
-
-
-import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus } from '@/lib/types';
+import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -106,6 +103,9 @@ export const mockItems: Item[] = itemNames.map((name, index) => {
   const imageId = `item-image-${(index % 5) + 1}`;
   const image = PlaceHolderImages.find(img => img.id === imageId);
   const { impactFactors, classification } = getImpactFactorsAndClassification(name);
+  const startDate = new Date(2020 - (index % 5), index % 12, (index % 28) + 1);
+  const warrantyYears = (index % 3) + 1;
+  const warrantyEnd = new Date(startDate.getFullYear() + warrantyYears, startDate.getMonth(), startDate.getDate());
 
   return {
     id: `ITM-${String(index + 1).padStart(3, '0')}`,
@@ -118,6 +118,10 @@ export const mockItems: Item[] = itemNames.map((name, index) => {
     contingencyPlan: contingencyPlans[index % contingencyPlans.length],
     leadTime: leadTimes[index % leadTimes.length],
     imageUrl: image?.imageUrl,
+    valorAtivo: (20 - (index % 10)) * 5000 + Math.random() * 1000,
+    dataInicioOperacao: startDate.toISOString(),
+    vidaUtilEstimada: (index % 10) + 5,
+    dataFimGarantia: warrantyEnd.toISOString(),
   }
 });
 
@@ -364,8 +368,10 @@ export const mockMaintenanceIndicators: MaintenanceIndicator[] = fullIndicatorDa
     };
 });
 
-    
-
-    
-
+export const mockSuppliers: Supplier[] = [
+    { id: "SUP-001", name: "Refrigeração Polar", contactName: "Carlos Silva", contactEmail: "carlos@polar.com", cnpj: "12.345.678/0001-90", specialty: "Refrigeração" },
+    { id: "SUP-002", name: "Eletro-Tudo Instalações", contactName: "Ana Souza", contactEmail: "ana@eletrotudo.com", cnpj: "98.765.432/0001-10", specialty: "Elétrica" },
+    { id: "SUP-003", name: "Segurança Águia", contactName: "Marcos Lima", contactEmail: "marcos@aguia.com", cnpj: "45.678.123/0001-20", specialty: "Segurança" },
+    { id: "SUP-004", name: "Construtora Alfa", contactName: "Juliana Pereira", contactEmail: "juliana@alfa.com", cnpj: "32.198.765/0001-30", specialty: "Infraestrutura" },
+];
     

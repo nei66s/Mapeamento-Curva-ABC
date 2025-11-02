@@ -11,6 +11,7 @@ import {
   LineChart,
   Wrench,
   Activity,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ const executionLinks = [
 const mappingLinks = [
     { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
     { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
+    { href: "/dashboard/suppliers", icon: Users, label: "Fornecedores" },
 ];
 
 const preventiveLinks = [

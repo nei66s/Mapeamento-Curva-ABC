@@ -12,6 +12,7 @@ import {
   Wrench,
   Grid3x3,
   Activity,
+  Users,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -89,6 +90,13 @@ export default function AppHeader() {
                 >
                   <Grid3x3 className="h-5 w-5" />
                   Matriz de Itens
+                </Link>
+                 <Link
+                  href="/dashboard/suppliers"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Users className="h-5 w-5" />
+                  Fornecedores
                 </Link>
                </div>
             </div>

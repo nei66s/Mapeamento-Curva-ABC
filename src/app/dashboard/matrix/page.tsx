@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -40,7 +41,7 @@ import { ClassificationBadge } from '@/components/shared/risk-badge';
 import { ItemForm } from '@/components/dashboard/matrix/item-form';
 import { mockItems, mockCategories } from '@/lib/mock-data';
 import type { Item } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Landmark, Wrench } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Landmark, Wrench, CalendarDays } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,6 +56,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { impactFactors, ImpactFactor } from '@/lib/impact-factors';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 
 
 const factorIconMap: Record<ImpactFactor['id'], React.ElementType> = {
@@ -144,7 +146,7 @@ export default function MatrixPage() {
               Adicionar Item
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
+          <DialogContent className="sm:max-w-3xl">
             <DialogHeader>
               <DialogTitle>
                 {selectedItem ? 'Editar Item' : 'Adicionar Novo Item'}
@@ -206,7 +208,7 @@ export default function MatrixPage() {
                   <TableRow>
                     <TableHead>Item</TableHead>
                     <TableHead>Classificação</TableHead>
-                    <TableHead>Fatores de Impacto</TableHead>
+                    <TableHead>Fim da Garantia</TableHead>
                     <TableHead className="hidden md:table-cell">Lead Time</TableHead>
                     <TableHead className="hidden md:table-cell">Plano de Contingência</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
@@ -237,25 +239,10 @@ export default function MatrixPage() {
                       <TableCell>
                         <ClassificationBadge classification={item.classification} />
                       </TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-2">
-                          {item.impactFactors.map(factorId => {
-                            const factor = impactFactors.find(f => f.id === factorId);
-                            if (!factor) return null;
-                            const Icon = factorIconMap[factor.id];
-                            return (
-                               <Tooltip key={factor.id}>
-                                <TooltipTrigger asChild>
-                                  <Badge variant="secondary" className="gap-1 px-2 py-1">
-                                    <Icon className="h-3.5 w-3.5" />
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>{factor.label}</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            );
-                          })}
+                       <TableCell>
+                        <div className="flex items-center gap-2">
+                          <CalendarDays />
+                          <span>{format(new Date(item.dataFimGarantia), 'dd/MM/yyyy')}</span>
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{item.leadTime}</TableCell>
