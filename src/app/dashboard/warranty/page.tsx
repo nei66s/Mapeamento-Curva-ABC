@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { PageHeader } from '@/components/shared/page-header';
 import { WarrantyItemForm } from '@/components/dashboard/warranty/warranty-form';
+import { WarrantyBulkForm } from '@/components/dashboard/warranty/warranty-bulk-form';
 import { mockWarrantyItems, mockSuppliers, allStores, mockItems } from '@/lib/mock-data';
 import type { WarrantyItem } from '@/lib/types';
 import { PlusCircle, MoreHorizontal, Pencil, Trash2, CalendarClock } from 'lucide-react';
@@ -56,6 +57,7 @@ export default function WarrantyPage() {
   const [warrantyItems, setWarrantyItems] = useState<WarrantyItem[]>(mockWarrantyItems);
   const [selectedItem, setSelectedItem] = useState<WarrantyItem | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkFormOpen, setIsBulkFormOpen] = useState(false);
   const { toast } = useToast();
 
   const suppliersMap = useMemo(() => new Map(mockSuppliers.map(s => [s.id, s.name])), []);
@@ -70,20 +72,23 @@ export default function WarrantyPage() {
         title: 'Garantia Atualizada!',
         description: `A garantia para "${values.itemName}" foi atualizada.`,
       });
-    } else {
-      const newItem: WarrantyItem = { 
-        ...values, 
-        id: `WAR-${Date.now()}`,
-      };
-      setWarrantyItems([newItem, ...warrantyItems]);
-      toast({
-        title: 'Garantia Adicionada!',
-        description: `A garantia para "${values.itemName}" foi adicionada.`,
-      });
     }
     setIsFormOpen(false);
     setSelectedItem(null);
   };
+  
+  const handleBulkSubmit = (newItems: Omit<WarrantyItem, 'id'>[]) => {
+      const itemsToAdd: WarrantyItem[] = newItems.map(item => ({
+        ...item,
+        id: `WAR-${Date.now()}-${Math.random()}`,
+      }));
+      setWarrantyItems(prev => [...itemsToAdd, ...prev]);
+      toast({
+          title: 'Garantias Adicionadas!',
+          description: `${itemsToAdd.length} novos itens em garantia foram adicionados.`
+      });
+      setIsBulkFormOpen(false);
+  }
 
   const handleDelete = (itemId: string) => {
     const deleted = warrantyItems.find(item => item.id === itemId);
@@ -99,11 +104,6 @@ export default function WarrantyPage() {
 
   const openEditDialog = (item: WarrantyItem) => {
     setSelectedItem(item);
-    setIsFormOpen(true);
-  };
-
-  const openNewDialog = () => {
-    setSelectedItem(null);
     setIsFormOpen(true);
   };
 
@@ -130,26 +130,23 @@ export default function WarrantyPage() {
         title="Gestão de Garantias"
         description="Acompanhe os itens e equipamentos que estão no período de garantia."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog open={isBulkFormOpen} onOpenChange={setIsBulkFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openNewDialog} className="flex gap-2">
+            <Button onClick={() => setIsBulkFormOpen(true)} className="flex gap-2">
               <PlusCircle />
-              Adicionar Item em Garantia
+              Adicionar Garantias
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-              <DialogTitle>
-                {selectedItem ? 'Editar Item em Garantia' : 'Adicionar Novo Item em Garantia'}
-              </DialogTitle>
+              <DialogTitle>Adicionar Itens em Garantia em Massa</DialogTitle>
             </DialogHeader>
-            <WarrantyItemForm
-              item={selectedItem}
+            <WarrantyBulkForm
               suppliers={mockSuppliers}
               stores={allStores}
               catalogItems={mockItems}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setIsFormOpen(false)}
+              onSubmit={handleBulkSubmit}
+              onCancel={() => setIsBulkFormOpen(false)}
             />
           </DialogContent>
         </Dialog>
@@ -234,6 +231,22 @@ export default function WarrantyPage() {
           </Table>
         </CardContent>
       </Card>
+      
+       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Editar Item em Garantia</DialogTitle>
+            </DialogHeader>
+            <WarrantyItemForm
+              item={selectedItem}
+              suppliers={mockSuppliers}
+              stores={allStores}
+              catalogItems={mockItems}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setIsFormOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RncForm } from '@/components/dashboard/rncs/rnc-form';
+import { RncBulkForm } from '@/components/dashboard/rncs/rnc-bulk-form';
 import { mockRncs, mockSuppliers, mockIncidents } from '@/lib/mock-data';
 import type { RNC, RncStatus } from '@/lib/types';
 import { PlusCircle, Clock, MoreVertical, Pencil, FileWarning, Users, AlertTriangle, Workflow, Download } from 'lucide-react';
@@ -41,6 +42,7 @@ const statusVariantMap: Record<RncStatus, 'destructive' | 'accent' | 'success' |
 export default function RncPage() {
   const [rncs, setRncs] = useState<RNC[]>(mockRncs);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkFormOpen, setIsBulkFormOpen] = useState(false);
   const [selectedRnc, setSelectedRnc] = useState<RNC | null>(null);
   const { toast } = useToast();
   const [rncToPrint, setRncToPrint] = useState<RNC | null>(null);
@@ -55,30 +57,28 @@ export default function RncPage() {
         title: 'RNC Atualizada!',
         description: `O registro "${values.title}" foi atualizado.`,
       });
-    } else {
-      const newRnc: RNC = {
-        ...values,
-        id: `RNC-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        status: 'Aberta',
-      };
-      setRncs([newRnc, ...rncs]);
-      toast({
-        title: 'RNC Registrada!',
-        description: `O registro "${values.title}" foi criado com sucesso.`,
-      });
     }
     setIsFormOpen(false);
     setSelectedRnc(null);
   };
+  
+  const handleBulkSubmit = (newRncs: Omit<RNC, 'id' | 'createdAt' | 'status'>[]) => {
+      const rncsToAdd: RNC[] = newRncs.map(rnc => ({
+        ...rnc,
+        id: `RNC-${Date.now()}-${Math.random()}`,
+        createdAt: new Date().toISOString(),
+        status: 'Aberta',
+      }));
+      setRncs(prev => [...rncsToAdd, ...prev]);
+      toast({
+          title: 'RNCs Registradas!',
+          description: `${rncsToAdd.length} novos registros foram adicionados.`
+      });
+      setIsBulkFormOpen(false);
+  };
 
   const openEditDialog = (rnc: RNC) => {
     setSelectedRnc(rnc);
-    setIsFormOpen(true);
-  };
-
-  const openNewDialog = () => {
-    setSelectedRnc(null);
     setIsFormOpen(true);
   };
 
@@ -120,23 +120,22 @@ export default function RncPage() {
         title="Registros de Não Conformidade"
         description="Gerencie e acompanhe descumprimentos e problemas com fornecedores."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog open={isBulkFormOpen} onOpenChange={setIsBulkFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openNewDialog} className="flex gap-2">
+            <Button onClick={() => setIsBulkFormOpen(true)} className="flex gap-2">
               <PlusCircle />
-              Gerar RNC
+              Gerar RNCs em Massa
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-2xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-              <DialogTitle>{selectedRnc ? 'Editar RNC' : 'Registrar Nova RNC'}</DialogTitle>
+              <DialogTitle>Registrar Novas RNCs em Massa</DialogTitle>
             </DialogHeader>
-            <RncForm
-              rnc={selectedRnc}
+            <RncBulkForm
               suppliers={mockSuppliers}
               incidents={mockIncidents}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setIsFormOpen(false)}
+              onSubmit={handleBulkSubmit}
+              onCancel={() => setIsBulkFormOpen(false)}
             />
           </DialogContent>
         </Dialog>
@@ -203,6 +202,21 @@ export default function RncPage() {
           </div>
         </CardContent>
       </Card>
+      
+       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Editar RNC</DialogTitle>
+            </DialogHeader>
+            <RncForm
+              rnc={selectedRnc}
+              suppliers={mockSuppliers}
+              incidents={mockIncidents}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setIsFormOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
       
       {rncToPrint && (
         <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>

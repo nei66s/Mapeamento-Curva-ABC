@@ -39,6 +39,7 @@ import {
 import { PageHeader } from '@/components/shared/page-header';
 import { ClassificationBadge } from '@/components/shared/risk-badge';
 import { ItemForm } from '@/components/dashboard/matrix/item-form';
+import { ItemBulkForm } from '@/components/dashboard/matrix/item-bulk-form';
 import { mockItems, mockCategories } from '@/lib/mock-data';
 import type { Item } from '@/lib/types';
 import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon, ListFilter, X, Shield, ShoppingCart, Scale, Landmark, Wrench } from 'lucide-react';
@@ -71,6 +72,7 @@ export default function MatrixPage() {
   const [items, setItems] = useState<Item[]>(mockItems);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkFormOpen, setIsBulkFormOpen] = useState(false);
   const { toast } = useToast();
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
 
@@ -82,8 +84,8 @@ export default function MatrixPage() {
   }, [items, categoryFilter]);
 
   const handleFormSubmit = (values: Item) => {
+    // This is for single edit, bulk add is separate
     if (selectedItem) {
-      // Edit
       setItems(
         items.map(item => (item.id === selectedItem.id ? values : item))
       );
@@ -91,18 +93,20 @@ export default function MatrixPage() {
         title: 'Item Atualizado!',
         description: `O item "${values.name}" foi atualizado com sucesso.`,
       });
-    } else {
-      // Add
-      const newItem = { ...values, id: `ITM-${Date.now()}` };
-      setItems([newItem, ...items]);
-       toast({
-        title: 'Item Adicionado!',
-        description: `O item "${values.name}" foi adicionado com sucesso.`,
-      });
     }
     setIsFormOpen(false);
     setSelectedItem(null);
   };
+  
+  const handleBulkFormSubmit = (newItems: Item[]) => {
+      setItems(prev => [...newItems, ...prev]);
+       toast({
+        title: 'Itens Adicionados!',
+        description: `${newItems.length} novos itens foram adicionados com sucesso.`,
+      });
+      setIsBulkFormOpen(false);
+  }
+
 
   const handleDeleteItem = (itemId: string) => {
     const deletedItem = items.find(item => item.id === itemId);
@@ -121,10 +125,6 @@ export default function MatrixPage() {
     setIsFormOpen(true);
   };
   
-  const openNewDialog = () => {
-    setSelectedItem(null);
-    setIsFormOpen(true);
-  }
 
   const handleCategoryFilterChange = (category: string) => {
     setCategoryFilter(prev => (prev === category ? null : category));
@@ -138,24 +138,21 @@ export default function MatrixPage() {
         title="Matriz de Itens"
         description="Gerencie todos os itens e suas classificações."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog open={isBulkFormOpen} onOpenChange={setIsBulkFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openNewDialog} className="flex gap-2">
+            <Button onClick={() => setIsBulkFormOpen(true)} className="flex gap-2">
               <PlusCircle />
-              Adicionar Item
+              Adicionar Itens
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-3xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-              <DialogTitle>
-                {selectedItem ? 'Editar Item' : 'Adicionar Novo Item'}
-              </DialogTitle>
+              <DialogTitle>Adicionar Novos Itens em Massa</DialogTitle>
             </DialogHeader>
-            <ItemForm
-              item={selectedItem}
+            <ItemBulkForm
               categories={mockCategories}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setIsFormOpen(false)}
+              onSubmit={handleBulkFormSubmit}
+              onCancel={() => setIsBulkFormOpen(false)}
             />
           </DialogContent>
         </Dialog>
@@ -303,6 +300,20 @@ export default function MatrixPage() {
             </TooltipProvider>
         </CardContent>
       </Card>
+      
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Editar Item</DialogTitle>
+          </DialogHeader>
+          <ItemForm
+            item={selectedItem}
+            categories={mockCategories}
+            onSubmit={handleFormSubmit}
+            onCancel={() => setIsFormOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
