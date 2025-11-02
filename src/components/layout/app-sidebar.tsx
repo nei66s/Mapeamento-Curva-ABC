@@ -1,8 +1,5 @@
-
-
 import Link from "next/link";
 import {
-  BarChart3,
   Grid3x3,
   Settings,
   ListCollapse,
@@ -20,6 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Logo } from "../icons/logo";
 
 const topLevelLinks = [
     { href: "/dashboard/indicators", icon: LineChart, label: "Indicadores" },
@@ -68,8 +66,8 @@ export default function AppSidebar() {
           href="/dashboard"
           className="group flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-lg font-semibold text-primary md:text-base"
         >
-          <BarChart3 className="h-6 w-6 text-primary transition-all group-hover:scale-110" />
-          <span className="font-bold text-xl font-headline">Manutenção</span>
+          <Logo className="h-8 w-8 transition-all group-hover:scale-110" />
+          <span className="font-bold text-xl font-headline">Manutenção PM</span>
         </Link>
       </div>
 

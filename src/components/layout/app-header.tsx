@@ -1,9 +1,7 @@
-
 import Link from "next/link";
 import {
   PanelLeft,
   Settings,
-  BarChart3,
   ListCollapse,
   ClipboardCheck,
   Map,
@@ -28,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/layout/user-nav";
 import { Separator } from "../ui/separator";
+import { Logo } from "../icons/logo";
 
 export default function AppHeader() {
   return (
@@ -45,8 +44,8 @@ export default function AppHeader() {
               href="/dashboard"
               className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
             >
-              <BarChart3 className="h-5 w-5 transition-all group-hover:scale-110" />
-              <span className="sr-only">Manutenção</span>
+              <Logo className="h-6 w-6 text-primary-foreground" />
+              <span className="sr-only">Manutenção PM</span>
             </Link>
             
             <Separator />
@@ -178,5 +177,3 @@ export default function AppHeader() {
     </header>
   );
 }
-
-    

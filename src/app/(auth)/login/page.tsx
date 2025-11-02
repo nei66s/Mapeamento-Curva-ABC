@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -14,10 +13,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BarChart3, KeyRound, Mail } from 'lucide-react';
+import { KeyRound, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { mockUsers } from '@/lib/users';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Logo } from '@/components/icons/logo';
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -83,10 +83,10 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-muted/40">
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center space-y-2">
-          <div className="flex justify-center items-center gap-2">
-            <BarChart3 className="h-8 w-8 text-primary" />
+          <div className="flex justify-center items-center gap-3">
+            <Logo className="h-10 w-10" />
             <CardTitle className="text-3xl font-bold font-headline">
-              Manutenção
+              Manutenção PM
             </CardTitle>
           </div>
           <CardDescription>
