@@ -3,13 +3,11 @@ import Link from "next/link";
 import {
   BarChart3,
   Grid3x3,
-  ShieldAlert,
   Settings,
   ListCollapse,
   ClipboardCheck,
   Map,
   ClipboardList,
-  Route,
   LineChart,
   Wrench,
 } from "lucide-react";
@@ -19,10 +17,13 @@ const topLevelLinks = [
     { href: "/dashboard/indicators", icon: LineChart, label: "Indicadores" },
 ];
 
+const executionLinks = [
+    { href: "/dashboard/incidents", icon: Wrench, label: "Ordens de Serviço" },
+];
+
 const mappingLinks = [
     { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
     { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
-    { href: "/dashboard/incidents", icon: Wrench, label: "Ordens de Serviço" },
 ];
 
 const preventiveLinks = [
@@ -58,6 +59,28 @@ export default function AppSidebar() {
                     </Link>
                 ))}
             </nav>
+
+            <nav className="flex flex-col gap-2 mt-4">
+                <div className="px-3 py-2">
+                    <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">
+                        <Wrench className="h-5 w-5" />
+                        Execução
+                    </h2>
+                </div>
+                {executionLinks.map((link) => (
+                    <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+                    )}
+                    >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                    </Link>
+                ))}
+            </nav>
+
             <nav className="flex flex-col gap-2 mt-4">
                 <div className="px-3 py-2">
                     <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">

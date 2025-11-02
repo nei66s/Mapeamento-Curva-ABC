@@ -2,18 +2,15 @@
 import Link from "next/link";
 import {
   PanelLeft,
-  Search,
-  Grid3x3,
-  ShieldAlert,
   Settings,
   BarChart3,
   ListCollapse,
   ClipboardCheck,
   Map,
   ClipboardList,
-  Route,
   LineChart,
   Wrench,
+  Grid3x3,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -22,7 +19,6 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/layout/user-nav";
 import { Separator } from "../ui/separator";
@@ -59,11 +55,26 @@ export default function AppHeader() {
 
             <div>
               <h2 className="mb-2 flex items-center gap-2 px-2.5 text-lg font-semibold tracking-tight text-primary">
+                <Wrench className="h-5 w-5" />
+                Execução
+              </h2>
+               <div className="grid gap-2">
+                <Link
+                  href="/dashboard/incidents"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Wrench className="h-5 w-5" />
+                  Ordens de Serviço
+                </Link>
+               </div>
+            </div>
+
+            <div>
+              <h2 className="mb-2 flex items-center gap-2 px-2.5 text-lg font-semibold tracking-tight text-primary">
                 <Map className="h-5 w-5" />
                 Mapeamento
               </h2>
                <div className="grid gap-2">
-                 
                 <Link
                   href="/dashboard/categories"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
@@ -77,13 +88,6 @@ export default function AppHeader() {
                 >
                   <Grid3x3 className="h-5 w-5" />
                   Matriz de Itens
-                </Link>
-                <Link
-                  href="/dashboard/incidents"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                >
-                  <Wrench className="h-5 w-5" />
-                  Ordens de Serviço
                 </Link>
                </div>
             </div>
