@@ -6,7 +6,7 @@ import { getIncidentSummary } from '@/ai/flows/incident-summary';
 import type { Incident, Item } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Lightbulb, ListChecks, FileText } from 'lucide-react';
+import { Lightbulb, ListChecks, FileText, ShieldAlert } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
@@ -67,8 +67,9 @@ export function IncidentAnalysis({ incident, items }: IncidentAnalysisProps) {
 
   const renderSkeleton = () => (
     <div className="space-y-4">
-      <Skeleton className="h-24 w-full" />
-      <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-32 w-full" />
     </div>
   );
 
@@ -99,11 +100,23 @@ export function IncidentAnalysis({ incident, items }: IncidentAnalysisProps) {
             </div>
           )}
 
+          {item?.contingencyPlan && (
+             <div>
+              <h4 className="flex items-center gap-2 font-semibold mb-2">
+                <ShieldAlert className="h-5 w-5 text-amber-600" />
+                Plano de Contingência Padrão
+              </h4>
+               <Alert variant="destructive">
+                    <AlertDescription>{item.contingencyPlan}</AlertDescription>
+                </Alert>
+            </div>
+          )}
+
           {suggestedPlans && (
             <div>
               <h4 className="flex items-center gap-2 font-semibold mb-2">
                 <ListChecks className="h-5 w-5 text-primary" />
-                Planos de Contingência Sugeridos
+                Sugestões Adicionais da IA
               </h4>
               <div className="space-y-2">
                 {suggestedPlans.map((plan, index) => (
