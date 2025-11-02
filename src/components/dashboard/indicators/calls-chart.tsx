@@ -18,11 +18,11 @@ interface CallsChartProps {
 
 const chartConfig = {
   abertos: {
-    label: "Abertas",
+    label: "Abertos",
     color: "hsl(var(--accent))",
   },
   solucionados: {
-    label: "Solucionadas",
+    label: "Solucionados",
     color: "hsl(var(--chart-2))",
   },
   backlog: {
@@ -48,8 +48,8 @@ export function CallsChart({ data }: CallsChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Fluxo de Ordens de Serviço e Backlog</CardTitle>
-        <CardDescription>Entrada (Abertas) vs. Saída (Solucionadas) e a linha de tendência do backlog.</CardDescription>
+        <CardTitle>Fluxo de Incidentes e Backlog</CardTitle>
+        <CardDescription>Entrada (Abertos) vs. Saída (Solucionados) e a linha de tendência do backlog.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
@@ -91,7 +91,7 @@ export function CallsChart({ data }: CallsChartProps) {
                     }
                 />
                 <Legend />
-                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name="Abertas" stackId="a">
+                <Bar dataKey="abertos" fill={chartConfig.abertos.color} radius={[4, 4, 0, 0]} name="Abertos" stackId="a">
                     <LabelList 
                         dataKey="abertos" 
                         position="top"
@@ -100,7 +100,7 @@ export function CallsChart({ data }: CallsChartProps) {
                         className="fill-foreground font-medium text-xs"
                     />
                 </Bar>
-                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[0, 0, 4, 4]} name="Solucionadas" stackId="a">
+                <Bar dataKey="solucionados" fill={chartConfig.solucionados.color} radius={[0, 0, 4, 4]} name="Solucionados" stackId="a">
                      <LabelList 
                         dataKey="solucionados" 
                         position="top"

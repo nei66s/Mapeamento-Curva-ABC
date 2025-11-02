@@ -41,9 +41,9 @@ export function EditableCallsTable({ data, setData }: EditableCallsTableProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Fluxo de O.S. e Backlog</CardTitle>
+        <CardTitle>Fluxo de Incidentes e Backlog</CardTitle>
         <CardDescription>
-          Preencha os valores de O.S. abertas, solucionadas e o backlog.
+          Preencha os valores de incidentes abertos, solucionados e o backlog.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -52,8 +52,8 @@ export function EditableCallsTable({ data, setData }: EditableCallsTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Mês</TableHead>
-                <TableHead>Abertas</TableHead>
-                <TableHead>Solucionadas</TableHead>
+                <TableHead>Abertos</TableHead>
+                <TableHead>Solucionados</TableHead>
                 <TableHead>Backlog</TableHead>
               </TableRow>
             </TableHeader>

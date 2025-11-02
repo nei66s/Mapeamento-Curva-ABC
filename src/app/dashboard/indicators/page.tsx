@@ -188,13 +188,13 @@ export default function IndicatorsPage() {
                  <KpiCard
                     title="Backlog"
                     value={selectedData.backlog}
-                    description="O.S. pendentes"
+                    description="Incidentes pendentes"
                     icon={TrendingUp}
                 />
                 <KpiCard
-                    title="O.S. Solucionadas"
+                    title="Incidentes Solucionados"
                     value={selectedData.chamados_solucionados}
-                    description={`${selectedData.chamados_abertos} abertas no mês`}
+                    description={`${selectedData.chamados_abertos} abertos no mês`}
                     icon={selectedData.chamados_solucionados > selectedData.chamados_abertos ? ArrowUp : ArrowDown}
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
                 />
