@@ -1,6 +1,6 @@
 
 
-import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier, WarrantyItem } from '@/lib/types';
+import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier, WarrantyItem, RNC, RncStatus, RncClassification } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -409,6 +409,38 @@ export const mockWarrantyItems: WarrantyItem[] = [
         warrantyEndDate: new Date('2025-01-10').toISOString(),
         supplierId: 'SUP-003',
         notes: 'Garantia curta, apenas 6 meses.'
+    },
+];
+
+export const mockRncs: RNC[] = [
+    {
+        id: 'RNC-001',
+        title: 'Atraso na entrega de peças',
+        supplierId: 'SUP-001',
+        incidentId: 'INC-001',
+        description: 'O fornecedor Refrigeração Polar atrasou em 3 dias a entrega das peças para o reparo do rack de compressores na Loja 01, descumprindo o SLA de 48h.',
+        status: 'Aberta',
+        classification: 'Moderada',
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    {
+        id: 'RNC-002',
+        title: 'Serviço de baixa qualidade',
+        supplierId: 'SUP-002',
+        incidentId: 'INC-003',
+        description: 'O técnico da Eletro-Tudo não identificou a causa raiz do desarme no QGBT da Loja 03 na primeira visita, necessitando um segundo chamado no dia seguinte.',
+        status: 'Em Análise',
+        classification: 'Crítica',
+        createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+     {
+        id: 'RNC-003',
+        title: 'Técnico sem EPI adequado',
+        supplierId: 'SUP-004',
+        description: 'O técnico da Construtora Alfa compareceu à Loja 04 para o reparo do elevador sem o capacete de segurança obrigatório.',
+        status: 'Concluída',
+        classification: 'Crítica',
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
     },
 ];
     

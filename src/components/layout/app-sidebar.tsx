@@ -15,6 +15,7 @@ import {
   Users,
   ShieldCheck,
   Archive,
+  FileWarning,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ const topLevelLinks = [
 
 const executionLinks = [
     { href: "/dashboard/incidents", icon: Activity, label: "Incidentes" },
+    { href: "/dashboard/rncs", icon: FileWarning, label: "RNCs" },
 ];
 
 const mappingLinks = [

@@ -134,4 +134,18 @@ export type WarrantyItem = {
   supplierId: string;
   notes?: string;
 };
+
+export type RncStatus = 'Aberta' | 'Em Análise' | 'Concluída' | 'Cancelada';
+export type RncClassification = 'Crítica' | 'Moderada' | 'Baixa';
+
+export type RNC = {
+    id: string;
+    title: string;
+    supplierId: string;
+    incidentId?: string;
+    description: string;
+    status: RncStatus;
+    classification: RncClassification;
+    createdAt: string; // ISO date string
+};
     
