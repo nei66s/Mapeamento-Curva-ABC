@@ -1,8 +1,9 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { suggestContingencyPlans } from '@/ai/flows/suggest-contingency-plans';
 import { getIncidentSummary } from '@/ai/flows/incident-summary';
-import type { Incident, Item } from '@/lib/types';
+import type { WorkOrder, Item } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Lightbulb, ListChecks, FileText } from 'lucide-react';
@@ -10,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 interface IncidentAnalysisProps {
-  incident: Incident;
+  incident: WorkOrder;
   items: Item[];
 }
 
@@ -25,7 +26,7 @@ export function IncidentAnalysis({ incident, items }: IncidentAnalysisProps) {
   useEffect(() => {
     const fetchAnalysis = async () => {
       if (!item) {
-        setError('Item relacionado ao incidente não encontrado.');
+        setError('Item relacionado à O.S. não encontrado.');
         setLoading(false);
         return;
       }

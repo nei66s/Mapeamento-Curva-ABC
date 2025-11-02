@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -183,13 +184,13 @@ export default function IndicatorsPage() {
                  <KpiCard
                     title="Backlog"
                     value={selectedData.backlog}
-                    description="Chamados pendentes"
+                    description="O.S. pendentes"
                     icon={TrendingUp}
                 />
                 <KpiCard
-                    title="Chamados Solucionados"
+                    title="O.S. Solucionadas"
                     value={selectedData.chamados_solucionados}
-                    description={`${selectedData.chamados_abertos} abertos no mês`}
+                    description={`${selectedData.chamados_abertos} abertas no mês`}
                     icon={selectedData.chamados_solucionados > selectedData.chamados_abertos ? ArrowUp : ArrowDown}
                     iconColor={selectedData.chamados_solucionados > selectedData.chamados_abertos ? 'text-green-500' : 'text-red-500'}
                 />

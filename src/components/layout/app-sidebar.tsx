@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import {
   BarChart3,
@@ -10,6 +11,7 @@ import {
   ClipboardList,
   Route,
   LineChart,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +22,7 @@ const topLevelLinks = [
 const mappingLinks = [
     { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
     { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
-    { href: "/dashboard/incidents", icon: ShieldAlert, label: "Incidentes" },
+    { href: "/dashboard/incidents", icon: Wrench, label: "Ordens de Serviço" },
 ];
 
 const preventiveLinks = [

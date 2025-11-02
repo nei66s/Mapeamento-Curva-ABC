@@ -1,7 +1,8 @@
 
 
+
 export type Classification = 'A' | 'B' | 'C';
-export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
+export type WorkOrderStatus = 'Aberta' | 'Em Andamento' | 'Aguardando Peças' | 'Agendada' | 'Concluída' | 'Validada';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
 import type { ImpactFactor } from './impact-factors';
 
@@ -28,11 +29,11 @@ export type Item = {
   imageUrl?: string;
 };
 
-export type Incident = {
+export type WorkOrder = {
   id: string;
   itemName: string;
   location: string;
-  status: IncidentStatus;
+  status: WorkOrderStatus;
   openedAt: string; // ISO date string
   description: string;
   lat?: number;
