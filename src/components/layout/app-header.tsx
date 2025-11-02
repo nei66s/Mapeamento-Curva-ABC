@@ -48,7 +48,7 @@ export default function AppHeader() {
             <Separator />
             
             <Link
-              href="/dashboard"
+              href="/dashboard/indicators"
               className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
             >
               <LineChart className="h-5 w-5" />
@@ -120,7 +120,7 @@ export default function AppHeader() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/dashboard">Indicadores</Link>
+              <Link href="/dashboard">Dashboard</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>

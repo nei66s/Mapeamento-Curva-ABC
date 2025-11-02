@@ -14,7 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const topLevelLinks = [
-    { href: "/dashboard", icon: LineChart, label: "Indicadores" },
+    { href: "/dashboard/indicators", icon: LineChart, label: "Indicadores" },
 ];
 
 const mappingLinks = [
