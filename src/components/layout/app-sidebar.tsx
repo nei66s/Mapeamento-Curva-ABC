@@ -30,7 +30,7 @@ const navSections = [
         icon: Wrench,
         links: [
             { href: "/dashboard/incidents", icon: Activity, label: "Incidentes" },
-            { href: "/dashboard/rncs", icon: FileWarning, label: "RNCs" },
+            { href: "/dashboard/rncs", icon: FileWarning, label: "Registros de Não Conformidade" },
         ]
     },
     {
@@ -68,7 +68,7 @@ export default function AppSidebar() {
           className="group flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-lg font-semibold text-primary md:text-base"
         >
           <LogoImage className="h-8 w-8 transition-all group-hover:scale-110" />
-          <span className="font-bold text-xl font-headline">Manutenção PM</span>
+          <span className="font-bold text-xl font-headline">Manutenção Pague Menos</span>
         </Link>
       </div>
 

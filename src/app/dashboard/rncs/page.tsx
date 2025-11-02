@@ -81,7 +81,7 @@ export default function RncPage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title="Registros de Não Conformidade (RNCs)"
+        title="Registros de Não Conformidade"
         description="Gerencie e acompanhe descumprimentos e problemas com fornecedores."
       >
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
@@ -108,7 +108,7 @@ export default function RncPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lista de RNCs</CardTitle>
+          <CardTitle>Lista de Registros de Não Conformidade</CardTitle>
           <CardDescription>{rncs.length} registros encontrados.</CardDescription>
         </CardHeader>
         <CardContent>

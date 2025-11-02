@@ -86,7 +86,7 @@ export default function LoginPage() {
           <div className="flex justify-center items-center gap-3">
             <LogoImage className="h-10 w-10" />
             <CardTitle className="text-3xl font-bold font-headline">
-              Manutenção PM
+              Manutenção Pague Menos
             </CardTitle>
           </div>
           <CardDescription>

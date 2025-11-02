@@ -28,6 +28,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/layout/user-nav";
 import { Separator } from "../ui/separator";
 import { LogoImage } from "../icons/logo-image";
+import { ThemeToggle } from "./theme-toggle";
 
 export default function AppHeader() {
   return (
@@ -46,7 +47,7 @@ export default function AppHeader() {
               className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
             >
               <LogoImage className="h-8 w-8" />
-              <span className="sr-only">Manutenção PM</span>
+              <span className="sr-only">Manutenção Pague Menos</span>
             </Link>
             
             <Separator />
@@ -77,7 +78,7 @@ export default function AppHeader() {
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 >
                   <FileWarning className="h-5 w-5" />
-                  RNCs
+                  Registros de Não Conformidade
                 </Link>
                </div>
             </div>
@@ -179,9 +180,10 @@ export default function AppHeader() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="relative ml-auto flex-1 md:grow-0">
+      <div className="relative ml-auto flex items-center gap-2">
+        <ThemeToggle />
+        <UserNav />
       </div>
-      <UserNav />
     </header>
   );
 }
