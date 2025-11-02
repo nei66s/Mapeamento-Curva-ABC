@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { UserNav } from "@/components/layout/user-nav";
 import { Separator } from "../ui/separator";
-import { Logo } from "../icons/logo";
+import { LogoImage } from "../icons/logo-image";
 
 export default function AppHeader() {
   return (
@@ -44,7 +44,7 @@ export default function AppHeader() {
               href="/dashboard"
               className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
             >
-              <Logo className="h-6 w-6 text-primary-foreground" />
+              <LogoImage className="h-8 w-8" />
               <span className="sr-only">Manutenção PM</span>
             </Link>
             

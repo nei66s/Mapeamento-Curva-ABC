@@ -17,7 +17,7 @@ import { KeyRound, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { mockUsers } from '@/lib/users';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Logo } from '@/components/icons/logo';
+import { LogoImage } from '@/components/icons/logo-image';
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -84,7 +84,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center items-center gap-3">
-            <Logo className="h-10 w-10" />
+            <LogoImage className="h-10 w-10" />
             <CardTitle className="text-3xl font-bold font-headline">
               Manutenção PM
             </CardTitle>
