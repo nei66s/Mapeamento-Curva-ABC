@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon, PlusCircle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ToolBulkFormProps {
   onSubmit: (data: Omit<Tool, 'id' | 'status'>[]) => void;
@@ -68,104 +69,106 @@ export function ToolBulkForm({ onSubmit, onCancel }: ToolBulkFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 py-4 max-h-[70vh]">
-        <div className='overflow-y-auto pr-4 space-y-6'>
-            {fields.map((field, index) => (
-            <div key={field.id} className="p-4 border rounded-lg relative space-y-4">
-                <h4 className='font-semibold text-primary'>Ferramenta #{index + 1}</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name={`tools.${index}.name`}
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Nome da Ferramenta</FormLabel>
-                        <FormControl>
-                        <Input placeholder="Ex: Furadeira de Impacto" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name={`tools.${index}.category`}
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Categoria</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                            <SelectTrigger>
-                            <SelectValue placeholder="Selecione a categoria" />
-                            </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                            <SelectItem value="Manual">Manual</SelectItem>
-                            <SelectItem value="Elétrica">Elétrica</SelectItem>
-                            <SelectItem value="Medição">Medição</SelectItem>
-                            <SelectItem value="EPI">EPI</SelectItem>
-                        </SelectContent>
-                        </Select>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                </div>
-
-                <FormField
-                    control={form.control}
-                    name={`tools.${index}.serialNumber`}
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Número de Série (Opcional)</FormLabel>
-                        <FormControl>
-                        <Input placeholder="Ex: ABC-12345-XYZ" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                
-                <FormField
-                    control={form.control}
-                    name={`tools.${index}.purchaseDate`}
-                    render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                        <FormLabel>Data da Compra</FormLabel>
-                        <Popover>
-                        <PopoverTrigger asChild>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col h-full max-h-[80vh]">
+        <ScrollArea className="flex-grow pr-6 -mr-6">
+            <div className='space-y-6 py-4'>
+                {fields.map((field, index) => (
+                <div key={field.id} className="p-4 border rounded-lg relative space-y-4">
+                    <h4 className='font-semibold text-primary'>Ferramenta #{index + 1}</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name={`tools.${index}.name`}
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Nome da Ferramenta</FormLabel>
                             <FormControl>
-                            <Button variant="outline" className={cn('pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
-                                {field.value ? format(field.value, 'PPP', { locale: ptBR }) : <span>Escolha uma data</span>}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
+                            <Input placeholder="Ex: Furadeira de Impacto" {...field} />
                             </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus locale={ptBR} />
-                        </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name={`tools.${index}.category`}
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Categoria</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                <SelectValue placeholder="Selecione a categoria" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                <SelectItem value="Manual">Manual</SelectItem>
+                                <SelectItem value="Elétrica">Elétrica</SelectItem>
+                                <SelectItem value="Medição">Medição</SelectItem>
+                                <SelectItem value="EPI">EPI</SelectItem>
+                            </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    </div>
 
-                {fields.length > 1 && (
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-2 right-2 text-destructive"
-                        onClick={() => remove(index)}
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
-                )}
+                    <FormField
+                        control={form.control}
+                        name={`tools.${index}.serialNumber`}
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Número de Série (Opcional)</FormLabel>
+                            <FormControl>
+                            <Input placeholder="Ex: ABC-12345-XYZ" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    
+                    <FormField
+                        control={form.control}
+                        name={`tools.${index}.purchaseDate`}
+                        render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                            <FormLabel>Data da Compra</FormLabel>
+                            <Popover>
+                            <PopoverTrigger asChild>
+                                <FormControl>
+                                <Button variant="outline" className={cn('pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}>
+                                    {field.value ? format(field.value, 'PPP', { locale: ptBR }) : <span>Escolha uma data</span>}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                                </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus locale={ptBR} />
+                            </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+
+                    {fields.length > 1 && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-2 right-2 text-destructive"
+                            onClick={() => remove(index)}
+                        >
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
+                ))}
             </div>
-            ))}
-        </div>
+        </ScrollArea>
         
-        <div className="flex justify-between items-center pt-4 border-t">
+        <div className="flex justify-between items-center pt-4 border-t mt-4 flex-shrink-0">
             <Button
                 type="button"
                 variant="outline"
