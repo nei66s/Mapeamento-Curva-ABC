@@ -32,7 +32,6 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { PageHeader } from '@/components/shared/page-header';
@@ -40,12 +39,15 @@ import { ToolForm } from '@/components/dashboard/tools/tool-form';
 import { mockTools } from '@/lib/mock-data';
 import { mockUsers } from '@/lib/users';
 import type { Tool, ToolStatus } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Wrench, User, CircleOff, AlertCircle, CalendarCheck2 } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Wrench, User, CircleOff, AlertCircle, CalendarCheck2, Search, Filter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 
 const statusVariantMap: Record<ToolStatus, 'success' | 'accent' | 'destructive'> = {
@@ -61,8 +63,22 @@ export default function ToolsPage() {
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const { toast } = useToast();
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showNeedsReview, setShowNeedsReview] = useState(false);
 
   const usersMap = useMemo(() => new Map(mockUsers.map(u => [u.id, u.name])), []);
+
+  const filteredTools = useMemo(() => {
+    return tools.filter(tool => {
+        const searchMatch = tool.name.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const reviewMatch = !showNeedsReview || (tool.lastMaintenance ? differenceInDays(new Date(), parseISO(tool.lastMaintenance)) > 180 : true);
+
+        return searchMatch && reviewMatch;
+    });
+  }, [tools, searchTerm, showNeedsReview]);
+
 
   const handleFormSubmit = (values: Omit<Tool, 'id' | 'status' | 'assignedTo' | 'lastMaintenance'>) => {
     if (selectedTool) {
@@ -167,10 +183,34 @@ export default function ToolsPage() {
       </PageHeader>
       <Card>
         <CardHeader>
-          <CardTitle>Inventário de Ferramentas</CardTitle>
-          <CardDescription>
-            Lista de todas as ferramentas cadastradas no sistema.
-          </CardDescription>
+           <div className='flex items-center justify-between'>
+            <div>
+              <CardTitle>Inventário de Ferramentas</CardTitle>
+              <CardDescription>
+                {filteredTools.length} de {tools.length} ferramentas exibidas.
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar por nome..."
+                  className="pl-8"
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                />
+              </div>
+               <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-muted-foreground"/>
+                <Switch
+                  id="needs-review-filter"
+                  checked={showNeedsReview}
+                  onCheckedChange={setShowNeedsReview}
+                />
+                <Label htmlFor="needs-review-filter">Revisão Pendente</Label>
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
             <TooltipProvider>
@@ -186,8 +226,8 @@ export default function ToolsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tools.map(tool => {
-                    const needsReview = tool.lastMaintenance ? differenceInDays(new Date(), parseISO(tool.lastMaintenance)) > 180 : false;
+                  {filteredTools.map(tool => {
+                    const needsReview = tool.lastMaintenance ? differenceInDays(new Date(), parseISO(tool.lastMaintenance)) > 180 : true;
                     return (
                         <TableRow key={tool.id}>
                         <TableCell>

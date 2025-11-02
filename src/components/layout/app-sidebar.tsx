@@ -19,29 +19,45 @@ import {
   Construction,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const topLevelLinks = [
     { href: "/dashboard/indicators", icon: LineChart, label: "Indicadores" },
 ];
 
-const executionLinks = [
-    { href: "/dashboard/incidents", icon: Activity, label: "Incidentes" },
-    { href: "/dashboard/rncs", icon: FileWarning, label: "RNCs" },
-];
-
-const mappingLinks = [
-    { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
-    { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
-];
-
-const preventiveLinks = [
-    { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Preventivas" },
-];
-
-const resourceLinks = [
-    { href: "/dashboard/suppliers", icon: Users, label: "Fornecedores" },
-    { href: "/dashboard/warranty", icon: ShieldCheck, label: "Garantias" },
-    { href: "/dashboard/tools", icon: Construction, label: "Almoxarifado" },
+const navSections = [
+    {
+        title: "Execução",
+        icon: Wrench,
+        links: [
+            { href: "/dashboard/incidents", icon: Activity, label: "Incidentes" },
+            { href: "/dashboard/rncs", icon: FileWarning, label: "RNCs" },
+        ]
+    },
+    {
+        title: "Mapeamento",
+        icon: Map,
+        links: [
+            { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
+            { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
+        ]
+    },
+    {
+        title: "Preventivas",
+        icon: ClipboardList,
+        links: [
+            { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Preventivas" },
+        ]
+    },
+    {
+        title: "Recursos",
+        icon: Archive,
+        links: [
+            { href: "/dashboard/suppliers", icon: Users, label: "Fornecedores" },
+            { href: "/dashboard/warranty", icon: ShieldCheck, label: "Garantias" },
+            { href: "/dashboard/tools", icon: Construction, label: "Almoxarifado" },
+        ]
+    }
 ];
 
 export default function AppSidebar() {
@@ -58,104 +74,49 @@ export default function AppSidebar() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-4 px-4">
-             <nav className="flex flex-col gap-2">
-                 {topLevelLinks.map((link) => (
-                    <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted font-medium"
-                    )}
-                    >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
-                    </Link>
-                ))}
-            </nav>
-
-            <nav className="flex flex-col gap-2 mt-4">
-                <div className="px-3 py-2">
-                    <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">
-                        <Wrench className="h-5 w-5" />
-                        Execução
-                    </h2>
-                </div>
-                {executionLinks.map((link) => (
-                    <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-                    )}
-                    >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
-                    </Link>
-                ))}
-            </nav>
-
-            <nav className="flex flex-col gap-2 mt-4">
-                <div className="px-3 py-2">
-                    <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">
-                        <Map className="h-5 w-5" />
-                        Mapeamento
-                    </h2>
-                </div>
-                {mappingLinks.map((link) => (
-                    <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-                    )}
-                    >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
-                    </Link>
-                ))}
-            </nav>
-            <nav className="flex flex-col gap-2 mt-4">
-                <div className="px-3 py-2">
-                    <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">
-                        <ClipboardList className="h-5 w-5" />
-                        Preventivas
-                    </h2>
-                </div>
-                {preventiveLinks.map((link) => (
-                    <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-                    )}
-                    >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
-                    </Link>
-                ))}
-            </nav>
-            <nav className="flex flex-col gap-2 mt-4">
-                <div className="px-3 py-2">
-                    <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">
-                        <Archive className="h-5 w-5" />
-                        Recursos
-                    </h2>
-                </div>
-                {resourceLinks.map((link) => (
-                    <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
-                    )}
-                    >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
-                    </Link>
-                ))}
-            </nav>
-        </div>
+        <nav className="flex flex-col gap-2 px-4">
+            {topLevelLinks.map((link) => (
+            <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted font-medium"
+                )}
+            >
+                <link.icon className="h-5 w-5" />
+                {link.label}
+            </Link>
+            ))}
+        </nav>
+        
+        <Accordion type="multiple" defaultValue={["Execução"]} className="w-full px-4 mt-2">
+           {navSections.map(section => (
+                <AccordionItem value={section.title} key={section.title} className="border-b-0">
+                    <AccordionTrigger className="py-2 hover:no-underline text-primary">
+                         <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
+                            <section.icon className="h-5 w-5" />
+                            {section.title}
+                        </h2>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-1">
+                        <nav className="flex flex-col gap-1 pl-2 border-l-2 border-primary/20">
+                            {section.links.map((link) => (
+                                <Link
+                                key={link.href}
+                                href={link.href}
+                                className={cn(
+                                    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+                                )}
+                                >
+                                <link.icon className="h-5 w-5" />
+                                {link.label}
+                                </Link>
+                            ))}
+                        </nav>
+                    </AccordionContent>
+                </AccordionItem>
+           ))}
+        </Accordion>
       </div>
       
       <nav className="mt-auto flex flex-col items-center gap-4 px-4 sm:py-5">
