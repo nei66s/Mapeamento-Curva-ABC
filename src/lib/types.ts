@@ -1,4 +1,5 @@
 
+
 import type { ImpactFactor } from './impact-factors';
 
 export type Classification = 'A' | 'B' | 'C';
