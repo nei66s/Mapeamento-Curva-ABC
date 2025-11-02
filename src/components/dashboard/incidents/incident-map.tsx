@@ -4,14 +4,14 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { WorkOrder } from '@/lib/types';
+import type { Incident } from '@/lib/types';
 import { allStores } from '@/lib/mock-data';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
 interface IncidentMapProps {
-  incidents: WorkOrder[];
+  incidents: Incident[];
 }
 
 const redIcon = new L.Icon({
@@ -61,7 +61,7 @@ export default function IncidentMap({ incidents }: IncidentMapProps) {
         }).addTo(map);
 
         const incidentsWithCoords = incidents.filter(
-            incident => incident.lat != null && incident.lng != null && (incident.status === 'Aberta' || incident.status === 'Em Andamento' || incident.status === 'Agendada' || incident.status === 'Aguardando Peças')
+            incident => incident.lat != null && incident.lng != null && (incident.status === 'Aberto' || incident.status === 'Em Andamento')
         );
 
         const incidentLocations = new Set(incidentsWithCoords.map(inc => `${inc.lat},${inc.lng}`));

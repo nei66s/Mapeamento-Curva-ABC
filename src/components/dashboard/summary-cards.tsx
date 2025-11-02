@@ -11,7 +11,7 @@ import { mockItems, mockIncidents } from "@/lib/mock-data";
 export function SummaryCards() {
   const totalItems = mockItems.length;
   const criticalItems = mockItems.filter(e => e.classification === 'A').length;
-  const openIncidents = mockIncidents.filter(i => i.status === 'Aberta' || i.status === 'Em Andamento').length;
+  const openIncidents = mockIncidents.filter(i => i.status === 'Aberto' || i.status === 'Em Andamento').length;
 
   const summaryData = [
     {
@@ -27,7 +27,7 @@ export function SummaryCards() {
       color: "text-destructive",
     },
     {
-      title: "O.S. Abertas",
+      title: "Incidentes Abertos",
       value: openIncidents,
       icon: Activity,
       color: "text-accent",

@@ -2,7 +2,7 @@
 'use client';
 import { useState, useCallback } from 'react';
 import { analyzeIncidentsForPareto } from '@/ai/flows/pareto-analysis-flow';
-import type { WorkOrder } from '@/lib/types';
+import type { Incident } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BarChart, Sparkles } from 'lucide-react';
@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { ParetoChart } from './pareto-chart';
 
 interface ParetoAnalysisProps {
-  incidents: WorkOrder[];
+  incidents: Incident[];
 }
 
 type ParetoData = {
@@ -55,7 +55,7 @@ export function ParetoAnalysis({ incidents }: ParetoAnalysisProps) {
     }
     if (analysis) {
        if (analysis.length === 0) {
-         return <p className="text-sm text-muted-foreground mt-4 text-center py-10">Não há dados de O.S. suficientes no mês selecionado para gerar uma análise.</p>
+         return <p className="text-sm text-muted-foreground mt-4 text-center py-10">Não há dados de incidentes suficientes no mês selecionado para gerar uma análise.</p>
        }
       return <ParetoChart data={analysis} />;
     }

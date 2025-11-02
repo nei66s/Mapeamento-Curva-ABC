@@ -23,13 +23,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import type { Item, WorkOrder } from '@/lib/types';
+import type { Item, Incident } from '@/lib/types';
 import { allStores } from '@/lib/mock-data';
 
 interface IncidentFormProps {
   items: Item[];
-  incident?: WorkOrder | null;
-  onSubmit: (data: Omit<WorkOrder, 'id' | 'openedAt' | 'status' | 'lat' | 'lng'>) => void;
+  incident?: Incident | null;
+  onSubmit: (data: Omit<Incident, 'id' | 'openedAt' | 'status' | 'lat' | 'lng'>) => void;
   onCancel: () => void;
 }
 
@@ -130,7 +130,7 @@ export function IncidentForm({ items, incident, onSubmit, onCancel }: IncidentFo
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descrição da O.S.</FormLabel>
+              <FormLabel>Descrição do Incidente</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Descreva em detalhes o que aconteceu, o impacto e qualquer observação relevante."
@@ -148,7 +148,7 @@ export function IncidentForm({ items, incident, onSubmit, onCancel }: IncidentFo
             <Button type="button" variant="outline" onClick={onCancel}>
                 Cancelar
             </Button>
-            <Button type="submit">{incident ? 'Salvar Alterações' : 'Abrir O.S.'}</Button>
+            <Button type="submit">{incident ? 'Salvar Alterações' : 'Registrar Incidente'}</Button>
         </div>
       </form>
     </Form>

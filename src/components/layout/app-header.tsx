@@ -11,6 +11,7 @@ import {
   LineChart,
   Wrench,
   Grid3x3,
+  Activity,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -63,8 +64,8 @@ export default function AppHeader() {
                   href="/dashboard/incidents"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 >
-                  <Wrench className="h-5 w-5" />
-                  Ordens de Serviço
+                  <Activity className="h-5 w-5" />
+                  Incidentes
                 </Link>
                </div>
             </div>

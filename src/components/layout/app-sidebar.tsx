@@ -10,6 +10,7 @@ import {
   ClipboardList,
   LineChart,
   Wrench,
+  Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +19,7 @@ const topLevelLinks = [
 ];
 
 const executionLinks = [
-    { href: "/dashboard/incidents", icon: Wrench, label: "Ordens de Serviço" },
+    { href: "/dashboard/incidents", icon: Activity, label: "Incidentes" },
 ];
 
 const mappingLinks = [
