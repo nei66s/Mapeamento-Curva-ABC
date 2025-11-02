@@ -23,7 +23,7 @@ interface KpiCardProps {
 }
 
 export function KpiCard({ title, value, change, changeType, description, icon: Icon, iconColor, formatAsCurrency = false }: KpiCardProps) {
-  const [displayValue, setDisplayValue] = useState(String(value));
+  const [displayValue, setDisplayValue] = useState<string | null>(null);
 
   useEffect(() => {
     let formattedValue: string;
@@ -46,7 +46,7 @@ export function KpiCard({ title, value, change, changeType, description, icon: I
         <Icon className={cn("h-4 w-4 text-muted-foreground", iconColor)} />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{displayValue}</div>
+        <div className="text-2xl font-bold">{displayValue ?? (typeof value === 'number' ? 'Calculando...' : value)}</div>
         <div className="flex items-center text-xs text-muted-foreground">
           {change !== undefined && changeType && (
             <div className={cn("flex items-center", changeType === 'increase' ? 'text-green-600' : 'text-red-600')}>
