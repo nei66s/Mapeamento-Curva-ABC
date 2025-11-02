@@ -3,7 +3,7 @@ import type { ImpactFactor } from './impact-factors';
 
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
-export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
+export type UserRole = 'admin' | 'gestor' | 'regional' | 'visualizador';
 export type ComplianceStatus = 'completed' | 'pending' | 'not-applicable';
 export type RncStatus = 'Aberta' | 'Em Análise' | 'Concluída' | 'Cancelada';
 export type RncClassification = 'Crítica' | 'Moderada' | 'Baixa';

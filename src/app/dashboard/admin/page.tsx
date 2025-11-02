@@ -24,14 +24,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { User, UserRole } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Shield, PlusCircle, MoreHorizontal, KeyRound, UserPlus } from 'lucide-react';
+import { Shield, PlusCircle, MoreHorizontal, KeyRound, UserPlus, Trash2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   AlertDialog,
@@ -54,9 +54,10 @@ import {
 import { UserForm, UserFormData } from '@/components/dashboard/admin/user-form';
 
 
-const currentUserRole: UserRole = 'admin'; 
+const currentUserRole: UserRole = 'admin';
+const currentUserId = 'user-001';
 
-const roles: UserRole[] = ['admin', 'gestor', 'regional', 'viewer'];
+const roles: UserRole[] = ['admin', 'gestor', 'regional', 'visualizador'];
 
 const modules = [
     { id: 'indicators', label: 'Painel de Indicadores' },
@@ -86,7 +87,7 @@ const initialPermissions: Record<UserRole, Record<string, boolean>> = {
     'categories': false, 'matrix': true, 'compliance': true, 'suppliers': false,
     'warranty': true, 'tools': true, 'profile': true, 'settings': true, 'about': true,
   },
-  viewer: {
+  visualizador: {
     'indicators': true, 'releases': false, 'incidents': false, 'rncs': false,
     'categories': false, 'matrix': false, 'compliance': false, 'suppliers': false,
     'warranty': false, 'tools': false, 'profile': true, 'settings': false, 'about': true,
@@ -140,11 +141,27 @@ export default function AdminPage() {
   };
 
   const handleResetPassword = (userId: string) => {
+    const user = users.find(u => u.id === userId);
+    if (!user) return;
+    
+    // In a real app, this would be an API call
     const newPassword = 'paguemenos';
-    setUsers(users.map(u => (u.id === userId ? { ...u, password: newPassword } : u)));
+    user.password = newPassword;
     toast({
       title: 'Senha Redefinida!',
-      description: `A senha do usuário foi redefinida para "${newPassword}".`,
+      description: `A senha de ${user.name} foi redefinida para "${newPassword}".`,
+    });
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    const userToDelete = users.find(u => u.id === userId);
+    if (!userToDelete) return;
+
+    setUsers(prev => prev.filter(u => u.id !== userId));
+    toast({
+        variant: 'destructive',
+        title: "Usuário Excluído!",
+        description: `O usuário ${userToDelete.name} foi removido do sistema.`
     });
   };
 
@@ -267,7 +284,7 @@ export default function AdminPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {roles.map(role => (
-                             <SelectItem key={role} value={role} className="capitalize">{role}</SelectItem>
+                             <SelectItem key={role} value={role} className="capitalize" disabled={role === 'admin'}>{role}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -275,7 +292,7 @@ export default function AdminPage() {
                    <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" disabled={user.role === 'admin'}>
+                        <Button variant="ghost" size="icon" disabled={user.id === currentUserId}>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -297,6 +314,28 @@ export default function AdminPage() {
                               <AlertDialogCancel>Cancelar</AlertDialogCancel>
                               <AlertDialogAction onClick={() => handleResetPassword(user.id)}>
                                 Redefinir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                        <DropdownMenuSeparator />
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                             <DropdownMenuItem onSelect={e => e.preventDefault()} className="text-destructive focus:text-destructive">
+                                <Trash2 className="mr-2" /> Excluir Usuário
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Excluir Usuário?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta ação não pode ser desfeita. Isso excluirá permanentemente o usuário <span className="font-bold">{user.name}</span> do sistema.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteUser(user.id)} className="bg-destructive hover:bg-destructive/90">
+                                Excluir
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>

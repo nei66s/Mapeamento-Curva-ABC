@@ -33,9 +33,9 @@ export const mockUsers: User[] = [
   {
     id: 'user-004',
     name: 'Daniela Faria',
-    email: 'viewer@example.com',
-    role: 'viewer',
-    password: 'viewer',
+    email: 'visualizador@example.com',
+    role: 'visualizador',
+    password: 'visualizador',
      avatarUrl: 'https://picsum.photos/seed/user4/100/100',
   },
    {

@@ -43,7 +43,7 @@ export function UserForm({ roles, onSubmit, onCancel }: UserFormProps) {
       name: '',
       email: '',
       password: '',
-      role: 'viewer',
+      role: 'visualizador',
     },
   });
 
