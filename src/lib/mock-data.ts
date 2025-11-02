@@ -5,6 +5,7 @@
 
 
 
+
 import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier, WarrantyItem, RNC, RncStatus, RncClassification, Tool, SettlementLetter } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
@@ -465,6 +466,8 @@ export const mockSettlementLetters: SettlementLetter[] = [
     requestDate: new Date('2024-06-01').toISOString(),
     status: 'Recebida',
     receivedDate: new Date('2024-06-15').toISOString(),
+    periodStartDate: new Date('2023-05-01').toISOString(),
+    periodEndDate: new Date('2023-05-31').toISOString(),
   },
   {
     id: 'SET-002',
@@ -473,6 +476,8 @@ export const mockSettlementLetters: SettlementLetter[] = [
     description: 'Instalação do novo sistema de refrigeração da Loja 05.',
     requestDate: new Date().toISOString(),
     status: 'Pendente',
+    periodStartDate: new Date('2024-07-01').toISOString(),
+    periodEndDate: new Date('2024-07-31').toISOString(),
   },
   {
     id: 'SET-003',
@@ -481,6 +486,18 @@ export const mockSettlementLetters: SettlementLetter[] = [
     description: 'Troca do quadro elétrico principal da Loja 12.',
     requestDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
     status: 'Pendente',
+    periodStartDate: new Date('2024-06-01').toISOString(),
+    periodEndDate: new Date('2024-06-30').toISOString(),
+  },
+    {
+    id: 'SET-004',
+    supplierId: 'SUP-001', // Outra para Refrigeração Polar
+    contractId: 'OS-2024-08-112',
+    description: 'Manutenção corretiva no balcão de frios da Loja 02.',
+    requestDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'Pendente',
+    periodStartDate: new Date('2024-08-01').toISOString(),
+    periodEndDate: new Date('2024-08-15').toISOString(),
   }
 ];
     

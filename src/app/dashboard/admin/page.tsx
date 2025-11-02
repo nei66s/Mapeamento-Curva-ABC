@@ -52,12 +52,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { UserForm, UserFormData } from '@/components/dashboard/admin/user-form';
+import { mockSuppliers } from '@/lib/mock-data';
 
 
 const currentUserRole: UserRole = 'admin';
 const currentUserId = 'user-001';
 
-const roles: UserRole[] = ['admin', 'gestor', 'regional', 'visualizador'];
+const roles: UserRole[] = ['admin', 'gestor', 'regional', 'visualizador', 'fornecedor'];
 
 const modules = [
     { id: 'indicators', label: 'Painel de Indicadores' },
@@ -70,6 +71,7 @@ const modules = [
     { id: 'suppliers', label: 'Gestão de Fornecedores' },
     { id: 'warranty', label: 'Controle de Garantias' },
     { id: 'tools', label: 'Almoxarifado de Ferramentas' },
+    { id: 'settlement', label: 'Cartas de Quitação' },
     { id: 'profile', label: 'Meu Perfil' },
     { id: 'settings', label: 'Configurações' },
     { id: 'about', label: 'Sobre a Plataforma' },
@@ -80,18 +82,23 @@ const initialPermissions: Record<UserRole, Record<string, boolean>> = {
   gestor: {
     'indicators': true, 'releases': true, 'incidents': true, 'rncs': true,
     'categories': true, 'matrix': true, 'compliance': true, 'suppliers': true,
-    'warranty': true, 'tools': true, 'profile': true, 'settings': true, 'about': true,
+    'warranty': true, 'tools': true, 'settlement': true, 'profile': true, 'settings': true, 'about': true,
   },
   regional: {
     'indicators': true, 'releases': false, 'incidents': true, 'rncs': true,
     'categories': false, 'matrix': true, 'compliance': true, 'suppliers': false,
-    'warranty': true, 'tools': true, 'profile': true, 'settings': true, 'about': true,
+    'warranty': true, 'tools': true, 'settlement': false, 'profile': true, 'settings': true, 'about': true,
   },
   visualizador: {
     'indicators': true, 'releases': false, 'incidents': false, 'rncs': false,
     'categories': false, 'matrix': false, 'compliance': false, 'suppliers': false,
-    'warranty': false, 'tools': false, 'profile': true, 'settings': false, 'about': true,
-  }
+    'warranty': false, 'tools': false, 'settlement': false, 'profile': true, 'settings': false, 'about': true,
+  },
+  fornecedor: {
+    'indicators': false, 'releases': false, 'incidents': false, 'rncs': false,
+    'categories': false, 'matrix': false, 'compliance': false, 'suppliers': false,
+    'warranty': false, 'tools': false, 'settlement': true, 'profile': true, 'settings': true, 'about': true,
+  },
 };
 
 
@@ -102,7 +109,7 @@ export default function AdminPage() {
   const [isUserFormOpen, setIsUserFormOpen] = useState(false);
 
   const handleRoleChange = (userId: string, newRole: UserRole) => {
-    setUsers(users.map(u => (u.id === userId ? { ...u, role: newRole } : u)));
+    setUsers(users.map(u => (u.id === userId ? { ...u, role: newRole, supplierId: newRole === 'fornecedor' ? u.supplierId : undefined } : u)));
     toast({
       title: 'Perfil Atualizado!',
       description: `O perfil do usuário foi atualizado para ${newRole}.`,
@@ -129,7 +136,11 @@ export default function AdminPage() {
   const handleAddUser = (data: UserFormData) => {
     const newUser: User = {
         id: `user-${Date.now()}`,
-        ...data,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        supplierId: data.role === 'fornecedor' ? data.supplierId : undefined,
         avatarUrl: `https://picsum.photos/seed/user${users.length + 1}/100/100`,
     };
     setUsers(prev => [newUser, ...prev]);
@@ -247,6 +258,7 @@ export default function AdminPage() {
                         </DialogHeader>
                         <UserForm 
                             roles={roles.filter(r => r !== 'admin')}
+                            suppliers={mockSuppliers}
                             onSubmit={handleAddUser}
                             onCancel={() => setIsUserFormOpen(false)}
                         />

@@ -13,6 +13,10 @@ interface SettlementPdfDocumentProps {
 export function SettlementPdfDocument({ letter, supplier }: SettlementPdfDocumentProps) {
   const today = format(new Date(), "'Campinas,' dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   
+  const period = letter.periodStartDate && letter.periodEndDate 
+    ? `referente ao período de ${format(new Date(letter.periodStartDate), 'dd/MM/yyyy')} a ${format(new Date(letter.periodEndDate), 'dd/MM/yyyy')}`
+    : '';
+
   return (
     <div id={`pdf-content-${letter.id}`} className="bg-white text-black p-12 font-serif text-justify" style={{ width: '210mm', minHeight: '297mm' }}>
       <header className="flex items-center justify-between border-b-2 border-gray-800 pb-4 mb-10">
@@ -38,7 +42,7 @@ export function SettlementPdfDocument({ letter, supplier }: SettlementPdfDocumen
         <p className="mb-6 leading-relaxed">
             Pela presente, nós, <span className="font-bold">{supplier?.name || '[NOME DO FORNECEDOR]'}</span>, pessoa jurídica de direito privado, inscrita no CNPJ/MF sob o nº <span className="font-bold">{supplier?.cnpj || '[CNPJ DO FORNECEDOR]'}</span>, com sede em <span className="font-bold">[Endereço do Fornecedor]</span>, declaramos, para todos os fins de direito, que recebemos da 
             <span className="font-bold">EMPREENDIMENTOS PAGUE MENOS S/A</span> o valor total referente à prestação de serviços/fornecimento de materiais, conforme Contrato/Ordem de Serviço nº 
-            <span className="font-bold"> {letter.contractId}</span>, cujo objeto foi <span className="font-bold">"{letter.description}"</span>.
+            <span className="font-bold"> {letter.contractId}</span>, cujo objeto foi <span className="font-bold">"{letter.description}"</span>, {period}.
         </p>
         
         <p className="mb-6 leading-relaxed">

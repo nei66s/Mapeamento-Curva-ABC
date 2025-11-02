@@ -1,11 +1,12 @@
 
 
 
+
 import type { ImpactFactor } from './impact-factors';
 
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
-export type UserRole = 'admin' | 'gestor' | 'regional' | 'visualizador';
+export type UserRole = 'admin' | 'gestor' | 'regional' | 'visualizador' | 'fornecedor';
 export type ComplianceStatus = 'completed' | 'pending' | 'not-applicable';
 export type RncStatus = 'Aberta' | 'Em Análise' | 'Concluída' | 'Cancelada';
 export type RncClassification = 'Crítica' | 'Moderada' | 'Baixa';
@@ -79,6 +80,7 @@ export type User = {
   role: UserRole;
   avatarUrl?: string;
   password?: string;
+  supplierId?: string; // Associated supplier if role is 'fornecedor'
 };
 
 export type AgingCriticidade = {
@@ -168,4 +170,6 @@ export type SettlementLetter = {
   requestDate: string; // ISO date string
   receivedDate?: string; // ISO date string
   status: SettlementStatus;
+  periodStartDate?: string; // ISO date string
+  periodEndDate?: string; // ISO date string
 };

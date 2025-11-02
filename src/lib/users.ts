@@ -46,4 +46,13 @@ export const mockUsers: User[] = [
     password: 'regional',
      avatarUrl: 'https://picsum.photos/seed/user5/100/100',
   },
+  {
+    id: 'user-006',
+    name: 'Refrigeração Polar (Fornecedor)',
+    email: 'fornecedor.polar@example.com',
+    role: 'fornecedor',
+    password: 'fornecedor',
+    supplierId: 'SUP-001', // Associated with Refrigeração Polar
+    avatarUrl: 'https://picsum.photos/seed/supplier1/100/100',
+  }
 ];

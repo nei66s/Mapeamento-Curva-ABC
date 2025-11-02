@@ -21,8 +21,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { SettlementForm } from '@/components/dashboard/settlement/settlement-form';
 import { mockSettlementLetters, mockSuppliers } from '@/lib/mock-data';
-import type { SettlementLetter, SettlementStatus } from '@/lib/types';
-import { PlusCircle, Clock, Check, Download, Handshake } from 'lucide-react';
+import type { SettlementLetter, SettlementStatus, User } from '@/lib/types';
+import { mockUsers } from '@/lib/users';
+import { PlusCircle, Clock, Check, Download, Handshake, UploadCloud } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -36,16 +37,32 @@ const statusVariantMap: Record<SettlementStatus, 'success' | 'accent'> = {
   Pendente: 'accent',
 };
 
+// Mock a logged-in user. In a real app, this would come from an auth context.
+const getCurrentUser = (): User | undefined => {
+    // To test the supplier view, change this to 'user-006'
+    return mockUsers.find(u => u.id === 'user-001'); 
+};
+
+
 export default function SettlementPage() {
   const [letters, setLetters] = useState<SettlementLetter[]>(mockSettlementLetters);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [letterToPrint, setLetterToPrint] = useState<SettlementLetter | null>(null);
   const { toast } = useToast();
+  
+  const currentUser = getCurrentUser();
 
   const suppliersMap = useMemo(() => new Map(mockSuppliers.map(s => [s.id, s.name])), []);
+
+  const visibleLetters = useMemo(() => {
+    if (currentUser?.role === 'fornecedor') {
+      return letters.filter(l => l.supplierId === currentUser.supplierId);
+    }
+    return letters;
+  }, [letters, currentUser]);
   
-  const pendingLetters = useMemo(() => letters.filter(l => l.status === 'Pendente').sort((a,b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime()), [letters]);
-  const receivedLetters = useMemo(() => letters.filter(l => l.status === 'Recebida').sort((a,b) => new Date(b.receivedDate!).getTime() - new Date(a.receivedDate!).getTime()), [letters]);
+  const pendingLetters = useMemo(() => visibleLetters.filter(l => l.status === 'Pendente').sort((a,b) => new Date(b.requestDate).getTime() - new Date(a.requestDate).getTime()), [visibleLetters]);
+  const receivedLetters = useMemo(() => visibleLetters.filter(l => l.status === 'Recebida').sort((a,b) => new Date(b.receivedDate!).getTime() - new Date(a.receivedDate!).getTime()), [visibleLetters]);
 
   const handleFormSubmit = (values: Omit<SettlementLetter, 'id' | 'requestDate' | 'status'>) => {
     const newLetter: SettlementLetter = {
@@ -69,6 +86,17 @@ export default function SettlementPage() {
           description: 'O status da carta de quitação foi atualizado.',
       });
   };
+  
+  const handleFileUploadSimulation = (letterId: string) => {
+      // In a real application, this would open a file dialog and upload the file
+      // to a server or a cloud storage service like Firebase Storage.
+      // Here, we just simulate the successful action.
+      handleMarkAsReceived(letterId);
+       toast({
+          title: 'Arquivo "Enviado"!',
+          description: 'O documento foi marcado como recebido. Em uma aplicação real, o upload seria feito aqui.',
+      });
+  }
 
   const handleDownloadPdf = async (letter: SettlementLetter) => {
     setLetterToPrint(letter);
@@ -121,20 +149,26 @@ export default function SettlementPage() {
             <p className="text-sm text-muted-foreground line-clamp-2">
                 {letter.description}
             </p>
-            <div className='flex flex-wrap items-center justify-between gap-2'>
+             <div className='flex flex-wrap items-center justify-between gap-2'>
                 <Button variant="outline" size="sm" onClick={() => handleDownloadPdf(letter)}>
                     <Download className="mr-2 h-4 w-4" />
                     Imprimir Modelo
                 </Button>
-                {letter.status === 'Pendente' && (
+                {letter.status === 'Pendente' && currentUser?.role === 'admin' && (
                     <Button size="sm" onClick={() => handleMarkAsReceived(letter.id)}>
                         <Check className="mr-2 h-4 w-4" />
                         Marcar como Recebido
                     </Button>
                 )}
+                 {letter.status === 'Pendente' && currentUser?.role === 'fornecedor' && (
+                    <Button size="sm" onClick={() => handleFileUploadSimulation(letter.id)}>
+                        <UploadCloud className="mr-2 h-4 w-4" />
+                        Anexar Quitação Assinada
+                    </Button>
+                )}
             </div>
         </CardContent>
-        <CardFooter className='justify-between text-xs text-muted-foreground'>
+        <CardFooter className='flex-wrap justify-between text-xs text-muted-foreground gap-y-2'>
             <div className="flex items-center">
                 <Clock className="mr-1 h-3 w-3" />
                 <span>Solicitada em: {format(new Date(letter.requestDate), 'dd/MM/yyyy')}</span>
@@ -154,24 +188,26 @@ export default function SettlementPage() {
         title="Cartas de Quitação"
         description="Gerencie e controle o recebimento de cartas de quitação de fornecedores."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setIsFormOpen(true)} className="flex gap-2">
-              <PlusCircle />
-              Registrar Solicitação
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle>Registrar Nova Solicitação de Quitação</DialogTitle>
-            </DialogHeader>
-            <SettlementForm
-              suppliers={mockSuppliers}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setIsFormOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        {currentUser?.role !== 'fornecedor' && (
+            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                <DialogTrigger asChild>
+                    <Button onClick={() => setIsFormOpen(true)} className="flex gap-2">
+                    <PlusCircle />
+                    Registrar Solicitação
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-xl">
+                    <DialogHeader>
+                    <DialogTitle>Registrar Nova Solicitação de Quitação</DialogTitle>
+                    </DialogHeader>
+                    <SettlementForm
+                    suppliers={mockSuppliers}
+                    onSubmit={handleFormSubmit}
+                    onCancel={() => setIsFormOpen(false)}
+                    />
+                </DialogContent>
+            </Dialog>
+        )}
       </PageHeader>
 
         <Tabs defaultValue="pending" className="w-full">
@@ -181,12 +217,12 @@ export default function SettlementPage() {
             </TabsList>
             <TabsContent value="pending">
                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
-                    {pendingLetters.length > 0 ? pendingLetters.map(renderLetterCard) : <p className="text-muted-foreground col-span-3 text-center">Nenhuma carta de quitação pendente.</p>}
+                    {pendingLetters.length > 0 ? pendingLetters.map(renderLetterCard) : <p className="text-muted-foreground col-span-3 text-center py-10">Nenhuma carta de quitação pendente.</p>}
                 </div>
             </TabsContent>
             <TabsContent value="received">
                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
-                     {receivedLetters.length > 0 ? receivedLetters.map(renderLetterCard) : <p className="text-muted-foreground col-span-3 text-center">Nenhuma carta de quitação recebida ainda.</p>}
+                     {receivedLetters.length > 0 ? receivedLetters.map(renderLetterCard) : <p className="text-muted-foreground col-span-3 text-center py-10">Nenhuma carta de quitação recebida ainda.</p>}
                 </div>
             </TabsContent>
         </Tabs>

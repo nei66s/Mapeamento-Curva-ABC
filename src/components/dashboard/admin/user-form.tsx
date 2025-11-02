@@ -19,24 +19,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { UserRole } from '@/lib/types';
+import { Supplier, UserRole } from '@/lib/types';
+import { useState } from 'react';
 
 const formSchema = z.object({
   name: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres.'),
   email: z.string().email('Por favor, insira um e-mail válido.'),
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.'),
   role: z.custom<UserRole>(),
+  supplierId: z.string().optional(),
+}).refine(data => {
+    if (data.role === 'fornecedor') {
+        return !!data.supplierId;
+    }
+    return true;
+}, {
+    message: "É obrigatório associar um fornecedor ao perfil 'fornecedor'.",
+    path: ['supplierId'],
 });
+
 
 export type UserFormData = z.infer<typeof formSchema>;
 
 interface UserFormProps {
   roles: UserRole[];
+  suppliers: Supplier[];
   onSubmit: (data: UserFormData) => void;
   onCancel: () => void;
 }
 
-export function UserForm({ roles, onSubmit, onCancel }: UserFormProps) {
+export function UserForm({ roles, suppliers, onSubmit, onCancel }: UserFormProps) {
   const form = useForm<UserFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,8 +56,11 @@ export function UserForm({ roles, onSubmit, onCancel }: UserFormProps) {
       email: '',
       password: '',
       role: 'visualizador',
+      supplierId: '',
     },
   });
+  
+  const watchedRole = form.watch('role');
 
   return (
     <Form {...form}>
@@ -113,6 +128,35 @@ export function UserForm({ roles, onSubmit, onCancel }: UserFormProps) {
             </FormItem>
           )}
         />
+        
+        {watchedRole === 'fornecedor' && (
+             <FormField
+                control={form.control}
+                name="supplierId"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Fornecedor Associado</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Selecione o fornecedor" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {suppliers.map(supplier => (
+                                    <SelectItem key={supplier.id} value={supplier.id}>
+                                        {supplier.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+        )}
+
+
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar
