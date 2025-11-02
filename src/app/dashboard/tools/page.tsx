@@ -39,7 +39,7 @@ import { ToolForm } from '@/components/dashboard/tools/tool-form';
 import { mockTools } from '@/lib/mock-data';
 import { mockUsers } from '@/lib/users';
 import type { Tool, ToolStatus } from '@/lib/types';
-import { PlusCircle, MoreHorizontal, Pencil, Wrench, User, PlayCircle, CircleOff } from 'lucide-react';
+import { PlusCircle, MoreHorizontal, Pencil, Wrench, User, CircleOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
