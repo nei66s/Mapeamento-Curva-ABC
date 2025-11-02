@@ -1,4 +1,5 @@
 
+
 import Link from "next/link";
 import {
   BarChart3,
@@ -12,6 +13,8 @@ import {
   Wrench,
   Activity,
   Users,
+  ShieldCheck,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,11 +29,15 @@ const executionLinks = [
 const mappingLinks = [
     { href: "/dashboard/categories", icon: ListCollapse, label: "Categorias" },
     { href: "/dashboard/matrix", icon: Grid3x3, label: "Matriz de Itens" },
-    { href: "/dashboard/suppliers", icon: Users, label: "Fornecedores" },
 ];
 
 const preventiveLinks = [
     { href: "/dashboard/compliance", icon: ClipboardCheck, label: "Preventivas" },
+];
+
+const resourceLinks = [
+    { href: "/dashboard/suppliers", icon: Users, label: "Fornecedores" },
+    { href: "/dashboard/warranty", icon: ShieldCheck, label: "Garantias" },
 ];
 
 export default function AppSidebar() {
@@ -124,6 +131,26 @@ export default function AppSidebar() {
                     </Link>
                 ))}
             </nav>
+            <nav className="flex flex-col gap-2 mt-4">
+                <div className="px-3 py-2">
+                    <h2 className="mb-2 text-lg font-semibold tracking-tight flex items-center gap-2 text-primary">
+                        <Archive className="h-5 w-5" />
+                        Recursos
+                    </h2>
+                </div>
+                {resourceLinks.map((link) => (
+                    <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+                    )}
+                    >
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                    </Link>
+                ))}
+            </nav>
         </div>
       </div>
       
@@ -141,5 +168,3 @@ export default function AppSidebar() {
     </aside>
   );
 }
-
-    

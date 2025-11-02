@@ -1,5 +1,6 @@
 
-import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier } from '@/lib/types';
+
+import type { Item, Incident, Category, Classification, ComplianceChecklistItem, StoreComplianceData, ComplianceStatus, MaintenanceIndicator, Store, IncidentStatus, Supplier, WarrantyItem } from '@/lib/types';
 import { PlaceHolderImages } from './placeholder-images';
 import type { ImpactFactor } from './impact-factors';
 
@@ -368,5 +369,46 @@ export const mockSuppliers: Supplier[] = [
     { id: "SUP-002", name: "Eletro-Tudo Instalações", contactName: "Ana Souza", contactEmail: "ana@eletrotudo.com", cnpj: "98.765.432/0001-10", specialty: "Elétrica" },
     { id: "SUP-003", name: "Segurança Águia", contactName: "Marcos Lima", contactEmail: "marcos@aguia.com", cnpj: "45.678.123/0001-20", specialty: "Segurança" },
     { id: "SUP-004", name: "Construtora Alfa", contactName: "Juliana Pereira", contactEmail: "juliana@alfa.com", cnpj: "32.198.765/0001-30", specialty: "Infraestrutura" },
+];
+
+export const mockWarrantyItems: WarrantyItem[] = [
+    {
+        id: 'WAR-001',
+        itemName: 'Gerador principal',
+        storeLocation: 'Loja 01 - Americana',
+        serialNumber: 'GEN-XYZ-12345',
+        purchaseDate: new Date('2023-01-15').toISOString(),
+        warrantyEndDate: new Date('2026-01-14').toISOString(),
+        supplierId: 'SUP-002',
+        notes: 'Garantia estendida de 3 anos para o motor.'
+    },
+    {
+        id: 'WAR-002',
+        itemName: 'Rack de compressores / unidade condensadora',
+        storeLocation: 'Loja 05 - Piracicaba',
+        serialNumber: 'COMP-ABC-67890',
+        purchaseDate: new Date('2024-03-20').toISOString(),
+        warrantyEndDate: new Date('2025-03-19').toISOString(),
+        supplierId: 'SUP-001',
+    },
+     {
+        id: 'WAR-003',
+        itemName: 'Elevador / monta-carga',
+        storeLocation: 'Loja 04 - Campinas',
+        serialNumber: 'ELEV-QRS-54321',
+        purchaseDate: new Date('2022-11-01').toISOString(),
+        warrantyEndDate: new Date('2024-10-31').toISOString(),
+        supplierId: 'SUP-004',
+        notes: 'Garantia quase expirando, verificar plano de renovação ou substituição.'
+    },
+    {
+        id: 'WAR-004',
+        itemName: 'Forno turbo / esteira',
+        storeLocation: 'Loja 09 - Limeira',
+        purchaseDate: new Date('2024-07-10').toISOString(),
+        warrantyEndDate: new Date('2025-01-10').toISOString(),
+        supplierId: 'SUP-003',
+        notes: 'Garantia curta, apenas 6 meses.'
+    },
 ];
     

@@ -1,4 +1,5 @@
 
+
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
@@ -121,5 +122,16 @@ export type Supplier = {
   contactEmail: string;
   cnpj: string;
   specialty: string;
+};
+
+export type WarrantyItem = {
+  id: string;
+  itemName: string;
+  storeLocation: string;
+  serialNumber?: string;
+  purchaseDate: string; // ISO date string
+  warrantyEndDate: string; // ISO date string
+  supplierId: string;
+  notes?: string;
 };
     

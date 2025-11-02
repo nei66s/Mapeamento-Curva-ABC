@@ -13,6 +13,8 @@ import {
   Grid3x3,
   Activity,
   Users,
+  ShieldCheck,
+  Archive,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -91,17 +93,8 @@ export default function AppHeader() {
                   <Grid3x3 className="h-5 w-5" />
                   Matriz de Itens
                 </Link>
-                 <Link
-                  href="/dashboard/suppliers"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                >
-                  <Users className="h-5 w-5" />
-                  Fornecedores
-                </Link>
                </div>
             </div>
-
-            <Separator />
             
              <div>
               <h2 className="mb-2 flex items-center gap-2 px-2.5 text-lg font-semibold tracking-tight text-primary">
@@ -115,6 +108,29 @@ export default function AppHeader() {
                 >
                   <ClipboardCheck className="h-5 w-5" />
                   Preventivas
+                </Link>
+               </div>
+            </div>
+            
+            <div>
+              <h2 className="mb-2 flex items-center gap-2 px-2.5 text-lg font-semibold tracking-tight text-primary">
+                <Archive className="h-5 w-5" />
+                Recursos
+              </h2>
+               <div className="grid gap-2">
+                 <Link
+                  href="/dashboard/suppliers"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Users className="h-5 w-5" />
+                  Fornecedores
+                </Link>
+                 <Link
+                  href="/dashboard/warranty"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <ShieldCheck className="h-5 w-5" />
+                  Garantias
                 </Link>
                </div>
             </div>
