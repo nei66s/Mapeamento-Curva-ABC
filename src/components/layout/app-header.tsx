@@ -16,6 +16,7 @@ import {
   FileWarning,
   Construction,
   Info,
+  ClipboardPaste,
 } from "lucide-react";
 import {
   Breadcrumb,
@@ -79,6 +80,13 @@ export default function AppHeader() {
                 >
                   <FileWarning className="h-5 w-5" />
                   Registros de Não Conformidade
+                </Link>
+                <Link
+                  href="/dashboard/releases"
+                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <ClipboardPaste className="h-5 w-5" />
+                  Lançamentos
                 </Link>
                </div>
             </div>

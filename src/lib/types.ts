@@ -1,10 +1,13 @@
-
-
+import type { ImpactFactor } from './impact-factors';
 
 export type Classification = 'A' | 'B' | 'C';
 export type IncidentStatus = 'Aberto' | 'Em Andamento' | 'Resolvido' | 'Fechado';
 export type UserRole = 'admin' | 'gestor' | 'regional' | 'viewer';
-import type { ImpactFactor } from './impact-factors';
+export type ComplianceStatus = 'completed' | 'pending' | 'not-applicable';
+export type RncStatus = 'Aberta' | 'Em Análise' | 'Concluída' | 'Cancelada';
+export type RncClassification = 'Crítica' | 'Moderada' | 'Baixa';
+export type ToolStatus = 'Disponível' | 'Em Uso' | 'Em Manutenção';
+
 
 export type Category = {
   id: string;
@@ -54,8 +57,6 @@ export type ComplianceChecklistItem = {
     name: string;
     classification: Classification;
 };
-
-export type ComplianceStatus = 'completed' | 'pending' | 'not-applicable';
 
 export type StoreComplianceData = {
     storeId: string;
@@ -136,9 +137,6 @@ export type WarrantyItem = {
   notes?: string;
 };
 
-export type RncStatus = 'Aberta' | 'Em Análise' | 'Concluída' | 'Cancelada';
-export type RncClassification = 'Crítica' | 'Moderada' | 'Baixa';
-
 export type RNC = {
     id: string;
     title: string;
@@ -150,8 +148,6 @@ export type RNC = {
     createdAt: string; // ISO date string
 };
 
-export type ToolStatus = 'Disponível' | 'Em Uso' | 'Em Manutenção';
-
 export type Tool = {
   id: string;
   name: string;
@@ -162,4 +158,3 @@ export type Tool = {
   purchaseDate: string; // ISO date string
   lastMaintenance?: string; // ISO date string
 };
-    

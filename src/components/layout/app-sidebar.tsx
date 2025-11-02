@@ -15,6 +15,7 @@ import {
   FileWarning,
   Construction,
   Info,
+  ClipboardPaste,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -31,6 +32,7 @@ const navSections = [
         links: [
             { href: "/dashboard/incidents", icon: Activity, label: "Incidentes" },
             { href: "/dashboard/rncs", icon: FileWarning, label: "Registros de Não Conformidade" },
+            { href: "/dashboard/releases", icon: ClipboardPaste, label: "Lançamentos" },
         ]
     },
     {
