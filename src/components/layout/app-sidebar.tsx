@@ -14,6 +14,7 @@ import {
   Archive,
   FileWarning,
   Construction,
+  Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -117,7 +118,7 @@ export default function AppSidebar() {
         </Accordion>
       </div>
       
-      <nav className="mt-auto flex flex-col items-center gap-4 px-4 sm:py-5">
+      <nav className="mt-auto flex flex-col items-center gap-2 px-4 sm:py-5">
          <Link
             href="/dashboard/admin"
             className={cn(
@@ -126,6 +127,15 @@ export default function AppSidebar() {
             >
             <Settings className="h-5 w-5" />
             Administração
+        </Link>
+         <Link
+            href="/dashboard/about"
+            className={cn(
+                "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-muted"
+            )}
+            >
+            <Info className="h-5 w-5" />
+            Sobre
         </Link>
       </nav>
     </aside>
