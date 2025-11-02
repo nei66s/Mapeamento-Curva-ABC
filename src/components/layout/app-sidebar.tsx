@@ -66,10 +66,10 @@ export default function AppSidebar() {
       <div className="flex flex-col gap-4 px-4 sm:py-5">
         <Link
           href="/dashboard"
-          className="group flex h-9 shrink-0 items-center gap-2 rounded-full px-3 text-lg font-semibold text-primary md:text-base"
+          className="group flex h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-lg font-semibold text-primary md:text-base"
         >
-          <BarChart3 className="h-5 w-5 text-primary transition-all group-hover:scale-110" />
-          <span className="font-bold text-xl text-primary">Manutenção</span>
+          <BarChart3 className="h-6 w-6 text-primary transition-all group-hover:scale-110" />
+          <span className="font-bold text-xl font-headline">Manutenção</span>
         </Link>
       </div>
 
@@ -89,11 +89,11 @@ export default function AppSidebar() {
             ))}
         </nav>
         
-        <Accordion type="multiple" defaultValue={["Execução"]} className="w-full px-4 mt-2">
+        <Accordion type="multiple" defaultValue={["Execução", "Mapeamento", "Preventivas", "Recursos"]} className="w-full px-4 mt-2">
            {navSections.map(section => (
                 <AccordionItem value={section.title} key={section.title} className="border-b-0">
-                    <AccordionTrigger className="py-2 hover:no-underline text-primary">
-                         <h2 className="text-lg font-semibold tracking-tight flex items-center gap-2">
+                    <AccordionTrigger className="py-2 hover:no-underline text-primary/80 hover:text-primary">
+                         <h2 className="text-base font-semibold tracking-tight flex items-center gap-2">
                             <section.icon className="h-5 w-5" />
                             {section.title}
                         </h2>

@@ -26,7 +26,7 @@ export function ClassificationTable() {
     });
 
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-lg">
       <CardHeader>
         <CardTitle>Ranking de Categorias</CardTitle>
         <CardDescription>
