@@ -1,13 +1,17 @@
 
 import { User, UserRole } from './types';
+import { PlaceHolderImages } from './placeholder-images';
+
+const userAvatar = PlaceHolderImages.find(img => img.id === "user-avatar-1");
 
 export const mockUsers: User[] = [
   {
     id: 'user-00',
-    name: 'Admin',
+    name: 'John Doe',
     email: 'admin@gmail.com',
     role: 'admin',
-    password: 'admin'
+    password: 'admin',
+    avatarUrl: userAvatar?.imageUrl,
   },
   {
     id: 'user-01',
@@ -25,12 +29,12 @@ export const mockUsers: User[] = [
     id: 'user-03',
     name: 'Líder Regional 03',
     email: 'regional3@example.com',
-    role: 'regional',
+    role: 'viewer',
   },
   {
     id: 'user-04',
     name: 'Líder Regional 04',
     email: 'regional4@example.com',
-    role: 'regional',
+    role: 'viewer',
   },
 ];
