@@ -23,36 +23,50 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+// This is a mock implementation. In a real app, you'd fetch the current user.
+// For now, we'll assume the first user is the logged-in user.
+const getCurrentUser = () => mockUsers.find(u => u.role === 'admin');
+
 export default function ProfilePage() {
-  const [user, setUser] = useState(mockUsers[0]);
+  const [user, setUser] = useState(getCurrentUser());
   const { toast } = useToast();
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
+    defaultValues: user ? {
       name: user.name,
       email: user.email,
       avatarUrl: user.avatarUrl || '',
-    },
+    } : {},
   });
 
   const onSubmit = (data: ProfileFormData) => {
-    // In a real app, this would be an API call.
-    // Here, we update the local state and the mock data object for session persistence.
-    const updatedUser = { ...user, ...data };
-    setUser(updatedUser);
-
-    // Update the mock data source
-    const userIndex = mockUsers.findIndex(u => u.id === user.id);
-    if (userIndex !== -1) {
-        mockUsers[userIndex] = updatedUser;
+    if (!user) {
+        toast({ variant: 'destructive', title: 'Erro', description: 'Usuário não encontrado.' });
+        return;
     }
     
-    toast({
-      title: 'Perfil Atualizado!',
-      description: 'Suas informações foram salvas com sucesso.',
-    });
+    // In a real app, this would be an API call.
+    // Here, we update the mock data object for session persistence.
+    const userIndex = mockUsers.findIndex(u => u.id === user.id);
+    
+    if (userIndex !== -1) {
+        const updatedUser = { ...mockUsers[userIndex], ...data };
+        mockUsers[userIndex] = updatedUser; // Persist in the mock "DB"
+        setUser(updatedUser); // Update local state for immediate feedback
+        
+        toast({
+          title: 'Perfil Atualizado!',
+          description: 'Suas informações foram salvas com sucesso. Atualize a página para ver as mudanças refletidas em todo o app.',
+        });
+    } else {
+         toast({ variant: 'destructive', title: 'Erro', description: 'Não foi possível salvar as alterações.' });
+    }
   };
+
+  if (!user) {
+    return <div>Usuário não encontrado.</div>
+  }
 
   return (
     <div className="flex flex-col gap-8">

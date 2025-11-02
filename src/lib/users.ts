@@ -7,7 +7,7 @@ const userAvatar = PlaceHolderImages.find(img => img.id === "user-avatar-1");
 export const mockUsers: User[] = [
   {
     id: 'user-00',
-    name: 'John Doe',
+    name: 'Admin User',
     email: 'admin@gmail.com',
     role: 'admin',
     password: 'admin',
