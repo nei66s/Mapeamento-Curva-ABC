@@ -87,7 +87,7 @@ export default function ProfilePage() {
             <CardContent className="space-y-8">
               <div className="flex items-center gap-6">
                   <Avatar className="h-20 w-20">
-                      {form.watch('avatarUrl') && <AvatarImage src={form.watch('avatarUrl')} alt={user.name} />}
+                      {form.watch('avatarUrl') && <AvatarImage src={form.watch('avatarUrl')} alt={user.name} data-ai-hint="person avatar"/>}
                       <AvatarFallback>{form.watch('name').charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="grid gap-1">

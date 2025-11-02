@@ -23,7 +23,7 @@ export function UserNav() {
           className="overflow-hidden rounded-full"
         >
           <Avatar className="h-8 w-8">
-            {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt="User avatar" />}
+            {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt="User avatar" data-ai-hint="person avatar"/>}
             <AvatarFallback>{user ? user.name.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
           </Avatar>
         </Button>
