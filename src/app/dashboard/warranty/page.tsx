@@ -166,8 +166,8 @@ export default function WarrantyPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Item / Local</TableHead>
-                <TableHead>Nº de Série</TableHead>
-                <TableHead>Fornecedor</TableHead>
+                <TableHead className="hidden md:table-cell">Nº de Série</TableHead>
+                <TableHead className="hidden lg:table-cell">Fornecedor</TableHead>
                 <TableHead>Fim da Garantia</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
@@ -180,8 +180,8 @@ export default function WarrantyPage() {
                     <div className="font-medium">{item.itemName}</div>
                     <div className="text-sm text-muted-foreground">{item.storeLocation}</div>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{item.serialNumber || 'N/A'}</TableCell>
-                  <TableCell>{suppliersMap.get(item.supplierId) || 'Desconhecido'}</TableCell>
+                  <TableCell className="hidden md:table-cell font-mono text-xs">{item.serialNumber || 'N/A'}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{suppliersMap.get(item.supplierId) || 'Desconhecido'}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                         <CalendarClock className="h-4 w-4 text-muted-foreground"/>

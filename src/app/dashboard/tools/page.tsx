@@ -165,9 +165,9 @@ export default function ToolsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Ferramenta</TableHead>
-                <TableHead>Nº de Série</TableHead>
+                <TableHead className="hidden sm:table-cell">Nº de Série</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Técnico Responsável</TableHead>
+                <TableHead className="hidden md:table-cell">Técnico Responsável</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -178,11 +178,11 @@ export default function ToolsPage() {
                     <div className="font-medium">{tool.name}</div>
                     <div className="text-sm text-muted-foreground">{tool.category}</div>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{tool.serialNumber || 'N/A'}</TableCell>
+                  <TableCell className="hidden sm:table-cell font-mono text-xs">{tool.serialNumber || 'N/A'}</TableCell>
                   <TableCell>
                     <Badge variant={statusVariantMap[tool.status]}>{tool.status}</Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
                     {tool.assignedTo ? usersMap.get(tool.assignedTo) : 'N/A'}
                   </TableCell>
                   <TableCell className="text-right">

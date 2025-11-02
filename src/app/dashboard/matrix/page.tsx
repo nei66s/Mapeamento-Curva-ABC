@@ -207,9 +207,9 @@ export default function MatrixPage() {
                   <TableRow>
                     <TableHead>Item</TableHead>
                     <TableHead>Classificação</TableHead>
-                    <TableHead>Fatores de Impacto</TableHead>
-                    <TableHead className="hidden md:table-cell">Lead Time</TableHead>
-                    <TableHead className="hidden md:table-cell">Plano de Contingência</TableHead>
+                    <TableHead className="hidden sm:table-cell">Fatores de Impacto</TableHead>
+                    <TableHead className="hidden lg:table-cell">Lead Time</TableHead>
+                    <TableHead className="hidden xl:table-cell">Plano de Contingência</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -238,7 +238,7 @@ export default function MatrixPage() {
                       <TableCell>
                         <ClassificationBadge classification={item.classification} />
                       </TableCell>
-                       <TableCell>
+                       <TableCell className="hidden sm:table-cell">
                         <div className="flex items-center gap-1.5">
                           {item.impactFactors.map(factorId => {
                             const factorInfo = impactFactors.find(f => f.id === factorId);
@@ -257,8 +257,8 @@ export default function MatrixPage() {
                           })}
                         </div>
                       </TableCell>
-                      <TableCell className="hidden md:table-cell">{item.leadTime}</TableCell>
-                      <TableCell className="hidden md:table-cell">{item.contingencyPlan}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{item.leadTime}</TableCell>
+                      <TableCell className="hidden xl:table-cell">{item.contingencyPlan}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
