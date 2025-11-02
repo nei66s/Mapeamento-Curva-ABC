@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { PageHeader } from '@/components/shared/page-header';
 import { CategoryForm } from '@/components/dashboard/categories/category-form';
+import { CategoryBulkForm } from '@/components/dashboard/categories/category-bulk-form';
 import { mockCategories } from '@/lib/mock-data';
 import type { Category } from '@/lib/types';
 import { PlusCircle, MoreHorizontal, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
@@ -56,11 +57,12 @@ export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>(mockCategories);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkFormOpen, setIsBulkFormOpen] = useState(false);
   const { toast } = useToast();
 
   const handleFormSubmit = (values: Omit<Category, 'id' | 'itemCount' | 'riskIndex'>) => {
     if (selectedCategory) {
-      const updatedCategory = { ...selectedCategory, ...values };
+      const updatedCategory: Category = { ...selectedCategory, ...values };
       setCategories(
         categories.map(cat => (cat.id === selectedCategory.id ? updatedCategory : cat))
       );
@@ -68,22 +70,25 @@ export default function CategoriesPage() {
         title: 'Categoria Atualizada!',
         description: `A categoria "${values.name}" foi atualizada.`,
       });
-    } else {
-      const newCategory: Category = { 
-        ...values, 
-        id: `CAT-${Date.now()}`,
-        itemCount: 0,
-        riskIndex: 0,
-      };
-      setCategories([newCategory, ...categories]);
-      toast({
-        title: 'Categoria Adicionada!',
-        description: `A categoria "${values.name}" foi adicionada.`,
-      });
-    }
+    } 
     setIsFormOpen(false);
     setSelectedCategory(null);
   };
+  
+  const handleBulkSubmit = (newCategories: Omit<Category, 'id' | 'itemCount' | 'riskIndex'>[]) => {
+      const categoriesToAdd: Category[] = newCategories.map(cat => ({
+          ...cat,
+          id: `CAT-${Date.now()}-${Math.random()}`,
+          itemCount: 0,
+          riskIndex: 0, // Should be recalculated
+      }));
+      setCategories(prev => [...categoriesToAdd, ...prev]);
+      toast({
+          title: 'Categorias Adicionadas!',
+          description: `${categoriesToAdd.length} novas categorias foram adicionadas.`
+      });
+      setIsBulkFormOpen(false);
+  }
 
   const handleDeleteCategory = (categoryId: string) => {
     const deletedCategory = categories.find(cat => cat.id === categoryId);
@@ -102,9 +107,9 @@ export default function CategoriesPage() {
     setIsFormOpen(true);
   };
 
-  const openNewDialog = () => {
+  const openNewBulkDialog = () => {
     setSelectedCategory(null);
-    setIsFormOpen(true);
+    setIsBulkFormOpen(true);
   };
 
   return (
@@ -113,23 +118,20 @@ export default function CategoriesPage() {
         title="Categorias de Itens"
         description="Gerencie as categorias (macro) para organização dos itens."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog open={isBulkFormOpen} onOpenChange={setIsBulkFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openNewDialog} className="flex gap-2">
+            <Button onClick={openNewBulkDialog} className="flex gap-2">
               <PlusCircle />
-              Adicionar Categoria
+              Adicionar Categorias
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-              <DialogTitle>
-                {selectedCategory ? 'Editar Categoria' : 'Adicionar Nova Categoria'}
-              </DialogTitle>
+              <DialogTitle>Adicionar Novas Categorias</DialogTitle>
             </DialogHeader>
-            <CategoryForm
-              category={selectedCategory}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setIsFormOpen(false)}
+            <CategoryBulkForm
+                onSubmit={handleBulkSubmit}
+                onCancel={() => setIsBulkFormOpen(false)}
             />
           </DialogContent>
         </Dialog>
@@ -217,6 +219,19 @@ export default function CategoriesPage() {
           </Table>
         </CardContent>
       </Card>
+      
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Editar Categoria</DialogTitle>
+            </DialogHeader>
+            <CategoryForm
+              category={selectedCategory}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setIsFormOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }

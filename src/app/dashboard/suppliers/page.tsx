@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { PageHeader } from '@/components/shared/page-header';
 import { SupplierForm } from '@/components/dashboard/suppliers/supplier-form';
+import { SupplierBulkForm } from '@/components/dashboard/suppliers/supplier-bulk-form';
 import { mockSuppliers } from '@/lib/mock-data';
 import type { Supplier } from '@/lib/types';
 import { PlusCircle, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
@@ -55,6 +56,7 @@ export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isBulkFormOpen, setIsBulkFormOpen] = useState(false);
   const { toast } = useToast();
 
   const handleFormSubmit = (values: Omit<Supplier, 'id'>) => {
@@ -67,20 +69,23 @@ export default function SuppliersPage() {
         title: 'Fornecedor Atualizado!',
         description: `O fornecedor "${values.name}" foi atualizado.`,
       });
-    } else {
-      const newSupplier: Supplier = { 
-        ...values, 
-        id: `SUP-${Date.now()}`,
-      };
-      setSuppliers([newSupplier, ...suppliers]);
-      toast({
-        title: 'Fornecedor Adicionado!',
-        description: `O fornecedor "${values.name}" foi adicionado.`,
-      });
     }
     setIsFormOpen(false);
     setSelectedSupplier(null);
   };
+  
+  const handleBulkSubmit = (newSuppliers: Omit<Supplier, 'id'>[]) => {
+      const suppliersToAdd: Supplier[] = newSuppliers.map(sup => ({
+        ...sup,
+        id: `SUP-${Date.now()}-${Math.random()}`,
+      }));
+      setSuppliers(prev => [...suppliersToAdd, ...prev]);
+      toast({
+          title: 'Fornecedores Adicionados!',
+          description: `${suppliersToAdd.length} novos fornecedores foram adicionados.`
+      });
+      setIsBulkFormOpen(false);
+  }
 
   const handleDelete = (supplierId: string) => {
     const deleted = suppliers.find(sup => sup.id === supplierId);
@@ -99,9 +104,9 @@ export default function SuppliersPage() {
     setIsFormOpen(true);
   };
 
-  const openNewDialog = () => {
+  const openNewBulkDialog = () => {
     setSelectedSupplier(null);
-    setIsFormOpen(true);
+    setIsBulkFormOpen(true);
   };
 
   return (
@@ -110,23 +115,20 @@ export default function SuppliersPage() {
         title="Fornecedores"
         description="Gerencie fornecedores e prestadores de serviço."
       >
-        <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <Dialog open={isBulkFormOpen} onOpenChange={setIsBulkFormOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openNewDialog} className="flex gap-2">
+            <Button onClick={openNewBulkDialog} className="flex gap-2">
               <PlusCircle />
-              Adicionar Fornecedor
+              Adicionar Fornecedores
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
-              <DialogTitle>
-                {selectedSupplier ? 'Editar Fornecedor' : 'Adicionar Novo Fornecedor'}
-              </DialogTitle>
+              <DialogTitle>Adicionar Novos Fornecedores</DialogTitle>
             </DialogHeader>
-            <SupplierForm
-              supplier={selectedSupplier}
-              onSubmit={handleFormSubmit}
-              onCancel={() => setIsFormOpen(false)}
+            <SupplierBulkForm
+              onSubmit={handleBulkSubmit}
+              onCancel={() => setIsBulkFormOpen(false)}
             />
           </DialogContent>
         </Dialog>
@@ -206,6 +208,19 @@ export default function SuppliersPage() {
           </Table>
         </CardContent>
       </Card>
+      
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Editar Fornecedor</DialogTitle>
+            </DialogHeader>
+            <SupplierForm
+              supplier={selectedSupplier}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setIsFormOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }
