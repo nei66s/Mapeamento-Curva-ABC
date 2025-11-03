@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 const profileSchema = z.object({
   name: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres.'),
   email: z.string().email('Por favor, insira um e-mail válido.'),
-  avatarUrl: z.string().url({ message: 'Por favor, insira uma URL de imagem válida.' }).optional().or(z.literal('')),
+  avatarUrl: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -28,6 +28,7 @@ const getCurrentUser = () => mockUsers.find(u => u.role === 'admin');
 
 export default function ProfilePage() {
   const [user, setUser] = useState(getCurrentUser());
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ProfileFormData>({
@@ -124,19 +125,66 @@ export default function ProfilePage() {
                       )}
                     />
               </div>
-               <FormField
-                  control={form.control}
-                  name="avatarUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Label>URL da Imagem do Avatar</Label>
-                      <FormControl>
-                        <Input placeholder="https://exemplo.com/sua-imagem.png" {...field} />
-                      </FormControl>
-                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
+               <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="avatar"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      // Validar tipo de arquivo
+                      if (!file.type.startsWith('image/')) {
+                        toast({
+                          variant: 'destructive',
+                          title: 'Erro',
+                          description: 'Por favor, selecione apenas arquivos de imagem.',
+                        });
+                        return;
+                      }
+
+                      try {
+                        setIsUploading(true);
+                        const formData = new FormData();
+                        formData.append('file', file);
+
+                        const response = await fetch('/api/upload', {
+                          method: 'POST',
+                          body: formData,
+                        });
+
+                        if (!response.ok) throw new Error('Erro ao fazer upload');
+
+                        const data = await response.json();
+                        form.setValue('avatarUrl', data.imageUrl);
+                        
+                        toast({
+                          title: 'Sucesso!',
+                          description: 'Imagem enviada com sucesso.',
+                        });
+                      } catch (error) {
+                        toast({
+                          variant: 'destructive',
+                          title: 'Erro',
+                          description: 'Não foi possível fazer o upload da imagem.',
+                        });
+                      } finally {
+                        setIsUploading(false);
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('avatar')?.click()}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? 'Enviando...' : 'Alterar Foto'}
+                  </Button>
+                </div>
+                <input type="hidden" {...form.register('avatarUrl')} />
             </CardContent>
              <CardFooter>
                 <Button type="submit">Salvar Alterações</Button>
