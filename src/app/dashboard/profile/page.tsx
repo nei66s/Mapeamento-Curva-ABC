@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,6 +29,7 @@ const getCurrentUser = () => mockUsers.find(u => u.role === 'admin');
 export default function ProfilePage() {
   const [user, setUser] = useState(getCurrentUser());
   const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const form = useForm<ProfileFormData>({
@@ -86,56 +87,25 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="flex items-center gap-6">
+                <div className="flex flex-col items-center gap-2">
                   <Avatar className="h-20 w-20">
-                      {form.watch('avatarUrl') && <AvatarImage src={form.watch('avatarUrl')} alt={user.name} data-ai-hint="person avatar"/>}
-                      <AvatarFallback>{form.watch('name').charAt(0).toUpperCase()}</AvatarFallback>
+                    {form.watch('avatarUrl') && (
+                      <AvatarImage 
+                        src={form.watch('avatarUrl')} 
+                        alt={user.name} 
+                        data-ai-hint="person avatar"
+                      />
+                    )}
+                    <AvatarFallback>{form.watch('name').charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
-                  <div className="grid gap-1">
-                      <h3 className="text-lg font-semibold">{form.watch('name')}</h3>
-                      <p className="text-sm text-muted-foreground">{form.watch('email')}</p>
-                      <p className="text-sm font-medium text-primary capitalize">{user.role}</p>
-                  </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                   <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label>Nome</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label>Email</Label>
-                          <FormControl>
-                            <Input type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-              </div>
-               <div className="flex items-center gap-2">
-                  <input
+                  <Input
                     type="file"
                     accept="image/*"
-                    id="avatar"
-                    className="hidden"
+                    disabled={isUploading}
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
 
-                      // Validar tipo de arquivo
                       if (!file.type.startsWith('image/')) {
                         toast({
                           variant: 'destructive',
@@ -174,17 +144,49 @@ export default function ProfilePage() {
                         setIsUploading(false);
                       }
                     }}
+                    className="w-full max-w-[200px]"
                   />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById('avatar')?.click()}
-                    disabled={isUploading}
-                  >
-                    {isUploading ? 'Enviando...' : 'Alterar Foto'}
-                  </Button>
+                  {isUploading && (
+                    <p className="text-sm text-muted-foreground">Enviando...</p>
+                  )}
                 </div>
-                <input type="hidden" {...form.register('avatarUrl')} />
+                <div className="grid gap-1">
+                  <h3 className="text-lg font-semibold">{form.watch('name')}</h3>
+                  <p className="text-sm text-muted-foreground">{form.watch('email')}</p>
+                  <p className="text-sm font-medium text-primary capitalize">{user.role}</p>
+                </div>
+              </div>
+              <input type="hidden" {...form.register('avatarUrl')} />
+
+              <div className="grid md:grid-cols-2 gap-6">
+                   <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label>Nome</Label>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label>Email</Label>
+                          <FormControl>
+                            <Input type="email" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+              </div>
+
             </CardContent>
              <CardFooter>
                 <Button type="submit">Salvar Alterações</Button>
